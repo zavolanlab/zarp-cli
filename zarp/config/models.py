@@ -56,7 +56,7 @@ class ToolParams(BaseModel):
 
 class Sample(BaseModel):
     # TODO: docstring
-    file_paths: Tuple[str, Optional[None]]
+    file_paths: Optional[Tuple[str, Optional[None]]] = None
     ids: SampleIds = SampleIds()
     adapters: Adapters = Adapters()
     fragment_length_distribution: FragLenDist = FragLenDist()
