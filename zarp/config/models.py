@@ -111,3 +111,11 @@ class User(BaseModel):
     url: Optional[str] = None
     # TODO: allow URLs and local file paths or only one of the two?
     logo_location: Optional[str] = None
+
+
+# Unified config model
+class Config(BaseModel):
+    # TODO: docstring
+    sample: Sample
+    run: Run = Run()
+    user: User = User()
