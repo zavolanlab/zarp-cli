@@ -116,6 +116,6 @@ class User(BaseModel):
 # Unified config model
 class Config(BaseModel):
     # TODO: docstring
-    sample: Sample
+    samples: List[Sample] = []
     run: Run = Run()
     user: User = User()
