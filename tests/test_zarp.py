@@ -1,4 +1,4 @@
-"""Unit tests for module `zarp/zarp.py`."""
+"""Unit tests for module `zarp.zarp`."""
 
 import importlib.util
 from pathlib import Path
