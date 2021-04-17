@@ -160,6 +160,41 @@ class OutputFiles(Enum):
     TEMPORARY = "temporary"
 
 
+class RunModes(Enum):
+    """Snakemake run modes.
+
+    Args:
+        LOCAL: local execution
+        SLURM: execution on slurm cluster
+    """
+    LOCAL = "local"
+    SLURM = "slurm"
+
+
+class SnakemakeConfig(BaseModel):
+    """Snakemake-specific parameters for executing zarp
+
+    Args:
+        workdir: Path for working directory (within zarp directory).
+        snakefile: Snakefile, relative to workdir.
+        configfile: Configuration file for snakemake, relative to workdir.
+        local_cores: Number of local cores (only used if in cluster mode).
+        run_mode: Snakemake run mode.
+        cluster_config: File for cluster configuration.
+    """
+    workdir: Optional[str] = None
+    snakefile: str = "Snakefile"
+    configfile: str = "config/config.yaml"
+    local_cores: int = 2
+    run_mode: RunModes = RunModes.LOCAL
+    cluster_config: Optional[str] = None
+    printshellcmds: bool = True
+    force_incomplete: bool = True
+    notemp: bool = False
+    no_hooks: bool = False
+    verbose: bool = True
+
+
 class Run(BaseModel):
     """Run-specific parameters.
 
@@ -167,11 +202,12 @@ class Run(BaseModel):
         identifier: Unique identifier for a run.
         description: Run description.
         cores: Cores to use when running the analysis workflow.
-        configuration: Configuration file for parameter inference, general
-            Snakemake parameters and workflow-specific parameters.
+        htsinfer_config: Configuration file for parameter inference.
         execution_mode: Execution mode to use.
         tool_packaging: Tool packaging option to use.
         execution_profile: Configuration options for execution environment.
+        snakemake_config: General
+            Snakemake parameters and workflow-specific parameters
         keep_files: Types of output files to keep.
     """
     identifier: Optional[str] = None
@@ -181,7 +217,7 @@ class Run(BaseModel):
     execution_mode: ExecModes = ExecModes.RUN
     tool_packaging: ToolPackaging = ToolPackaging.CONDA
     execution_profile: Optional[str] = None
-    snakemake_config: Optional[str] = None
+    snakemake_config: SnakemakeConfig = None
     keep_files: List[OutputFiles] = [
         OutputFiles.CONFIGS,
         OutputFiles.LOGS,
