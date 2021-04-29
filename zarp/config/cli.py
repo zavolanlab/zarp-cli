@@ -3,9 +3,10 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from zarp import __version__
 # from pydantic import BaseModel
 # from pydantic_cli import run_and_exit
-
+LOGGER = logging.getLogger(__name__)
 
 def parse_cli_args() -> argparse.Namespace:
     """
@@ -16,7 +17,7 @@ def parse_cli_args() -> argparse.Namespace:
     """
     # set metadata
     __doc__ = "ZARP-cli argument parser"
-    __version__= 'v.0.1'
+
 
     description = (
         f"{sys.modules[__name__].__doc__}\n\n"
@@ -57,7 +58,6 @@ def parse_cli_args() -> argparse.Namespace:
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    # add arguments
     parser.add_argument(
         'samples',
         nargs="+",
@@ -65,8 +65,29 @@ def parse_cli_args() -> argparse.Namespace:
         action=PathsAction,
         metavar="PATH",
         help=(
-            "either one or two paths to FASTQ files representing the "
-            "sequencing library to be evaluated."
+            "paths to individual samples, ZARP sample tables and/or"
+            "SRA identifiers; see online documentation for details"
+        ),
+    )
+    parser.add_argument(
+        "-h", "--help",
+        action="help",
+        help="show this help message and exit",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=epilog,
+        help="show version information and exit",
+    )
+    parser.add_argument(
+        "--name",
+        required=False,
+        help=(
+            "name of each sample "
+            "if not specified, the sample name "
+            "is the sample id (or the concatenation in case of "
+            "multiple lanes or paired-end library) "
         ),
     )
     parser.add_argument(
@@ -74,31 +95,51 @@ def parse_cli_args() -> argparse.Namespace:
         default=Path.cwd(),
         type=lambda p: Path(p).absolute(),
         metavar="PATH",
-        help="path to directory where output is written to",
-    ) 
-    parser.add_argument(
-        "--name",
-        default="",
+        help="output directory",
+    )
+    annotation = parser.add_argument_group("organism annotation")
+    annotation.add_argument(
+        "--organism",
         help=(
-            "name corresponding to each sample to be analysed "
-            "if nothing is specified then the sample name "
-            "is the sample id (or the concatenation in case of "
-            "multiple lanes or paired-end library) "
+            "organism that the sample originates from "
         ),
     )
-    parser.add_argument(
-        "--read_orientation",
+    annotation.add_argument(
+        "--gtf",
+        type=str,
+        metavar="STR",
+        help=(
+            "gtf annotation file containing the transcript information"
+        ),
+    )
+    annotation.add_argument(
+        "--genome",
+        type=str,
+        metavar="STR",
+        help=(
+            "fasta file containing the chromosome sequences"
+        ),
+    )
+    processing = parser.add_argument_group("ZARP processing options")
+    processing.add_argument(
+        "--init",
+        required=True,
+        type=bool,
+        metavar="BOOL",
+        help=(
+            "config file containing ZARP rule-specific parameters" 
+        )
+    )
+    processing.add_argument(
+        "--read-orientation",
         required=False,
         type=str,
         metavar="STR",
         help=(
-            "description of the library type "
-            "paired-end, single-end protocol and "
-            "relative orientation of the reads "
+            "fragment library type (salmon compatible abbreviations) "
             "if not provided it will be inferred by htsinfer"
         ),
     )
-    processing = parser.add_argument_group("ZARP processing options")
     processing.add_argument(
         "--adapter-3p",
         default="XXX",
@@ -113,13 +154,33 @@ def parse_cli_args() -> argparse.Namespace:
         "--trim-polya",
         type=bool,
         default=False,
+        metavar="BOOL",
         help=(
             "remove poly-A tails from reads "
         ),
     )
+     
+    processing.add_argument(
+        "--fragment-length-mean",
+        default=100,
+        type=int,
+        metavar="INT",
+        help=(
+            "mean fragment size "
+        ),
+    )
+    processing.add_argument(
+        "--fragment-length-sd",
+        default=10,
+        type=int,
+        metavar="INT",
+        help=(
+            "standard deviation of fragment sizes "
+        ),
+    )
     # to be moved to the rule-specific config
-    parser.add_argument(
-        "---multimappers",
+    processing.add_argument(
+        "--multimappers",
         type=int,
         metavar="INT",
         default=40,
@@ -128,7 +189,7 @@ def parse_cli_args() -> argparse.Namespace:
         )
     )
     # to be moved to the rule-specific config
-    parser.add_argument(
+    processing.add_argument(
         "--soft-clip",
         choices=['Local', 'EndtoEnd'],
         default='EndtoEnd',
@@ -136,10 +197,7 @@ def parse_cli_args() -> argparse.Namespace:
             "STAR related choice of multimappers "
             "choices: {%(choices)s} "
         )
-    )
-    
-    
-    
+    ) 
     htsinfer = parser.add_argument_group("htsinfer options")
     htsinfer.add_argument(
         "--no-inference",
@@ -147,19 +205,20 @@ def parse_cli_args() -> argparse.Namespace:
         type=bool,
         metavar="BOOL",
         help=(
-            "if True then htsinfer is disabled "
-            "if htsinfer is disabled then library type"
-            "has to be specified "
+            "this option disables htsinfer inferences "
+            "if htsinfer is disabled, library type"
+            "has to be specified by the user"
         ),
     )
     htsinfer.add_argument(
         "--htsinfer-config",
-        default=False,
+        default=None,
+        type=Path,
+        metavar="PATH",
         help=(
-            " "
+            "htsinfer specific config"
         ),
     )
-    
     system = parser.add_argument_group("containers and system related options")
     system.add_argument(
         "--tool-packaging",
@@ -197,12 +256,13 @@ def parse_cli_args() -> argparse.Namespace:
     )
     verbosity = parser.add_argument_group("verbosity related options")
     verbosity.add_argument(
-        "---no-report",
+        "--no-report",
         default=False,
         type=bool,
         metavar="BOOL",
         help=(
-            "optional output of the reports of ZARP "
+            "this option disables the reports of ZARP"
+            "(multiqc and snakemake) "
         ),
     )
     verbosity.add_argument(
@@ -216,48 +276,10 @@ def parse_cli_args() -> argparse.Namespace:
             "choices: {%(choices)s} "
         ),
     )
-    parser.add_argument(
-        "--fragment-length-mean",
-        default=100,
-        type=int,
-        metavar="INT",
-        help=(
-            "mean fragment size "
-        ),
-    )
-    parser.add_argument(
-        "--fragment-length-sd",
-        default=10,
-        type=int,
-        metavar="INT",
-        help=(
-            "standard deviation of fragment sizes "
-        ),
-    )
-    parser.add_argument(
-        "--organism",
-        help=(
-            "organism that the sample originates from "
-        ),
-    )
-    parser.add_argument(
-        "--gtf",
-        type=str,
-        metavar="STR",
-        help=(
-            "gtf annotation file containing the transcript information"
-        ),
-    )
-    parser.add_argument(
-        "--genome",
-        type=str,
-        metavar="STR",
-        help=(
-            "fasta file containing the chromosome sequences"
-        ),
-    )
 
-    parser.add_argument(
+    report = parser.add_argument_group("report")
+        
+    report.add_argument(
         "--run-description",
         default="",
         type=str,
@@ -266,7 +288,6 @@ def parse_cli_args() -> argparse.Namespace:
             "text description about the samples included"
         )
     )
-    report = parser.add_argument_group("report")
     report.add_argument(
         "--run-identifier",
         default=None,
@@ -312,26 +333,6 @@ def parse_cli_args() -> argparse.Namespace:
         help=(
             "user email that will appear in the multiqc report "    
         )
-    )
-    parser.add_argument(
-        "--init",
-        default=True,
-        type=bool,
-        metavar="BOOL",
-        help=(
-            "" 
-        )
-    )
-    parser.add_argument(
-        "-h", "--help",
-        action="help",
-        help="show this help message and exit",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=epilog,
-        help="show version information and exit",
     )
     args = parser.parse_args()
 
