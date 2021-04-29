@@ -8,7 +8,7 @@ from zarp import __version__
 # from pydantic_cli import run_and_exit
 LOGGER = logging.getLogger(__name__)
 
-def parse_cli_args() -> argparse.Namespace:
+def parse_args() -> argparse.Namespace:
     """
     Parse command line (CLI) arguments.
 
@@ -123,9 +123,7 @@ def parse_cli_args() -> argparse.Namespace:
     processing = parser.add_argument_group("ZARP processing options")
     processing.add_argument(
         "--init",
-        required=True,
-        type=bool,
-        metavar="BOOL",
+        action="store_false",
         help=(
             "config file containing ZARP rule-specific parameters" 
         )
@@ -343,14 +341,18 @@ def main() -> None:
     """Entry point for CLI executable."""
     try:
         # handle CLI args
-        args = parse_cli_args()
+        args = parse_args()
+        # set up logging
+        LOGGER.info("Started ZARP-cli...")
+        LOGGER.debug(f"CLI arguments: {args}")
+
     except KeyboardInterrupt:
         LOGGER.error('Execution interrupted.')
         sys.exit(128 + signal.SIGINT)
 
     # conclude execution
     LOGGER.info("Done")
-    sys.exit(hts_infer.state.value)
+    sys.exit(0)
 
 
 
