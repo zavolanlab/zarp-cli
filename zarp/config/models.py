@@ -172,21 +172,21 @@ class RunModes(Enum):
 
 
 class SnakemakeConfig(BaseModel):
-    """Snakemake-specific parameters for executing zarp
+    """Snakemake-specific parameters for executing zarp. 
+    Only Snakemake API args allowed.
 
     Args:
         workdir: Path for working directory (within zarp directory).
         snakefile: Snakefile, relative to workdir.
         configfile: Configuration file for snakemake, relative to workdir.
         local_cores: Number of local cores (only used if in cluster mode).
-        run_mode: Snakemake run mode.
         cluster_config: File for cluster configuration.
     """
     workdir: Optional[str] = None
     snakefile: str = "Snakefile"
-    configfile: str = "config/config.yaml"
+    configfiles: list = ["config.yaml"]
     local_cores: int = 2
-    run_mode: RunModes = RunModes.LOCAL
+    cluster: Optional[str] = None
     cluster_config: Optional[str] = None
     printshellcmds: bool = True
     force_incomplete: bool = True
@@ -204,25 +204,28 @@ class Run(BaseModel):
         cores: Cores to use when running the analysis workflow.
         htsinfer_config: Configuration file for parameter inference.
         execution_mode: Execution mode to use.
+        run_mode: Snakemake run mode.
         tool_packaging: Tool packaging option to use.
         execution_profile: Configuration options for execution environment.
-        snakemake_config: General
-            Snakemake parameters and workflow-specific parameters
         keep_files: Types of output files to keep.
+        genome_resources: Genome resource description.
+        config_file: Configuration file 
     """
     identifier: Optional[str] = None
     description: Optional[str] = None
     cores: int = 1
     htsinfer_config: Optional[str] = None
-    execution_mode: ExecModes = ExecModes.RUN
+    execution_mode: ExecModes = ExecModes.DRY_RUN
+    run_mode: RunModes = RunModes.LOCAL
     tool_packaging: ToolPackaging = ToolPackaging.CONDA
     execution_profile: Optional[str] = None
-    snakemake_config: SnakemakeConfig = None
     keep_files: List[OutputFiles] = [
         OutputFiles.CONFIGS,
         OutputFiles.LOGS,
         OutputFiles.RESULTS,
     ]
+    genome_resources: Optional[GenomeResources] = None
+    config_file: Optional[str] = None
 
 
 # User-specific enumerators and models
@@ -259,8 +262,11 @@ class Config(BaseModel):
     Attributes:
         sample: Sample-specific parameters.
         run: Run-specific parameters.
+        snakemake_config: General
+            Snakemake parameters and workflow-specific parameters
         user: User-specific parameters.
     """
     samples: List[Sample] = []
     run: Run = Run()
+    snakemake_config: Optional[SnakemakeConfig] = None
     user: User = User()
