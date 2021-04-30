@@ -15,13 +15,15 @@ class Snakemake:
     """Output file types.
 
     Args:
-        RUN: Run specific configuration.
-        SNAKEMAKE_CONFIG: Snakemake configuration.
-
+        run: Run specific configuration.
+        snakemake_config: Snakemake configuration.
+    
     Attributes:
-        run_dict:
-        config_dict:
+        run_dict: Dictionary from Run specific configuration.
+        config_dict: Dictionary from Snakemake configuration.
+        success (bool): True if snakemake run successful, False if not.
     """
+
     def __init__(self, run: Run, snakemake_config: SnakemakeConfig) -> None:
         self.run_dict = run.dict()
         self.config_dict = snakemake_config.dict()
@@ -29,7 +31,12 @@ class Snakemake:
 
     def prepare_run(self) -> bool:
         """ Prepare Snakemake run.
+        
         Translate Run entries to Snakemake API keywords.
+        This will add or adjust config_dict based on values in run_dict.
+
+        Returns:
+            True if success, False otherwise.
         """
         try:
             # Define cores
@@ -49,7 +56,10 @@ class Snakemake:
             return False
         
     def run(self) -> None:
-        """Run snakemake command with supplied dictionary
+        """Run snakemake command with supplied dictionary.
+
+        The attribute config_dict is passed to snakemake.
+        The attribute success is set according to snakemake return value.
         """
         try:
             self.success = snakemake.snakemake(**self.config_dict)
