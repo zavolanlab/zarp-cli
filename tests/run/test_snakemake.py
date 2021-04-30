@@ -1,9 +1,5 @@
 """Unit tests for module zarp.run.snakemake"""
 
-import os
-import snakemake
-import sys
-
 import pytest
 
 from zarp.config.models import (
@@ -11,11 +7,6 @@ from zarp.config.models import (
     Run
 )
 import zarp.run.snakemake as snk
-
-@pytest.fixture
-def setup_config():
-    """Setup configuration files"""
-    pass
 
 @pytest.fixture
 def snakemake_with_default_args():
@@ -36,7 +27,9 @@ class TestSnakemake:
         assert type(mysnk.config_dict['configfiles']) == list
 
     def test_default_run(self, snakemake_with_default_args):
-        """Prepare run with default args and run. """
+        """Prepare run with default args and run. 
+        Snakemake will not successfully finish, as files are not found.
+        """
         mysnk = snakemake_with_default_args
         assert mysnk.prepare_run()
         assert mysnk.success is None
