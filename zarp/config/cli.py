@@ -3,9 +3,11 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from zarp import __version__
-# from pydantic import BaseModel
-# from pydantic_cli import run_and_exit
+from zarp.zarp import (
+    ZARP,
+    __version__
+)
+
 LOGGER = logging.getLogger(__name__)
 
 def parse_args() -> argparse.Namespace:
@@ -91,7 +93,7 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--output-directory",
+        "-o", "--output-directory",
         default=Path.cwd(),
         type=lambda p: Path(p).absolute(),
         metavar="PATH",
@@ -157,7 +159,7 @@ def parse_args() -> argparse.Namespace:
             "remove poly-A tails from reads "
         ),
     )
-     
+
     processing.add_argument(
         "--fragment-length-mean",
         default=100,
@@ -336,7 +338,6 @@ def parse_args() -> argparse.Namespace:
 
     return args
 
-
 def main() -> None:
     """Entry point for CLI executable."""
     try:
@@ -345,6 +346,37 @@ def main() -> None:
         # set up logging
         LOGGER.info("Started ZARP-cli...")
         LOGGER.debug(f"CLI arguments: {args}")
+        zarp = ZARP(
+            sample_1=args.samples[0],
+            sample_2=args.samples[1],
+            name=args.name,
+            output_directory=args.output_directory,
+            organism=args.organism,
+            gtf=args.gtf,
+            genome=args.genome,
+            init=args.init,
+            read_orientation=args.read_orientation,
+            adapter_3p=args.adapter_3p,
+            trim_polya=args.trim_polya,
+            fragment_length_mean=args.fragment_length_mean,
+            fragment_length_sd=args.fragment_length_sd,
+            multimappers=args.multimappers,
+            soft_clip=args.soft_clip,
+            no_inference=args.no_inference,
+            htsinfer_config=args.htsinfer_config,
+            tool_packaging=args.tool_packaging,
+            profile=args.profile,
+            execution_mode=args.execution_mode,
+            no_report=args.no_report,
+            delete_files=args.delete_files,
+            run_description=args.run_description,
+            run_identifier=args.run_identifier,
+            logo=args.logo,
+            url=args.url,
+            author=args.author,
+            author_email=args.author_email,
+        )
+        zarp.evaluate()
 
     except KeyboardInterrupt:
         LOGGER.error('Execution interrupted.')
@@ -353,7 +385,6 @@ def main() -> None:
     # conclude execution
     LOGGER.info("Done")
     sys.exit(0)
-
 
 
 if __name__ == '__main__':
