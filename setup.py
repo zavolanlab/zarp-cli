@@ -49,7 +49,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'zarp = zarp.zarp:main',
+            'zarp = zarp.config.cli:main',
         ],
     },
     keywords=[
