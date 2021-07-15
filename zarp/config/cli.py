@@ -1,16 +1,33 @@
 #!/usr/bin/env python3
+"""Command-line interface client."""
+
 import argparse
+from enum import Enum
 import logging
-import sys
 from pathlib import Path
-from zarp.zarp import (
-    ZARP,
-    __version__
-)
+import signal
+import sys
+from typing import (Optional, Sequence)
+
+from zarp import __version__
+from zarp.zarp import ZARP
 
 LOGGER = logging.getLogger(__name__)
 
-def parse_args() -> argparse.Namespace:
+
+class LogLevels(Enum):
+    """Log level enumerator."""
+    DEBUG = logging.DEBUG
+    INFO = logging.INFO
+    WARN = logging.WARNING
+    WARNING = logging.WARNING
+    ERROR = logging.ERROR
+    CRITICAL = logging.CRITICAL
+
+
+def parse_args(
+    args: Optional[Sequence[str]] = None
+) -> argparse.Namespace:
     """
     Parse command line (CLI) arguments.
 
@@ -18,9 +35,6 @@ def parse_args() -> argparse.Namespace:
         Parsed CLI arguments
     """
     # set metadata
-    __doc__ = "ZARP-cli argument parser"
-
-
     description = (
         f"{sys.modules[__name__].__doc__}\n\n"
         ""
@@ -45,43 +59,25 @@ def parse_args() -> argparse.Namespace:
             if len(values) > 2:
                 parser.print_usage(file=sys.stderr)
                 sys.stderr.write(
-                    "zarp-cli: error: only one or two of the following "
+                    "zarp-cli: error: not more than two of the following "
                     "arguments are allowed: PATH\n"
                 )
                 parser.exit(2)
-            if len(values) == 1:
+            elif len(values) == 1:
                 values.append(None)
+            elif len(values) == 0:
+                values += [None, None]
             setattr(namespace, self.dest, values)
 
-    # instantiate parser
+    # Instantiate parser
     parser = argparse.ArgumentParser(
         description=description,
         epilog=epilog,
         add_help=False,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        'samples',
-        nargs="+",
-        type=Path,
-        action=PathsAction,
-        metavar="PATH",
-        help=(
-            "paths to individual samples, ZARP sample tables and/or"
-            "SRA identifiers; see online documentation for details"
-        ),
-    )
-    parser.add_argument(
-        "-h", "--help",
-        action="help",
-        help="show this help message and exit",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=epilog,
-        help="show version information and exit",
-    )
+
+    # Positional parameters
     parser.add_argument(
         "--name",
         required=False,
@@ -89,7 +85,7 @@ def parse_args() -> argparse.Namespace:
             "name of each sample "
             "if not specified, the sample name "
             "is the sample id (or the concatenation in case of "
-            "multiple lanes or paired-end library) "
+            "multiple lanes or paired-end library)"
         ),
     )
     parser.add_argument(
@@ -97,39 +93,108 @@ def parse_args() -> argparse.Namespace:
         default=Path.cwd(),
         type=lambda p: Path(p).absolute(),
         metavar="PATH",
-        help="output directory",
+        help="directory where output shall be written",
     )
-    annotation = parser.add_argument_group("organism annotation")
-    annotation.add_argument(
-        "--organism",
-        help=(
-            "organism that the sample originates from "
-        ),
-    )
-    annotation.add_argument(
-        "--gtf",
-        type=str,
-        metavar="STR",
-        help=(
-            "gtf annotation file containing the transcript information"
-        ),
-    )
-    annotation.add_argument(
-        "--genome",
-        type=str,
-        metavar="STR",
-        help=(
-            "fasta file containing the chromosome sequences"
-        ),
-    )
-    processing = parser.add_argument_group("ZARP processing options")
-    processing.add_argument(
-        "--init",
-        action="store_false",
-        help=(
-            "config file containing ZARP rule-specific parameters" 
+
+    run_modes = parser.add_argument_group(
+        title="run modes",
+        description=(
+            "Specifying any of the options in this group will cause ZARP-cli "
+            "to behave differently then the default mode. Generally, most "
+            "other parameters are not required and will be ignored in these "
+            "cases."
         )
     )
+    run_modes.add_argument(
+        "--init",
+        default=False,
+        action="store_true",
+        help="edit user-level default parameters and exit",
+    )
+    run_modes.add_argument(
+        "-h", "--help",
+        action="help",
+        help="show this help message and exit",
+    )
+    run_modes.add_argument(
+        "--version",
+        action="version",
+        version=epilog,
+        help="show version information and exit",
+    )
+
+    # Sample-specific parameters
+    sample = parser.add_argument_group(
+        title="sample-related options",
+        description=(
+            "Specify the values for any sample-related parameters. If "
+            "provided via the command line, the same values will be applied "
+            "to all samples. When analyzing multiple samples and samples "
+            "either originate different sources and/or shall be processed "
+            "with different genome resources, these values should be "
+            "specified in a sample table instead. Alternatively, you can make "
+            "use of the inference functionality to infer the sample source "
+            "and use or retrieve the corresponding genome resources as per "
+            "your ZARP-cli configuration."
+        )
+    )
+    # TODO: ids, read layout
+    sample.add_argument(
+        'samples',
+        nargs="*",
+        type=Path,
+        action=PathsAction,
+        metavar="PATH",
+        help=(
+            "paths to individual samples, ZARP sample tables and/or "
+            "SRA identifiers; see online documentation for details"
+        ),
+    )
+    sample.add_argument(
+        "--fragment-length-mean",
+        default=100,
+        type=int,
+        metavar="INT",
+        help=(
+            "mean of the fragment length distribution"
+        ),
+    )
+    sample.add_argument(
+        "--fragment-length-sd",
+        default=10,
+        type=int,
+        metavar="INT",
+        help=(
+            "standard deviation of the fragment length distribution"
+        ),
+    )
+    sample.add_argument(
+        "--sample-source",
+        help=(
+            "origin of the sample as either a NCBI taxonomy database "
+            "identifier, e.g, 9606 for humans, or the corresponding full "
+            "name, e.g., 'Homo sapiens'."
+        )
+    )
+    sample.add_argument(
+        "--annotations",
+        type=str,
+        metavar="STR",
+        help=(
+            "gene annotation file matching the `--organism`, in GTF format"
+        ),
+    )
+    sample.add_argument(
+        "--reference-sequences",
+        type=str,
+        metavar="STR",
+        help=(
+            "file containing reference/chromosome sequences matching the "
+            "`--organism`, in FASTA format"
+        ),
+    )
+
+    processing = parser.add_argument_group("ZARP processing options")
     processing.add_argument(
         "--read-orientation",
         required=False,
@@ -145,10 +210,7 @@ def parse_args() -> argparse.Namespace:
         default="XXX",
         type=str,
         metavar="STR",
-        help=(
-            "3 prime end adapter used in the protocol "
-            "if not provided it will be inferred by htsinfer "
-        ),
+        help="3'-end adapter, truncated during preprocessing",
     )
     processing.add_argument(
         "--trim-polya",
@@ -156,28 +218,10 @@ def parse_args() -> argparse.Namespace:
         default=False,
         metavar="BOOL",
         help=(
-            "remove poly-A tails from reads "
+            "remove poly-A tails from reads"
         ),
     )
 
-    processing.add_argument(
-        "--fragment-length-mean",
-        default=100,
-        type=int,
-        metavar="INT",
-        help=(
-            "mean fragment size "
-        ),
-    )
-    processing.add_argument(
-        "--fragment-length-sd",
-        default=10,
-        type=int,
-        metavar="INT",
-        help=(
-            "standard deviation of fragment sizes "
-        ),
-    )
     # to be moved to the rule-specific config
     processing.add_argument(
         "--multimappers",
@@ -185,7 +229,7 @@ def parse_args() -> argparse.Namespace:
         metavar="INT",
         default=40,
         help=(
-            "STAR related choice of multimappers "
+            "STAR related choice of multimappers"
         )
     )
     # to be moved to the rule-specific config
@@ -195,10 +239,18 @@ def parse_args() -> argparse.Namespace:
         default='EndtoEnd',
         help=(
             "STAR related choice of multimappers "
-            "choices: {%(choices)s} "
+            "choices: {%(choices)s}"
         )
-    ) 
-    htsinfer = parser.add_argument_group("htsinfer options")
+    )
+
+    # Parameters related to the inference of missing sample metadata
+    htsinfer = parser.add_argument_group(
+        title="metadata inference options",
+        description=(
+            "Specify if and how sample metadata sniffing shall be performed "
+            "via HTSinfer."
+        )
+    )
     htsinfer.add_argument(
         "--no-inference",
         default=False,
@@ -219,6 +271,7 @@ def parse_args() -> argparse.Namespace:
             "htsinfer specific config"
         ),
     )
+
     system = parser.add_argument_group("containers and system related options")
     system.add_argument(
         "--tool-packaging",
@@ -228,9 +281,9 @@ def parse_args() -> argparse.Namespace:
         metavar="STR",
         help=(
             "choose container environment, "
-            "choices: {%(choices)s} "
+            "choices: {%(choices)s}"
         ),
-    ) 
+    )
     system.add_argument(
         "--profile",
         choices=["slurm", "local"],
@@ -239,7 +292,7 @@ def parse_args() -> argparse.Namespace:
         metavar="STR",
         help=(
             "choose cluster environment "
-            "choices: {%(choices)s} "
+            "choices: {%(choices)s}"
         ),
     )
     system.add_argument(
@@ -251,10 +304,18 @@ def parse_args() -> argparse.Namespace:
         help=(
             "mode of execution only the option `run` "
             "will create the final results "
-            "choices: {%(choices)s} "
+            "choices: {%(choices)s}"
         ),
     )
+
     verbosity = parser.add_argument_group("verbosity related options")
+    verbosity.add_argument(
+         "--verbosity",
+         choices=[e.name for e in LogLevels],
+         default="INFO",
+         type=str,
+         help="logging verbosity level",
+     )
     verbosity.add_argument(
         "--no-report",
         default=False,
@@ -262,7 +323,7 @@ def parse_args() -> argparse.Namespace:
         metavar="BOOL",
         help=(
             "this option disables the reports of ZARP"
-            "(multiqc and snakemake) "
+            "(multiqc and snakemake)"
         ),
     )
     verbosity.add_argument(
@@ -273,12 +334,11 @@ def parse_args() -> argparse.Namespace:
         metavar="STR",
         help=(
             "remove files after ZARP has finished "
-            "choices: {%(choices)s} "
+            "choices: {%(choices)s}"
         ),
     )
 
     report = parser.add_argument_group("report")
-        
     report.add_argument(
         "--run-description",
         default="",
@@ -295,7 +355,7 @@ def parse_args() -> argparse.Namespace:
         metavar="STR",
         help=(
             "identifier specific to the run "
-            "make sure this is unique "
+            "make sure this is unique"
         )
     )
     report.add_argument(
@@ -304,7 +364,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         metavar="STR",
         help=(
-            "logo that will appear in the multiqc report "    
+            "logo that will appear in the multiqc report"
         )
     )
     report.add_argument(
@@ -313,7 +373,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         metavar="STR",
         help=(
-            "url that will appear in the multiqc report "    
+            "url that will appear in the multiqc report"
         )
     )
     report.add_argument(
@@ -322,7 +382,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         metavar="STR",
         help=(
-            "user information that will appear in the multiqc report "    
+            "user information that will appear in the multiqc report"
         )
     )
     report.add_argument(
@@ -331,20 +391,62 @@ def parse_args() -> argparse.Namespace:
         type=str,
         metavar="STR",
         help=(
-            "user email that will appear in the multiqc report "    
+            "user email that will appear in the multiqc report"
         )
     )
-    args = parser.parse_args()
 
-    return args
+    # parse CLI args
+    args_parsed = parser.parse_args(args)
+
+    # fix faulty usage string for nargs={1,2}
+    parser.usage = parser.format_usage()
+    parser.usage = parser.usage.replace("PATH [PATH ...]", "PATH [PATH]")
+
+    # check for required arguments
+    if all(e is None for e in args_parsed.samples) and not args_parsed.init:
+        parser.print_usage(file=sys.stderr)
+        print(
+            "zarp-cli: error: at least one of the following arguments "
+            "required if not in init mode: PATH"
+        )
+        sys.exit(1)
+
+    return args_parsed
+
+
+def setup_logging(
+    verbosity: str = 'INFO',
+) -> None:
+    """Configure logging."""
+    level = LogLevels[verbosity].value
+    logging.basicConfig(
+        level=level,
+        format="[%(asctime)s] %(message)s",
+        datefmt='%m-%d %H:%M:%S',
+    )
+
 
 def main() -> None:
     """Entry point for CLI executable."""
     try:
         # handle CLI args
         args = parse_args()
+
         # set up logging
-        LOGGER.info("Started ZARP-cli...")
+        setup_logging(verbosity=args.verbosity)
+        messages = {e.value: [] for e in LogLevels}
+        messages[logging.DEBUG].append('Logging set up')
+
+        # log startup messages
+        if not args.init:
+            LOGGER.info("Starting ZARP-cli...")
+        else:
+            LOGGER.info("Starting ZARP-cli in init mode...")
+        for lvl, msgs in messages.items():
+            for msg in msgs:
+                LOGGER.log(lvl, msg)
+
+        # initialize ZARP-cli
         LOGGER.debug(f"CLI arguments: {args}")
         zarp = ZARP(
             sample_1=args.samples[0],

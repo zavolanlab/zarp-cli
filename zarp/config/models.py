@@ -55,8 +55,27 @@ class FragLenDist(BaseModel):
     sd: float = 100
 
 
+class SampleSource(BaseModel):
+    """Origin of the sample, such as an organism, a particular tissue type or
+    a cell line.
+
+    Args:
+        id: NCBI Taxonomy ID of the sample source, e.g., 9606 for humans.
+        name: Full name of the sample source, according to the NCBI taxonomy
+            database, e.g., "Homo sapiens" for humans.
+
+    Attributes:
+        id: NCBI Taxonomy ID of the sample source, e.g., 9606 for humans.
+        name: Full name of the sample source, according to the NCBI taxonomy
+            database, e.g., "Homo sapiens" for humans.
+    """
+    id: Optional[int] = None
+    name: Optional[str] = None
+
+
 class GenomeResources(BaseModel):
-    """Genome resources to be used for mapping reads and annotating alignments.
+    """Genome resources to be used for mapping reads and annotating the
+    sequence library.
 
     Args:
         reference_sequences: Path to FASTA file containing reference sequences
@@ -86,6 +105,10 @@ class Sample(BaseModel):
             reads.
         fragment_length_distribution: Fragment length distribution parameters
             of the sequencing library.
+        sample_source: Origin of the sample, such as an organism, a particular
+            tissue type or a cell line
+        genome_resources: Genome resources to be used for mapping reads and
+            annotating the sequence library.
 
     Attributes:
         file_paths: Paths to FASTQ files of a sequencing library.
@@ -94,11 +117,17 @@ class Sample(BaseModel):
             reads.
         fragment_length_distribution: Fragment length distribution parameters
             of the sequencing library.
+        sample_source: Origin of the sample, such as an organism, a particular
+            tissue type or a cell line
+        genome_resources: Genome resources to be used for mapping reads and
+            annotating the sequence library.
     """
     file_paths: Optional[Tuple[str, Optional[None]]] = None
     ids: SampleIds = SampleIds()
     read_layout: ReadLayout = ReadLayout()
     fragment_length_distribution: FragLenDist = FragLenDist()
+    sample_source: SampleSource = SampleSource()
+    genome_resources: GenomeResources = GenomeResources()
 
 
 # Run-specific enumerators and models
