@@ -3,8 +3,11 @@
 import pytest
 
 from zarp.config.models import (
+    ExecModes,
     SnakemakeConfig,
-    Run
+    Run,
+    RunModes,
+    ToolPackaging
 )
 import zarp.run.snakemake as snk
 
@@ -48,3 +51,36 @@ class TestSnakemake:
         mysnk.prepare_run()
         mysnk.run()
         assert not mysnk.success
+
+    def test_execution_mode(self, snakemake_with_default_args):
+        """Change default ExecMode and check the change.
+        """
+        # default run: dry run
+        mysnk_default = snakemake_with_default_args
+        mysnk_default.prepare_run()
+        assert mysnk_default.config_dict['dryrun']
+        # Normal run
+        myrun = Run(execution_mode = ExecModes.RUN)
+        mysnk = snk.Snakemake(myrun, SnakemakeConfig())
+        mysnk.prepare_run()
+        assert not mysnk.config_dict['dryrun']
+    
+    def test_snakemake_profile(self):
+        """Initialise Run with non-default profile.
+        Check whether profile is correctly added.
+        """
+        myrun = Run(run_mode = RunModes.SLURM,
+            tool_packaging = ToolPackaging.SINGULARITY,
+            cores = 4)
+        assert myrun.run_mode == RunModes.SLURM
+        assert myrun.cores == 4
+        mysnk = snk.Snakemake(myrun, SnakemakeConfig())
+        with pytest.raises(KeyError):
+            mysnk.config_dict['cores']
+        assert mysnk.config_dict['profile'] == "profiles/local-conda"
+        
+        mysnk.prepare_run()
+        assert mysnk.config_dict['cores'] == 4
+        assert mysnk.run_dict['run_mode'] == RunModes.SLURM
+        assert mysnk.run_dict['tool_packaging'] == ToolPackaging.SINGULARITY
+        assert mysnk.config_dict['profile'] == "profiles/slurm-singularity"

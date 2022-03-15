@@ -17,7 +17,7 @@ class Snakemake:
     Args:
         run: Run specific configuration.
         snakemake_config: Snakemake configuration.
-    
+
     Attributes:
         run_dict: Dictionary from Run specific configuration.
         config_dict: Dictionary from Snakemake configuration.
@@ -31,7 +31,7 @@ class Snakemake:
 
     def prepare_run(self) -> bool:
         """ Prepare Snakemake run.
-        
+
         Translate Run entries to Snakemake API keywords.
         This will add or adjust config_dict based on values in run_dict.
 
@@ -41,20 +41,24 @@ class Snakemake:
         try:
             # Define cores
             self.config_dict['cores'] = self.run_dict['cores']
-            # Singularity
-            if self.run_dict['tool_packaging'] == ToolPackaging.SINGULARITY:
-                self.config_dict['use_singularity'] = True
-                self.config_dict['singularity_args'] = self.run_dict['execution_profile']
-            # Conda
-            if self.run_dict['tool_packaging'] == ToolPackaging.CONDA:
-                self.config_dict['use_conda'] = True
-                # additional args to conda
-            self.config_dict['dryrun'] = (True if 
+            # dryrun
+            self.config_dict['dryrun'] = (True if
                 self.run_dict['execution_mode'] == ExecModes.DRY_RUN else False)
+            # Run mode (with profile)
+            if self.run_dict['run_mode'] == RunModes.LOCAL:
+                if self.run_dict['tool_packaging'] == ToolPackaging.CONDA:
+                    self.config_dict['profile'] = "profiles/local-conda"
+                if self.run_dict['tool_packaging'] == ToolPackaging.SINGULARITY:
+                    self.config_dict['profile'] = "profiles/local-singularity"
+            if self.run_dict['run_mode'] == RunModes.SLURM:
+                if self.run_dict['tool_packaging'] == ToolPackaging.CONDA:
+                    self.config_dict['profile'] = "profiles/slurm-conda"
+                if self.run_dict['tool_packaging'] == ToolPackaging.SINGULARITY:
+                    self.config_dict['profile'] = "profiles/slurm-singularity"
             return True
         except KeyError:
             return False
-        
+
     def run(self) -> None:
         """Run snakemake command with supplied dictionary.
 

@@ -172,7 +172,7 @@ class RunModes(Enum):
 
 
 class SnakemakeConfig(BaseModel):
-    """Snakemake-specific parameters for executing zarp. 
+    """Snakemake-specific parameters for executing zarp.
     Only Snakemake API args allowed.
 
     Args:
@@ -180,14 +180,13 @@ class SnakemakeConfig(BaseModel):
         snakefile: Snakefile, relative to workdir.
         configfile: Configuration file for snakemake, relative to workdir.
         local_cores: Number of local cores (only used if in cluster mode).
-        cluster_config: File for cluster configuration.
+        profile: Path for profile.
     """
     workdir: Optional[str] = None
     snakefile: str = "Snakefile"
     configfiles: list = ["config.yaml"]
     local_cores: int = 2
-    cluster: Optional[str] = None
-    cluster_config: Optional[str] = None
+    profile: str = "profiles/local-conda"
     printshellcmds: bool = True
     force_incomplete: bool = True
     notemp: bool = False
@@ -209,7 +208,7 @@ class Run(BaseModel):
         execution_profile: Configuration options for execution environment.
         keep_files: Types of output files to keep.
         genome_resources: Genome resource description.
-        config_file: Configuration file 
+        config_file: Configuration file
     """
     identifier: Optional[str] = None
     description: Optional[str] = None
