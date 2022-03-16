@@ -68,7 +68,15 @@ ZARP-CLI arguments:
 
 ## Installation
 
-TBA
+Create virtual environment and install dependencies
+```bash
+python3 -m venv ~/virtualenv/py-zarp-cli
+source ~/virtualenv/py-zarp-cli/bin/activate
+pip install -r requirements.txt
+pip install -r requirements_dev.txt
+python setup.py install
+```
+
 
 ## Contributing
 
