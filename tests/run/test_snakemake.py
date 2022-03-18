@@ -61,3 +61,20 @@ class TestSnakemakeExecutor:
         assert snke.run_list == exp_list
         snke.run()
         assert not snke.get_success()
+
+    def test_set_run_list(self):
+        """Test setting a new run_list"""
+        snke = snakemake.SnakemakeExecutor(Run())
+        assert snke.get_run_list() == []
+        snke.set_run_list(["snakemake"])
+        assert snke.get_run_list() == ["snakemake"]
+        snke.prepare_run(snkfile= "Snakefile", workdir = ".")
+        assert snke.get_run_list() == ["snakemake", "--snakefile", 
+            "Snakefile", "--cores", "1"]
+
+    def test_validate_run(self):
+        """Test validation of run."""
+        snke = snakemake.SnakemakeExecutor(Run())
+        assert not snke.validate_run()
+        snke.prepare_run(snkfile = "Snakefile", workdir = ".")
+        assert snke.validate_run()

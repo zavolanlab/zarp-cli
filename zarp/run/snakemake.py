@@ -15,6 +15,7 @@ class SnakemakeExecutor:
     Attributes:
         run_dict (dict): Dictionary with run-specific parameters.
         success (bool): Indicator for successful snakemake run.
+        run_list (list): List containing strings for snakemake call.
     
     Example:
         The example below expects a valid `Snakefile` in the current working
@@ -30,6 +31,20 @@ class SnakemakeExecutor:
         """Class constructor."""
         self.run_dict = run.dict()
         self.success = None
+        self.run_list = []
+
+    def set_run_list(self, run_list: list) -> None:
+        """Set run list."""
+        self.run_list = run_list
+
+    def get_run_list(self) -> list:
+        """Get run list.
+        
+        Returns:
+            run_list (list): list of strings for system call.
+        
+        """
+        return self.run_list
 
     def prepare_run(self, snkfile: str, workdir: str) -> None:
         """Configure list of strings for execution.
@@ -51,7 +66,7 @@ class SnakemakeExecutor:
         if self.run_dict['execution_profile'] == "local-conda":
             prof = ["--profile", os.path.join("submodules", "zarp", "profiles", "local-conda")]
             run_list.extend(prof)
-        self.run_list = run_list
+        self.set_run_list(run_list)
 
     def validate_run(self) -> bool:
         """Ensure the list of strings is a correct Snakemake call.
@@ -61,7 +76,12 @@ class SnakemakeExecutor:
                 False otherwise.
 
         """
-        pass
+        if len(self.run_list) == 0:
+            return False
+        else:
+            # in minimum snakemake command must be called
+            if self.run_list[0] == "snakemake":
+                return True
 
     def run(self) -> None:
         """Execute Snakemake with system call.
