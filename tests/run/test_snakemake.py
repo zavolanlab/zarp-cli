@@ -1,4 +1,4 @@
-"""Tests for module `zarp.run.snakemake"""
+"""Tests for module `zarp.run.snakemake`"""
 
 from zarp.config.models import Run
 from zarp.run import snakemake
@@ -59,7 +59,18 @@ class TestSnakemakeExecutor:
         exp_list = ["snakemake", "--snakefile", 
             "notASnakefile.smk", "--cores", "1"]
         assert snke.run_list == exp_list
-        snke.run()
+        with pytest.raises(subprocess.CalledProcessError):
+            snke.run()
+        assert not snke.get_success()
+
+    def test_run_subprocess(self):
+        """Trigger Error by subprocess."""
+        snke = snakemake.SnakemakeExecutor(Run())
+        with pytest.raises(IndexError):
+            snke.run()
+        snke.set_run_list(["snakemake"])
+        with pytest.raises(subprocess.CalledProcessError):
+            snke.run()
         assert not snke.get_success()
 
     def test_set_run_list(self):

@@ -93,15 +93,12 @@ class SnakemakeExecutor:
 
         """
         try:
-            completed = subprocess.run(self.run_list)
-            if completed.returncode == 0:
-                print("Successfully finished!")
-                self.success = True
-            else:
-                print(f"Snakemake not finished: {completed}")
-                self.success = False
+            subprocess.run(self.run_list, check=True)
+            print("Successfully finished!")
+            self.success = True
         except subprocess.CalledProcessError as e:
-            print(e)
+            self.success = False
+            raise e
     
     def get_success(self) -> bool:
         """Obtain whether run successful or not.
