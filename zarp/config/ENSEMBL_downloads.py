@@ -1,269 +1,353 @@
-#!/usr/bin/env python                                                           
-"""Genomic resource builder."""
+#!/usr/bin/env python
+
+"""Genome resource builder.
+
+Given a species code, download genome and annotation
+information from ENSEMBL.
+
+Args:
+   species(str): species name or taxon id
+   out_dir(int): output directory
+   genome(str): name of genome sequence file
+   annotation(str): name of anno file
+"""
 
 import argparse
 import os
 import re
-import requests
-import sys
+import subprocess
 from collections import defaultdict
+import requests
 
-# ENSEMBL data servers/end points
-server = "https://rest.ensembl.org"
-info = "/info/species/"
-assembly = "/info/assembly/"
 
-ftp_server = "http://ftp.ensembl.org/pub/"
-dna_dir_path = ["fasta", "dna"]
-anno_type = "gff3"
-anno_path = anno_type + "/"
+class GenResDownloader:
+    """Download genome and annotation from EMSEMBL."""
 
-def verify_species_data(server, info, species):
-    """Verify that there is data about the species of interest.
+    # ENSEMBL data servers/end points
+    server = "https://rest.ensembl.org"
+    info = "/info/species/"
+    assembly = "/info/assembly/"
 
-    Check whether data for the species of interest in available
-    in the current release of ENSEMBL. 
+    ftp_server = "http://ftp.ensembl.org/pub/"
+    dna_dir_path = ["fasta", "dna"]
+    anno_type = "gff3"
+    anno_path = anno_type + "/"
 
-    Args:
-        server (string): Root of the data path.
-        info (str): Type of data that we want.
-        species(int or str): Taxon ID or species name.
+    def __init__(self, in_species):
+        """Generate object.
 
-    Returns:
-        tuple: Release number, taxon id, species name.
+        Creates a downloader object for the species of interest.
 
-    Raises:
-        requests.exceptions.HTTPError: Request cannot be satisfied.
-        AttributeError: Species name not understood.
+        Args:
+            species(int or str): Taxon ID or species name.
 
-    """
+        Returns:
+            GenResDownloader instance.
+        """
+        self.in_species = in_species
+        self.release = ""
+        self.taxon_id = ""
+        self.species_name = ""
+        self.chr_length = {}
 
-    # check that the input is species name or taxon ID 
-    search_field = ""
-    try:
-        if(type(species) == int):
-            # input parameter is taxon id
+    def verify_species_data(self):
+        """Verify that there is data about the species of interest.
+
+        Check whether data for the species of interest in available
+        in the current release of ENSEMBL.
+
+        Raises:
+            AttributeError: Species name not understood.
+            AttributeError: Release number not found.
+            AttributeError: Taxon id not found.
+            AttributeError: Species name not found.
+            KeyError: Misformatted species table.
+
+        """
+        # check that the input is species name or taxon ID
+        search_field = ""
+        species_indicator = ""
+        if isinstance(self.in_species, int):
+            # input parameter is probably taxon id
             search_field = 'taxon_id'
-            species = str(species)
-        elif(re.search('^[a-zA-Z]+\_[a-zA-Z]+$', species)):
-            # input parameter is species name
+            species_indicator = str(self.in_species)
+        elif re.search(r'^[a-zA-Z]+_[a-zA-Z]+$', self.in_species):
+            # input parameter is probably species name
             search_field = 'name'
-            species = species.lower()
+            species_indicator = self.in_species.lower()
         else:
             # input parameter not understood
-            raise AttributeError(f'"{species}" not understood. Should be a species name or taxon ID.')
+            mssg = f'"{self.in_species}" not understood. '
+            mssg += 'Should be a species name or taxon ID.'
+            raise AttributeError(mssg)
 
-    except AttributeError as err:
-        raise
-        
-    # get the ENSEMBL species info table
-    try:
-        response = requests.get(server+info, headers={ "Content-Type" : "application/json"})
-        response.raise_for_status()
+        # get the ENSEMBL species info table
+        url = self.server + self.info
+        response = requests.get(url,
+                                headers={"Content-Type": "application/json"})
         species_table = response.json()
-    except requests.exceptions.HTTPError as e: 
-        raise
 
-    # look for the information we need
-    (release, taxon_id, name) = ("", "", "")
-    for item in species_table['species']:
-        if search_field not in item.keys():
-            continue
-        if item[search_field] == species:
-            if 'release' in item.keys():
-                release = item['release']
-            if 'taxon_id' in item.keys():
-                taxon_id = item['taxon_id']
-            if 'name' in item.keys():
-                name = item['name']
+        # look for the information we need
+        if 'species' not in species_table.keys():
+            mssg = "Misformatted species table: "
+            mssg += "does not contain the 'species' key"
+            raise KeyError(mssg)
 
-    return (release, taxon_id, name)
+        for item in species_table['species']:
+            if isinstance(item, dict) and search_field in item.keys():
+                if item[search_field].lower() == species_indicator:
+                    if 'release' in item.keys():
+                        self.release = item['release']
+                    if 'taxon_id' in item.keys():
+                        self.taxon_id = item['taxon_id']
+                    if 'name' in item.keys():
+                        self.species_name = item['name']
 
+        if not self.release or not self.taxon_id or not self.species_name:
+            mssg = f"{self.in_species}: "
+            mssg += "Release version or taxon id or species name "
+            mssg += "not found in species table"
+            raise AttributeError(mssg)
 
-def compile_genome_parts(server, assembly, species):
-    """Gather chromosome info for this species.
+    def compile_genome_parts(self):
+        """Gather chromosome info for this species.
 
-    Extract the chromosome IDs for this species,
-    and get the chromosome lengths. 
+        Extract the chromosome IDs for this species,
+        and get the chromosome lengths.
 
-    Args:
-        server (string): Root of the data path.
-        assembly (str): Type of data that we want.
-        species(int or str): Taxon ID or species name.
+        Raises:
+            AttributeError: No karyotype given in the species record.
+        """
+        if not self.species_name:
+            self.verify_species_data()
 
-    Returns:
-        dict(int): Dictionary of chromosome lenghts.
-
-    Raises:
-        requests.exceptions.HTTPError: Request cannot be satisfied.
-        AttributeError: No karyotype given in the species record.
-
-    """
-    
-    try:
-        response = requests.get(server+assembly+str(species), headers={ "Content-Type" : "application/json"})
-        response.raise_for_status()
+        url = self.server + self.assembly + self.species_name
+        response = requests.get(url,
+                                headers={"Content-Type": "application/json"})
         species_info = response.json()
-        if not species_info['karyotype']:
-            raise AttributeError(f'No karyotype found for "{species}".')
-        else:
-            data = defaultdict(int)
-            for item in species_info['top_level_region']:
-                if(item['coord_system'] == 'chromosome'):
-                    data[item['name']] = item['length']
-            return data
-    except requests.exceptions.HTTPError as e: 
-        raise 
+        if 'karyotype' not in species_info.keys():
+            mssg = f'No karyotype found for "{self.species_name}"'
+            raise AttributeError(mssg)
+        if 'top_level_region' not in species_info.keys():
+            mssg = 'No "top_level_region" dictionary '
+            mssg += f'for "{self.species_name}"'
+            raise AttributeError(mssg)
 
-def get_genome_parts(ftp_server, dna_dir_path, release, species, chrs, outdir):
-    """Download chromosome sequence data.
+        self.chr_length = defaultdict(int)
+        for item in species_info['top_level_region']:
+            if 'coord_system' not in item.keys():
+                mssg = "Cannot recognize region type in {item}"
+                raise AttributeError(mssg)
+            if item['coord_system'] == 'chromosome':
+                if 'name' not in item.keys():
+                    mssg = "No chromosome name in {item}"
+                    raise AttributeError(mssg)
+                if 'length' not in item.keys():
+                    mssg = "No chromosome length in {item}"
+                    raise AttributeError(mssg)
+                self.chr_length[item['name']] = item['length']
 
-    Extract the chromosome sequences for this species,
-    concatenate them into a single genome sequence,
-    save to a file. 
+    def check_chr(self, chromosome, file_name):
+        """Check legnth of the downloaded sequence.
 
-    Args:
-        ftp_server (string): Root of the data path.
-        dna_dir_path (list): Type of data that we want (fasta & dna).
-        release (int): Release version.
-        species (int or str): Taxon ID or species name.
-        chrs (dict): Chromosome and lengths.
-        outdir (str): Directory for the output.
-        
-    Returns:
-        None.
+        Check whether the chromosome sequence that was
+        downloaded has the expected length.
 
-    Raises:
-        ValueError: Cannot find/parse sequence file name.
+        Args:
+            chromosome (str): Name of chromosome.
+            file_name (str): Name of gzipped seq file.
 
-    """    
+        Returns:
+            chr_ok (bool): lengths match?.
 
-    url = ftp_server + f'release-{release}/{dna_dir_path[0]}/{species}/{dna_dir_path[1]}/'
-    files = []
-    
-    # get a list of files in fasta/{species}/dna dir
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except Exception as err:
-        raise
+        Raises:
+            ValueError: No length available for chromosome.
+            ValueError: Sequence file not found.
+        """
+        if chromosome not in self.chr_length.keys():
+            raise ValueError(f'No {chromosome} length data')
+        if not os.path.exists(file_name):
+            raise ValueError(f'No such file {file_name} exists')
+        # unzip file and count letters
+        cmd = ['gunzip', '-c', f'{file_name}']
+        nr_letters = 0
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        for line in proc.stdout:
+            # decode byte to characters
+            line = line.decode()
+            if line[0] == ">":
+                continue
+            # for some reason the newline seems
+            # to not be removed by strip()
+            # so we use regex
+            line = re.sub(r'[^a-zA-Z]', '', line)
+            nr_letters += len(line)
+        proc.wait()
+        if proc.returncode != 0:
+            mssg = f'Problem when gunzipping {file_name}'
+            raise ValueError(mssg)
 
-    # parse the directory content to determine the files we want to download
-    result = True
-    r = response.text
-    while result:
-        result = re.search('<a href=\"([^\>\"]+)\">([\s\S]*)$', r)
+        return nr_letters == self.chr_length[chromosome]
+
+    def get_genome(self, out_dir, file_name):
+        """Download chromosome sequence data.
+
+        Extract the chromosome sequences for this species,
+        concatenate them into a single genome sequence,
+        save to a file.
+
+        Args:
+            out_dir (str): Output directory.
+            file_name (str): Name of genome file.
+
+        Raises:
+            ValueError: List of files not found on server.
+            ValueError: Cannot find/parse sequence file name.
+            ValueError: Could not get chr file of correct len.
+        """
+        if not self.chr_length:
+            self.compile_genome_parts()
+
+        # create output directory if it does not exist
+        os.makedirs(out_dir, exist_ok=True)
+
+        url = self.ftp_server + f'release-{self.release}/'
+        url += f'{self.dna_dir_path[0]}/{self.species_name}/'
+        url += f'{self.dna_dir_path[1]}/'
+        files = []
+
+        # get the content of fasta/{species}/dna dir
+        mssg = requests.get(url)
+
+        # parse out file names
+        result = True
+        suffix = mssg.text
+        while result:
+            result = re.search(r'<a href="([^>"]+)">(.*)', suffix, re.DOTALL)
+            if result:
+                (prefix, suffix) = (result.group(1), result.group(2))
+                files.append(prefix)
+
+        # if available, save the soft-masked sequences
+        # otherwise the standard chromosome sequences
+        prefix = [x for x in files if re.search("dna_sm.chr", x)]
+        suffix = [x for x in files if re.search("dna.chr", x)]
+        files = suffix
+        if len(prefix) >= len(suffix):
+            files = prefix
+
+        # save bits of the file name structure
+        # to then request chromosome files
+        if not files:
+            raise ValueError(f'No chromosome files found in {url}')
+        result = re.search(r"^(\S+chromosome\.)\S+(\.fa\S*)$", files[0])
+        if not result:
+            raise ValueError(f"Cannot parse file name in {files[0]}")
+        (prefix, suffix) = (result.group(1), result.group(2))
+
+        # download chromosome files
+        files = []
+        for k in self.chr_length:
+            # make at most 3 tries to get a sequence of expected length
+            mssg = False
+            tries = 0
+            print(f'Getting sequence of {k}')
+            chr_name = prefix + f'{k}' + suffix
+            fname = out_dir + "/" + chr_name
+            while not mssg and tries < 3:
+                tries += 1
+                # get sequence
+                result = requests.get(url + chr_name)
+                # save in the output dir
+                with open(fname, 'wb') as outf:
+                    outf.write(result.content)
+                mssg = self.check_chr(k, fname)
+            if not mssg:
+                # we have to quit
+                # clean up files we got so far
+                for chr_name in files:
+                    os.system(f'rm {chr_name}')
+                mssg = f'Could not get correct sequence for {k}'
+                raise ValueError(mssg)
+            files.append(fname)
+
+        if files:
+            # concatenate all chromosome sequences
+            cmd = "gunzip -c " + " ".join(files)
+            cmd += f" > {out_dir}/{file_name}; "
+            cmd += "rm " + " ".join(files) + "; "
+            cmd += f"gzip {out_dir}/{file_name}"
+            os.system(cmd)
+            print(f"Done saving/gzipping {file_name}")
+
+    def get_annotation(self, out_dir, file_name):
+        """Get annotation info for the species.
+
+        Extract the gff annotation for the species.
+
+        Args:
+            out_dir (str): Directory where data should be placed.
+            file_name (str): File name where data should be placed.
+
+        Raises:
+            ValueError: Cannot find/parse annotation file name.
+        """
+        if not self.chr_length:
+            self.compile_genome_parts()
+
+        # create output directory if it does not exist
+        os.makedirs(out_dir, exist_ok=True)
+
+        url = self.ftp_server + f'release-{self.release}/'
+        url += self.anno_path
+        url += f'{self.species_name}/'
+        files = []
+
+        # get annotation directory content
+        mssg = requests.get(url)
+
+        # determine which files we want to download
+        pattern = True
+        suffix = mssg.text
+        while pattern:
+            pattern = re.search(r'<a href="([^>"]+)">(.*)', suffix, re.DOTALL)
+            if pattern:
+                (prefix, suffix) = (pattern.group(1), pattern.group(2))
+                files.append(prefix)
+
+        files = [x for x in files if re.search(r"\.chromosome", x)]
+
+        # save bits of file name structure
+        # to then request chromosome files
+        if not files:
+            raise ValueError(f'No chromosome annotations found in {url}')
+        pattern = rf"^(\S+chromosome\.)\S+(\.{self.anno_type}\S*)$"
+        result = re.search(pattern, files[0])
         if result:
-            (link, rest) = (result.group(1), result.group(2))
-            files.append(link)
-            r = rest
-
-    # if available, save the soft-masked sequences
-    # otherwise the standard chromosome sequences
-    sm_files = [x for x in files if re.search("dna_sm\.chromosome", x)]
-    nm_files = [x for x in files if re.search("dna\.chromosome", x)]
-    if(len(sm_files) >= len(nm_files)):
-        files = sm_files
-    else:
-        files = nm_files
-
-    # save bits of the file name structure
-    # to then request chromosome files
-    if(files):
-        file_root = re.search("^(\S+chromosome\.)\S+(\.fa\S*)$", files[0])
-        if(file_root):
-            (prefix, suffix) = (file_root.group(1), file_root.group(2))
+            (prefix, suffix) = (result.group(1), result.group(2))
         else:
             raise ValueError(f"Cannot parse file name in {files[0]}")
-    else:
-        raise ValueError(f"Cannot find sequence files") 
 
-    # download chromosome files
-    files = []
-    for k in chrs:
-        print(f'Getting sequence of {k}')
-        chr_name = prefix + f'{k}' + suffix
-        
-        # get sequence
-        try:
-            chr_req = requests.get(url + chr_name)
-            chr_req.raise_for_status()
-        except Exception as err:
-            raise
-        # save in the output dir
-        fname = outdir + "/" + chr_name
-        files.append(fname)
-        with open(fname, 'wb') as outf:
-            outf.write(chr_req.content)
+        # download annotations
+        files = []
+        for k in self.chr_length:
+            print(f'Getting annotation of {k}')
+            chr_name = prefix + f'{k}' + suffix
+            result = requests.get(url + chr_name)
+            fname = out_dir + "/" + chr_name
+            files.append(fname)
+            with open(fname, 'wb') as outf:
+                outf.write(result.content)
 
-    return files
+        # concatenate annotation files
+        if files:
+            cmd = "gunzip -c " + " ".join(files)
+            cmd += f" > {out_dir}/{file_name}; "
+            cmd += "rm " + " ".join(files) + "; "
+            cmd += f"gzip {out_dir}/{file_name}"
+            os.system(cmd)
+            print(f"Done saving/gzipping {file_name}")
 
-def get_annotation(ftp_server, anno_path, release, species, chrs, outdir):
-    """Get annotation info for this species.
-
-    Extract the gff annotation for this species.
-
-    Args:
-        ftp_server (string): Root of the data path.
-        anno_part (str): Type of data that we want (e.g. gff3).
-        release (int): Release number.
-        species (int or str): Taxon ID or species name.
-        chrs (dict): Dictionary of chromosome lengths.
-        outdir (str): Directory where data should be placed.
-
-    Returns:
-        None
-
-    Raises:
-        ValueError: Cannot find/parse sequence file name.
-
-    """
-
-    url = ftp_server + f'release-{release}/' + anno_path + f'{species}/'
-    files = []
-
-    # get list of files in the annotation directory
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except Exception as err:
-        raise
-        
-    # determine which files we want to download
-    result = True
-    r = response.text
-    while result:
-        result = re.search('<a href=\"([^\>\"]+)\">([\s\S]*)$', r)
-        if result:
-            (link, rest) = (result.group(1), result.group(2))
-            files.append(link)
-            r = rest
-
-    files = [x for x in files if re.search("\.chromosome", x)]
-
-    # save bits of file name structure
-    # to then request chromosome files
-    if(files):
-        file_root = re.search(rf"^(\S+chromosome\.)\S+(\.{anno_type}\S*)$", files[0])
-        if(file_root):
-            (prefix, suffix) = (file_root.group(1), file_root.group(2))
-        else:
-            raise ValueError(f"Cannot parse file name in {files[0]}")
-    else:
-        raise ValueError(f"Cannot find sequence files") 
-
-    # download annotations
-    files = []
-    for k in chrs:
-        print(f'Getting annotation of {k}')
-        chr_name = prefix + f'{k}' + suffix
-        chr_req = requests.get(url + chr_name)
-        fname = outdir + "/" + chr_name
-        files.append(fname)
-        with open(fname, 'wb') as outf:
-            outf.write(chr_req.content)
-    
-    return files
 
 def main(raw_args=None):
     """Get genome sequence and annotation info a species.
@@ -271,82 +355,37 @@ def main(raw_args=None):
     Args:
         species (int or str): Taxon ID or species name.
         outdir (str): Directory where data should be placed.
-        genome (str): Genome sequence file name.
-        annotation (str): Annotation file name.
+
+    Returns:
+        None
 
     Raises:
-        argparse.ArgumentError: Cannot parse arguments
-        requests.Exception.HTTPError: Cannot download doc
-        AttributeError: Parameters not understood
-        Exception: Other errors
-
+        ValueError: Cannot find/parse sequence file name.
     """
-    
     parser = argparse.ArgumentParser(description='Download species data.')
-    parser.add_argument('-s', dest='species', action='store', required=True, 
+    parser.add_argument('-s', dest='species', action='store', required=True,
                         help="Taxon id or species name")
-    parser.add_argument('-o', dest='outdir', action='store', required=True, 
+    parser.add_argument('-o', dest='outdir', action='store', required=True,
                         help="Output directory")
-    parser.add_argument('-g', dest='genome', action='store', required=True, 
+    parser.add_argument('-g', dest='genome', action='store', required=True,
                         help="Name of genome file")
-    parser.add_argument('-a', dest='annotation', action='store', required=True, 
+    parser.add_argument('-a', dest='annotation', action='store', required=True,
                         help="Name of annotation file")
-    try:
-        args = parser.parse_args(raw_args)
-    except argparse.ArgumentError as err:
-        sys.exit(err)
-    
+
+    args = parser.parse_args(raw_args)
+
     # create output file if not there already
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
+    os.makedirs(args.outdir, exist_ok=True)
 
-    # check that information about our species of interest
-    # exists in the current ENSEMBL release
-    try:
-        species_info = verify_species_data(server, info, args.species)
-    except (requests.exceptions.HTTPError, AttributeError) as err:
-        sys.exit(err)
+    # create downloader object
+    worker = GenResDownloader(args.species)
 
-    # get karyotype and chromosome lengths
-    try:
-        chrs = compile_genome_parts(server, assembly, args.species)
-    except requests.exceptions.HTTPError as e:
-        sys.exit(err)
+    # get genome data
+    worker.get_genome(args.outdir, args.genome)
 
-    # download chromosome sequence data
-    try:
-        seq_files = get_genome_parts(ftp_server, dna_dir_path, 
-                                     species_info[0], species_info[2], 
-                                     chrs, args.outdir)
-    except Exception as err:
-        sys.exit(err)
-    
-    # concatenate chromosome sequences
-    try:
-        cmd = "gunzip -c " + " ".join(seq_files) + f" > {args.outdir}/{args.genome}; "
-        cmd += "rm " + " ".join(seq_files) + "; "
-        cmd += f"gzip {args.outdir}/{args.genome}"
-        os.system(cmd)
-    except Exception as err:
-        sys.exit(err)
-        
-    # download annotation data
-    try:
-        anno_files = get_annotation(ftp_server, anno_path, 
-                                    species_info[0], species_info[2], 
-                                    chrs, args.outdir)
-    except Exception as err:
-        sys.exit(err)
-   
-    # concatenate annotation files
-    try:
-        cmd = "gunzip -c " + " ".join(anno_files) + f" > {args.outdir}/{args.annotation}; "
-        cmd += "rm " + " ".join(anno_files) + "; "
-        cmd += f"gzip {args.outdir}/{args.annotation}"
-        os.system(cmd)
-    except Exception as err:
-        sys.exit(err)
+    # get annotation data
+    worker.get_annotation(args.outdir, args.annotation)
+
 
 if __name__ == '__main__':
     main()
-
