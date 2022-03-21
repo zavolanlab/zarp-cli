@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+from typing import List, Optional
 
 from zarp.config.models import Run
 
@@ -15,7 +16,7 @@ class SnakemakeExecutor:
     Attributes:
         run_dict (dict): Dictionary with run-specific parameters.
         success (bool): Indicator for successful snakemake run.
-        run_list (list): List containing strings for snakemake call.
+        run_list (list[str]): List containing strings for snakemake call.
 
     Example:
         The example below expects a valid `Snakefile` (e.g. `touch Snakefile`)
@@ -31,8 +32,8 @@ class SnakemakeExecutor:
     def __init__(self, run: Run) -> None:
         """Class constructor."""
         self.run_dict = run.dict()
-        self.success = None
-        self.run_list = []
+        self.success: Optional[bool] = None
+        self.run_list: List[str] = []
 
     def set_run_list(self, run_list: list) -> None:
         """Set run list."""
@@ -79,13 +80,10 @@ class SnakemakeExecutor:
                 False otherwise.
 
         """
-        valid_run = None
-        if len(self.run_list) == 0:
-            valid_run = False
-        else:
-            # in minimum snakemake command must be called
-            if self.run_list[0] == "snakemake":
-                valid_run = True
+        valid_run = False
+        # in minimum snakemake command must be called
+        if len(self.run_list) > 0 and self.run_list[0] == "snakemake":
+            valid_run = True
         return valid_run
 
     def run(self) -> None:
@@ -105,7 +103,7 @@ class SnakemakeExecutor:
             self.success = False
             raise process_error
 
-    def get_success(self) -> bool:
+    def get_success(self) -> Optional[bool]:
         """Obtain whether run successful or not.
 
         If not yet run, success == None.
