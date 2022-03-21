@@ -44,7 +44,7 @@ class TestSnakemakeExecutor:
         snke.prepare_run(snkfile, workdir)
         exp_list = ["snakemake", "--snakefile",
                     snkfile, "--cores", "1"]
-        assert snke.run_list == exp_list
+        assert snke.get_run_list() == exp_list
         # Run the example Snakemake workflow.
         snke.run()
         assert snke.get_success()
@@ -59,7 +59,7 @@ class TestSnakemakeExecutor:
         snke.prepare_run(snkfile="notASnakefile.smk", workdir=workdir)
         exp_list = ["snakemake", "--snakefile",
                     "notASnakefile.smk", "--cores", "1"]
-        assert snke.run_list == exp_list
+        assert snke.get_run_list() == exp_list
         with pytest.raises(subprocess.CalledProcessError):
             snke.run()
         assert not snke.get_success()
