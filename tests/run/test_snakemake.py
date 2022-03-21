@@ -40,8 +40,7 @@ class TestSnakemakeExecutor:
         snke = snakemake.SnakemakeExecutor(myrun)
         os.chdir(tmpdir)
         snkfile = create_test_files()
-        workdir = os.getcwd()
-        snke.prepare_run(snkfile, workdir)
+        snke.prepare_run(snkfile)
         exp_list = ["snakemake", "--snakefile",
                     snkfile, "--cores", "1"]
         assert snke.get_run_list() == exp_list
@@ -55,8 +54,7 @@ class TestSnakemakeExecutor:
         myrun = Run()
         snke = snakemake.SnakemakeExecutor(myrun)
         os.chdir(tmpdir)
-        workdir = os.getcwd()
-        snke.prepare_run(snkfile="notASnakefile.smk", workdir=workdir)
+        snke.prepare_run(snkfile="notASnakefile.smk")
         exp_list = ["snakemake", "--snakefile",
                     "notASnakefile.smk", "--cores", "1"]
         assert snke.get_run_list() == exp_list
@@ -82,7 +80,8 @@ class TestSnakemakeExecutor:
         assert snke.get_run_list() == ["snakemake"]
         snke.prepare_run(snkfile="Snakefile", workdir=".")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
-                                       "Snakefile", "--cores", "1"]
+                                       "Snakefile", "--cores", "1",
+                                       "--directory", "."]
 
     def test_validate_run(self):
         """Test validation of run."""
@@ -90,3 +89,22 @@ class TestSnakemakeExecutor:
         assert not snke.validate_run()
         snke.prepare_run(snkfile="Snakefile", workdir=".")
         assert snke.validate_run()
+
+    def test_working_dir(self, tmpdir):
+        """Test proper setting of working directory."""
+        snke = snakemake.SnakemakeExecutor(Run())
+        # default working directory: None.
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1"]
+        # Manually set working directory.
+        snke.prepare_run(snkfile="Snakefile", workdir=".")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--directory", "."]
+        # Run with "." as working directory.
+        os.chdir(tmpdir)
+        snkfile = create_test_files()
+        snke.prepare_run(snkfile=snkfile, workdir=".")
+        snke.run()
+        assert snke.get_success()

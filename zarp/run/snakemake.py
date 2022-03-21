@@ -22,7 +22,7 @@ class SnakemakeExecutor:
         in the current working directory.
         It constructs a run with default values and runs it.
         >>> mysnk = SnakemakeExecutor(Run())
-        >>> mysnk.prepare_run(snkfile = "Snakefile", workdir = ".")
+        >>> mysnk.prepare_run(snkfile = "Snakefile")
         >>> mysnk.run()
         >>> assert mysnk.get_success()
 
@@ -47,12 +47,12 @@ class SnakemakeExecutor:
         """
         return self.run_list
 
-    def prepare_run(self, snkfile: str, workdir: str) -> None:
+    def prepare_run(self, snkfile: str, workdir: str = None) -> None:
         """Configure list of strings for execution.
 
         Args:
             snkfile (str): Path to Snakefile.
-            workdir (str): Path to workdir.
+            workdir (str): Optional path to working directory. (default None).
 
         Raises:
             KeyError: If `execution_profile` not in run_dict.
@@ -62,7 +62,8 @@ class SnakemakeExecutor:
         # Snakemake config
         run_list.extend(["--snakefile", snkfile])
         run_list.extend(["--cores", str(self.run_dict["cores"])])
-        # run_list.extend(["--config", f"workdir={workdir}"])
+        if workdir is not None:
+            run_list.extend(["--directory", workdir])
         # execution profile
         if self.run_dict['execution_profile'] == "local-conda":
             prof = ["--profile", os.path.join("submodules",
