@@ -18,9 +18,10 @@ class SnakemakeExecutor:
         run_list (list): List containing strings for snakemake call.
     
     Example:
-        The example below expects a valid `Snakefile` in the current working
-        directory. It constructs a run with default values and runs it. 
-        >>> mysnk = SnakemakeExecutor(zarp.config.models.Run())
+        The example below expects a valid `Snakefile` (e.g. `touch Snakefile`) 
+        in the current working directory. 
+        It constructs a run with default values and runs it. 
+        >>> mysnk = SnakemakeExecutor(Run())
         >>> mysnk.prepare_run(snkfile = "Snakefile", workdir = ".")
         >>> mysnk.run()
         >>> assert mysnk.get_success()
