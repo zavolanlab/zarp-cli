@@ -6,6 +6,7 @@ import os
 import subprocess
 import pytest
 
+
 def create_test_files():
     # Setup
     example = "example_snakefile.smk"
@@ -23,6 +24,7 @@ rule example:
         f.write("This is an example inputfile.")
     return example
 
+
 class TestSnakemakeExecutor:
     """Unit tests for executing Snakemake."""
 
@@ -30,7 +32,7 @@ class TestSnakemakeExecutor:
         """Initialise object."""
         myrun = Run()
         snke = snakemake.SnakemakeExecutor(myrun)
-        assert snke.success == None
+        assert snke.success is None
 
     def test_run(self, tmpdir):
         """Prepare a run with a valid Snakefile."""
@@ -40,8 +42,8 @@ class TestSnakemakeExecutor:
         snkfile = create_test_files()
         workdir = os.getcwd()
         snke.prepare_run(snkfile, workdir)
-        exp_list = ["snakemake", "--snakefile", 
-            snkfile, "--cores", "1"]
+        exp_list = ["snakemake", "--snakefile",
+                    snkfile, "--cores", "1"]
         assert snke.run_list == exp_list
         # Run the example Snakemake workflow.
         snke.run()
@@ -53,11 +55,10 @@ class TestSnakemakeExecutor:
         myrun = Run()
         snke = snakemake.SnakemakeExecutor(myrun)
         os.chdir(tmpdir)
-        snkfile = create_test_files()
         workdir = os.getcwd()
-        snke.prepare_run(snkfile = "notASnakefile.smk", workdir = workdir)
-        exp_list = ["snakemake", "--snakefile", 
-            "notASnakefile.smk", "--cores", "1"]
+        snke.prepare_run(snkfile="notASnakefile.smk", workdir=workdir)
+        exp_list = ["snakemake", "--snakefile",
+                    "notASnakefile.smk", "--cores", "1"]
         assert snke.run_list == exp_list
         with pytest.raises(subprocess.CalledProcessError):
             snke.run()
@@ -79,13 +80,13 @@ class TestSnakemakeExecutor:
         assert snke.get_run_list() == []
         snke.set_run_list(["snakemake"])
         assert snke.get_run_list() == ["snakemake"]
-        snke.prepare_run(snkfile= "Snakefile", workdir = ".")
-        assert snke.get_run_list() == ["snakemake", "--snakefile", 
-            "Snakefile", "--cores", "1"]
+        snke.prepare_run(snkfile="Snakefile", workdir=".")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1"]
 
     def test_validate_run(self):
         """Test validation of run."""
         snke = snakemake.SnakemakeExecutor(Run())
         assert not snke.validate_run()
-        snke.prepare_run(snkfile = "Snakefile", workdir = ".")
+        snke.prepare_run(snkfile="Snakefile", workdir=".")
         assert snke.validate_run()

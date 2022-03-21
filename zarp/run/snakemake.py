@@ -8,7 +8,7 @@ from zarp.config.models import Run
 
 class SnakemakeExecutor:
     """Run snakemake with system calls.
-    
+
     Args:
         run (Run): Run-specific parameters.
 
@@ -16,11 +16,11 @@ class SnakemakeExecutor:
         run_dict (dict): Dictionary with run-specific parameters.
         success (bool): Indicator for successful snakemake run.
         run_list (list): List containing strings for snakemake call.
-    
+
     Example:
-        The example below expects a valid `Snakefile` (e.g. `touch Snakefile`) 
-        in the current working directory. 
-        It constructs a run with default values and runs it. 
+        The example below expects a valid `Snakefile` (e.g. `touch Snakefile`)
+        in the current working directory.
+        It constructs a run with default values and runs it.
         >>> mysnk = SnakemakeExecutor(Run())
         >>> mysnk.prepare_run(snkfile = "Snakefile", workdir = ".")
         >>> mysnk.run()
@@ -40,10 +40,10 @@ class SnakemakeExecutor:
 
     def get_run_list(self) -> list:
         """Get run list.
-        
+
         Returns:
             run_list (list): list of strings for system call.
-        
+
         """
         return self.run_list
 
@@ -53,7 +53,7 @@ class SnakemakeExecutor:
         Args:
             snkfile (str): Path to Snakefile.
             workdir (str): Path to workdir.
-        
+
         Raises:
             KeyError: If `execution_profile` not in run_dict.
 
@@ -65,7 +65,8 @@ class SnakemakeExecutor:
         # run_list.extend(["--config", f"workdir={workdir}"])
         # execution profile
         if self.run_dict['execution_profile'] == "local-conda":
-            prof = ["--profile", os.path.join("submodules", "zarp", "profiles", "local-conda")]
+            prof = ["--profile", os.path.join("submodules",
+                    "zarp", "profiles", "local-conda")]
             run_list.extend(prof)
         self.set_run_list(run_list)
 
@@ -73,22 +74,24 @@ class SnakemakeExecutor:
         """Ensure the list of strings is a correct Snakemake call.
 
         Returns:
-            bool: True, if constructed run_list is a valid snakemake call, 
+            bool: True, if constructed run_list is a valid snakemake call,
                 False otherwise.
 
         """
+        valid_run = None
         if len(self.run_list) == 0:
-            return False
+            valid_run = False
         else:
             # in minimum snakemake command must be called
             if self.run_list[0] == "snakemake":
-                return True
+                valid_run = True
+        return valid_run
 
     def run(self) -> None:
         """Execute Snakemake with system call.
-        
+
         Run Snakemake with a system call, errors there are not handed over.
-        
+
         Raises:
             CalledProcessError: by `subprocess.run()`
 
@@ -97,10 +100,10 @@ class SnakemakeExecutor:
             subprocess.run(self.run_list, check=True)
             print("Successfully finished!")
             self.success = True
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as process_error:
             self.success = False
-            raise e
-    
+            raise process_error
+
     def get_success(self) -> bool:
         """Obtain whether run successful or not.
 
