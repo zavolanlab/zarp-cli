@@ -34,8 +34,29 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Install dev dependencies
         run: pip install -r requirements_dev.txt
 
       - name: Run Pylint
         run: pylint --rcfile pylint.cfg setup.py zarp/
+
+  Mypy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dev dependencies
+        run: pip install -r requirements_dev.txt
+
+      - name: Run Mypy
+        run: mypy zarp
