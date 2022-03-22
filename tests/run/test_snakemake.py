@@ -1,6 +1,6 @@
 """Tests for module `zarp.run.snakemake`"""
 
-from zarp.config.models import Run
+from zarp.config.models import ExecModes, Run, ToolPackaging
 from zarp.run import snakemake
 import os
 import subprocess
@@ -42,7 +42,8 @@ class TestSnakemakeExecutor:
         snkfile = create_test_files()
         snke.prepare_run(snkfile)
         exp_list = ["snakemake", "--snakefile",
-                    snkfile, "--cores", "1"]
+                    snkfile, "--cores", "1",
+                    "--use-conda"]
         assert snke.get_run_list() == exp_list
         # Run the example Snakemake workflow.
         snke.run()
@@ -56,7 +57,8 @@ class TestSnakemakeExecutor:
         os.chdir(tmpdir)
         snke.prepare_run(snkfile="notASnakefile.smk")
         exp_list = ["snakemake", "--snakefile",
-                    "notASnakefile.smk", "--cores", "1"]
+                    "notASnakefile.smk", "--cores", "1",
+                    "--use-conda"]
         assert snke.get_run_list() == exp_list
         with pytest.raises(subprocess.CalledProcessError):
             snke.run()
@@ -81,7 +83,8 @@ class TestSnakemakeExecutor:
         snke.prepare_run(snkfile="Snakefile", workdir=".")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
-                                       "--directory", "."]
+                                       "--directory", ".",
+                                       "--use-conda"]
 
     def test_validate_run(self):
         """Test validation of run."""
@@ -96,15 +99,76 @@ class TestSnakemakeExecutor:
         # default working directory: None.
         snke.prepare_run("Snakefile")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
-                                       "Snakefile", "--cores", "1"]
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda"]
         # Manually set working directory.
         snke.prepare_run(snkfile="Snakefile", workdir=".")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
-                                       "--directory", "."]
+                                       "--directory", ".",
+                                       "--use-conda"]
         # Run with "." as working directory.
         os.chdir(tmpdir)
         snkfile = create_test_files()
         snke.prepare_run(snkfile=snkfile, workdir=".")
         snke.run()
         assert snke.get_success()
+
+    def test_execution_profile(self):
+        """Prepare run with a profile."""
+        non_profile_run = Run()
+        snke = snakemake.SnakemakeExecutor(non_profile_run)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda"]
+        # profile run
+        profile_run = Run(execution_profile="local-conda")
+        snke = snakemake.SnakemakeExecutor(profile_run)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--profile", "local-conda"]
+
+    def test_execution_mode(self):
+        """Test dry run and prepare run."""
+        dryrun = Run(execution_mode=ExecModes.DRY_RUN)
+        snke = snakemake.SnakemakeExecutor(dryrun)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda",
+                                       "--dry-run"]
+        # prepare run
+        prep_run = Run(execution_mode=ExecModes.PREPARE_RUN)
+        snke = snakemake.SnakemakeExecutor(prep_run)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda",
+                                       "--dry-run"]
+
+    def test_tool_packaging(self):
+        """Test supply of conda or singularity."""
+        conda_run = Run(tool_packaging=ToolPackaging.CONDA)
+        snke = snakemake.SnakemakeExecutor(conda_run)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda"]
+        singularity_run = Run(tool_packaging=ToolPackaging.SINGULARITY)
+        snke = snakemake.SnakemakeExecutor(singularity_run)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-singularity"]
+
+    def test_configfile(self):
+        """Test supply of configfile."""
+        configrun = Run(snakemake_config="configfile.yaml")
+        snke = snakemake.SnakemakeExecutor(configrun)
+        snke.prepare_run("Snakefile")
+        assert snke.get_run_list() == ["snakemake", "--snakefile",
+                                       "Snakefile", "--cores", "1",
+                                       "--use-conda",
+                                       "--configfile", "configfile.yaml"]

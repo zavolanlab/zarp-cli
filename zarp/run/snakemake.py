@@ -1,10 +1,9 @@
 """Module for running snakemake."""
 
 import subprocess
-import os
 from typing import List, Optional
 
-from zarp.config.models import Run
+from zarp.config.models import ExecModes, Run, ToolPackaging
 
 
 class SnakemakeExecutor:
@@ -66,10 +65,24 @@ class SnakemakeExecutor:
         if workdir is not None:
             run_list.extend(["--directory", workdir])
         # execution profile
-        if self.run_dict['execution_profile'] == "local-conda":
-            prof = ["--profile", os.path.join("submodules",
-                    "zarp", "profiles", "local-conda")]
+        if not self.run_dict['execution_profile'] is None:
+            prof = ["--profile", self.run_dict['execution_profile']]
             run_list.extend(prof)
+        else:
+            # tool packaging (conda or singularity)
+            # only applies if execution_profile not defined.
+            if self.run_dict["tool_packaging"] == ToolPackaging.CONDA:
+                run_list.extend(["--use-conda"])
+            if self.run_dict["tool_packaging"] == ToolPackaging.SINGULARITY:
+                run_list.extend(["--use-singularity"])
+        # execution mode (e.g. dry-run)
+        if self.run_dict["execution_mode"] == ExecModes.DRY_RUN or \
+           self.run_dict["execution_mode"] == ExecModes.PREPARE_RUN:
+            run_list.extend(["--dry-run"])
+        # configfile
+        if not self.run_dict["snakemake_config"] is None:
+            conf = ["--configfile", self.run_dict["snakemake_config"]]
+            run_list.extend(conf)
         self.set_run_list(run_list)
 
     def validate_run(self) -> bool:
