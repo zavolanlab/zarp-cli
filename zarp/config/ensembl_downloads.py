@@ -148,7 +148,7 @@ class GenResDownloader:
                 self.chr_length[item['name']] = item['length']
 
     def check_chr(self, chromosome, file_name):
-        """Check legnth of the downloaded sequence.
+        """Check length of the downloaded sequence.
 
         Check whether the chromosome sequence that was
         downloaded has the expected length.
