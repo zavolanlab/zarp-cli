@@ -23,7 +23,14 @@ jobs:
         run: pip install -r requirements_dev.txt
 
       - name: Test code coverage
-        run: coverage run --source zarp -m pytest
+        run: |
+          coverage run --source zarp -m pytest
+          coverage xml
 
-      - name: Upload code coverage to coveralls
-        run: coveralls
+      - name: Submit Report to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
