@@ -24,9 +24,6 @@ jobs:
       - name: Install dev dependencies
         run: pip install -r requirements_dev.txt
 
-      - name: Branches
-        run: git branch -a
-
       - name: Publish the package (DEBUG mode)
         run: |
           git config --global user.name "semantic-release (via GH Actions)"
