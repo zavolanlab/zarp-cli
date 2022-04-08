@@ -38,7 +38,7 @@ jobs:
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10' ]
 
-    name: Python ${{ matrix.python-version }}
+    name: unit-testing-Python-${{ matrix.python-version }}
 
     steps:
 
@@ -76,7 +76,7 @@ jobs:
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10' ]
 
-    name: Python ${{ matrix.python-version }}
+    name: integration-testing-Python-${{ matrix.python-version }}
 
     steps:
 
@@ -100,7 +100,7 @@ jobs:
       - name: Run integration test
         run: zarp --help
 
-  publish-debug:
+  semantic-release:
     runs-on: ubuntu-latest
     steps:
 
