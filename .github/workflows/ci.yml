@@ -101,7 +101,14 @@ jobs:
         run: zarp --help
 
   semantic-release:
+
+    needs:
+      - static-code-analysis
+      - unit-testing
+      - integration-testing
+    
     runs-on: ubuntu-latest
+
     steps:
 
       - name: Checkout the repository
