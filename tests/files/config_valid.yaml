@@ -9,10 +9,10 @@ run:
   htsinfer_config: null
   resources_version: null
   snakemake_config: null
-  working_directory: /home/uniqueg/Dropbox/repos/__bioninfo__/zarp-cli
+  working_directory: null
 sample:
-  fragment_length_distribution_mean: 321.0
-  fragment_length_distribution_sd: 123.0
+  fragment_length_distribution_mean: 300.0
+  fragment_length_distribution_sd: 100.0
 user:
   affiliations: null
   author: test_author
