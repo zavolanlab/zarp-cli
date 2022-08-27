@@ -5,7 +5,7 @@ from typing import List
 
 from setuptools import setup, find_packages
 
-from zarp.version import __version__
+from zarp import __version__
 
 root_dir: str = os.path.dirname(os.path.abspath(__file__))
 
