@@ -56,7 +56,9 @@ def main() -> None:
         LOGGER.debug("Logging set up")
 
         # run in initialization mode
-        if args.init:
+        if args.init or not args.config_file.is_file():
+            if not args.config_file.is_file():
+                LOGGER.warning(f"Config file not found: {args.config_file}")
             LOGGER.info("Starting ZARP-cli in mode: initialization")
             initializer = Initializer()
             initializer.set_from_file(config_file=args.config_file)
@@ -74,9 +76,9 @@ def main() -> None:
             )
             LOGGER.info("Done")
             sys.exit(0)
-        LOGGER.info("Starting ZARP-cli in mode: normal")
 
         # parse config
+        LOGGER.info("Starting ZARP-cli in mode: normal")
         LOGGER.debug("Parsing configuration...")
         config_parser = ConfigParser(config_file=args.config_file)
         config_parser.set_from_file()

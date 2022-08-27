@@ -83,8 +83,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: install requirements
-        run: |
-          pip install -e .
+        run: pip install -e .
 
       - name: integration test - help screen
         run: zarp --help
@@ -93,4 +92,7 @@ jobs:
         run: zarp --version
 
       - name: integration test - normal mode
-        run: zarp SRR1234567
+        run: |
+          mkdir ~/.zarp
+          cp tests/files/config_valid.yaml ~/.zarp/user.yaml
+          zarp SRR1234567
