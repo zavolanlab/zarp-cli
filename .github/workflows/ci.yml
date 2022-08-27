@@ -85,7 +85,6 @@ jobs:
       - name: install requirements
         run: |
           pip install -e .
-          pip install -r requirements_dev.txt
 
       - name: integration test - help screen
         run: zarp --help

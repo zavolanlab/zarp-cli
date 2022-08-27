@@ -5,7 +5,7 @@ from typing import List
 
 from setuptools import setup, find_packages
 
-from zarp import __version__
+from zarp.version import __version__
 
 root_dir: str = os.path.dirname(os.path.abspath(__file__))
 
@@ -46,21 +46,24 @@ setup(
         "Topic :: Utilities",
     ],
     entry_points={
-        'console_scripts': [
-            'zarp = zarp.cli:main',
+        "console_scripts": [
+            "zarp = zarp.cli:main",
         ],
     },
     keywords=[
-        'bioinformatics',
-        'workflow',
-        'ngs',
-        'high-throughput sequencing',
+        "bioinformatics",
+        "workflow",
+        "ngs",
+        "high-throughput sequencing",
     ],
     project_urls={
-        "Repository":
-        "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli",
-        "Tracker":
-        "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli/-/issues",
+        "Repository": (
+            "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli"
+        ),
+        "Tracker": (
+            "https://git.scicore.unibas.ch/zavolan_group/"
+            "tools/zarp-cli/-/issues"
+        ),
     },
     packages=find_packages(),
     include_package_data=True,
