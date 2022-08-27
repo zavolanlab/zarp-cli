@@ -26,7 +26,9 @@ jobs:
         run: pylint --rcfile pylint.cfg setup.py zarp/
 
       - name: mypy
-        run: mypy zarp
+        run: |
+          mypy --install-types
+          mypy zarp
 
   unit-testing:
     runs-on: ubuntu-latest
