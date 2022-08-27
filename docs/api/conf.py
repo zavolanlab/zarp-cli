@@ -1,3 +1,5 @@
+"""Sphinx configuration."""
+
 from zarp import __version__
 
 # Configuration file for the Sphinx documentation builder.
@@ -68,6 +70,7 @@ html_static_path = []
 
 # Auto-generate API doc
 def run_apidoc(_):
+    """Auto-generate API doc."""
     ignore_paths = [
     ]
     argv = [
@@ -80,4 +83,5 @@ def run_apidoc(_):
 
 
 def setup(app):
+    """Set up API doc."""
     app.connect('builder-inited', run_apidoc)

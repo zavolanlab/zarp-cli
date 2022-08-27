@@ -1,0 +1,21 @@
+run:
+  cleanup_strategy:
+  - CONFIG
+  - LOGS
+  - RESULTS
+  cores: 1
+  dependency_embedding: CONDA
+  execution_mode: RUN
+  htsinfer_config: null
+  resources_version: null
+  snakemake_config: null
+  working_directory: null
+sample:
+  fragment_length_distribution_mean: 300.0
+  fragment_length_distribution_sd: 100.0
+user:
+  affiliations: null
+  author: test_author
+  emails: null
+  logo: null
+  urls: null

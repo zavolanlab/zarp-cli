@@ -27,7 +27,9 @@ _or do not apply_.
       have added type annotations for any local variables that are non-trivial,
       potentially ambiguous or might otherwise benefit from explicit typing.
 - [ ] I have commented my code in hard-to-understand areas
-- [ ] I have added ["Google-style docstrings"] to all new modules, classes,
+- [ ] I have added [Google-style
+      docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
+      to all new modules, classes,
       methods/functions or updated previously existing ones
 - [ ] I have added tests that prove my fix is effective or that my feature
       works

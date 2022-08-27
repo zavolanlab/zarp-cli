@@ -6,35 +6,36 @@ jobs:
 
   static-code-analysis:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
 
-      - name: Checkout the repository
+      - name: check out repository
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
+      - name: install requirements
+        run: |
+          pip install -e .
+          pip install -r requirements_dev.txt
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Install dev dependencies
-        run: pip install -r requirements_dev.txt
-
-      - name: Run Flake8
+      - name: flake8
         run: flake8
 
-      - name: Run Pylint
+      - name: pylint
         run: pylint --rcfile pylint.cfg setup.py zarp/
 
-      - name: Run Mypy
+      - name: mypy
         run: mypy zarp
 
   unit-testing:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10' ]
 
@@ -42,26 +43,20 @@ jobs:
 
     steps:
 
-      - name: Checkout the repository
+      - name: check out repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+      - name: install requirements
+        run: |
+          pip install -e .
+          pip install -r requirements_dev.txt
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Install dev dependencies
-        run: pip install -r requirements_dev.txt
-
-      - name: Test code coverage
+      - name: run unit tests
         run: |
           coverage run --source zarp -m pytest
           coverage xml
 
-      - name: Submit Report to Codecov
+      - name: submit coverage report
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -71,8 +66,12 @@ jobs:
 
   integration-testing:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ '3.7', '3.8', '3.9', '3.10' ]
 
@@ -80,55 +79,20 @@ jobs:
 
     steps:
 
-      - name: Checkout the repository
+      - name: check out repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+      - name: install requirements
+        run: pip install -e .
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Install dev dependencies
-        run: pip install -r requirements_dev.txt
-
-      - name: Install ZARP-CLI
-        run: python setup.py install
-
-      - name: Run integration test
+      - name: integration test - help screen
         run: zarp --help
 
-#  semantic-release:
-#
-#    needs:
-#      - static-code-analysis
-#      - unit-testing
-#      - integration-testing
-#    
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#
-#      - name: Checkout the repository
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: '0'
-#
-#      - name: Set up Python 3.10
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: '3.10'
-#
-#      - name: Install dependencies
-#        run: pip install -r requirements.txt
-#
-#      - name: Install dev dependencies
-#        run: pip install -r requirements_dev.txt
-#
-#      - name: Publish the package (DEBUG mode)
-#        run: |
-#          git config --global user.name "semantic-release (via GH Actions)"
-#          git config --global user.email "semantic-release@actions"
-#          semantic-release publish -v DEBUG
+      - name: integration test - version screen
+        run: zarp --version
+
+      - name: integration test - normal mode
+        run: |
+          mkdir -p ~/.zarp
+          cp tests/files/config_valid.yaml ~/.zarp/user.yaml
+          zarp SRR1234567

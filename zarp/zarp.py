@@ -1,133 +1,71 @@
-#!/usr/bin/env python
-"""CLI runner for the ZARP RNA-Seq analysis pipeline."""
+"""Main class and entry point when imported as a library."""
 
-import argparse
-from enum import Enum
 import logging
-import sys
-from typing import (Optional, Sequence)
+from pathlib import Path
 
-from zarp import __version__
+from zarp.config import models
+from zarp.config.samples import SampleProcessor
+from zarp.utils import generate_id
 
 LOGGER = logging.getLogger(__name__)
 
 
-class LogLevels(Enum):
-    """Log level enumerator."""
-    DEBUG = logging.DEBUG
-    INFO = logging.INFO
-    WARN = logging.WARNING
-    WARNING = logging.WARNING
-    ERROR = logging.ERROR
-    CRITICAL = logging.CRITICAL
-
-
-def parse_args(
-    args: Optional[Sequence[str]] = None
-) -> argparse.Namespace:
-    """Parse CLI arguments."""
-    description = (
-        f"{sys.modules[__name__].__doc__}\n\n"
-        ""
-    )
-    epilog = (
-        f"%(prog)s v{__version__}, (c) 2021 by Zavolab "
-        "(zavolab-biozentrum@unibas.ch)"
-    )
-    parser = argparse.ArgumentParser(
-        description=description,
-        epilog=epilog,
-        add_help=False,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    samples = parser.add_argument_group(
-        title="Positional arguments",
-    )
-    samples.add_argument(
-        "samples",
-        metavar="PATH/ID",
-        nargs="*",
-        type=str,
-        help=(
-            "paths to individual samples, ZARP sample tables and/or SRA "
-            "identifiers; see online documentation for details"
-        ),
-    )
-#    runs = parser.add_argument_group(
-#        title="Run-specific arguments",
-#        description=(
-#            "Use these arguments to overwrite defaults set up during "
-#            "initiation; see online documentation for details"
-#        ),
-#    )
-    misc = parser.add_argument_group(
-        title="ZARP-CLI arguments",
-        description="Arguments not passed on to the analysis pipeline",
-    )
-    misc.add_argument(
-        "-h", "--help",
-        action="help",
-        help="show this help message and exit",
-    )
-    misc.add_argument(
-        "--init",
-        action="store_true",
-        help="edit user-level default parameters and exit",
-    )
-    misc.add_argument(
-        "--verbosity",
-        choices=[e.name for e in LogLevels],
-        default="INFO",
-        type=str,
-        help="logging verbosity level",
-    )
-    misc.add_argument(
-        "--version",
-        action="version",
-        version=epilog,
-        help="show version information and exit",
-    )
-
-    args_parsed = parser.parse_args(args)
-    if not args_parsed.init and not args_parsed.samples:
-        print("Error: no samples supplied\n")
-        parser.print_help(sys.stderr)
-        sys.exit(1)
-
-    return args_parsed
-
-
-def setup_logging(
-    verbosity: str = 'INFO',
-) -> None:
-    """Configure logging."""
-    level = LogLevels[verbosity].value
-    logging.basicConfig(
-        level=level,
-        format="[%(asctime)s] %(message)s",
-        datefmt='%m-%d %H:%M:%S',
-    )
-
-
-def main() -> None:
-    """Main function.
+class ZARP:
+    """Handle ZARP workflow execution.
 
     Args:
-        args: Command-line arguments and their values.
+        config: ZARP-cli configuration.
+
+    Attributes:
+        config: ZARP-cli configuration.
     """
 
-    # Initialize
-    args = parse_args()
-    setup_logging(
-        verbosity=args.verbosity,
-    )
-    LOGGER.debug("Logging set up")
+    def __init__(
+        self,
+        config: models.Config = models.Config(),
+    ):
+        """Class constructor."""
+        self.config: models.Config = config
 
-    # Do stuff
+    def set_up_run(self) -> None:
+        """Set up run.
 
-    # Clean up
-    LOGGER.info("Done")
+        Raises:
+            FileExistsError: The run directory exists already.
+        """
+        if self.config.run.working_directory is None:
+            self.config.run.working_directory = Path.cwd()
+        self.config.run.working_directory.mkdir(parents=True, exist_ok=True)
+        LOGGER.info("Setting up run...")
+        if self.config.run.identifier is None:
+            self.config.run.identifier = generate_id()
+        LOGGER.info(f"Run identifier: {self.config.run.identifier}")
+        self.config.run.run_directory = (
+            self.config.run.working_directory / self.config.run.identifier
+        )
+        try:
+            self.config.run.run_directory.mkdir(parents=False, exist_ok=False)
+        except FileExistsError as exc:
+            raise FileExistsError(
+                f"Run directory '{self.config.run.run_directory}' already "
+                "exists. Please choose a different run identifier or "
+                "working directory."
+            ) from exc
+        LOGGER.info(f"Run directory: {self.config.run.run_directory}")
+        LOGGER.info("Run set up")
 
-
-if __name__ == "__main__":
-    main()
+    def process_samples(self) -> None:
+        """Process samples."""
+        LOGGER.info("Processing sample references...")
+        sample_processor = SampleProcessor(
+            *self.config.ref,
+            sample_config=self.config.sample,
+            run_config=self.config.run,
+        )
+        sample_processor.set_samples()
+        LOGGER.info(f"Samples found: {len(sample_processor.samples)}")
+        if len(sample_processor.samples) == 0:
+            raise ValueError("No samples found. Aborting.")
+        self.config.run.sample_table = sample_processor.write_sample_table()
+        LOGGER.info(f"Sample table: {self.config.run.sample_table}")
+        LOGGER.info("Samples processed")

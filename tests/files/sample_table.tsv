@@ -1,0 +1,6 @@
+sample	seqmode	fq1	index_size	kmer	fq1_3p	fq1_5p	organism	gtf	genome	sd	mean	libtype	fq1_polya_3p	fq1_polya_5p	fq2	fq2_3p	fq2_5p	fq2_polya_3p	fq2_polya_5p
+paired		empty	199		ACGTACGT		homo_sapiens		empty	25		ISF	AAAAAAAA		empty	ACGTACGT		XXXXXXXX	TTTTTTTT
+single	se	empty		31	ACGTACGT	XXXXXXXX	12345	empty	empty		250	SF	AAAAAAAA			XXXXXXXX			
+SRR1234567	pe		34	15						100	350	ISF	AAAAAAAA	XXXXXXXX		ACGTACGT	XXXXXXXX	XXXXXXXX	TTTTTTTT
+DRR7654321																			
+invalid_ref																			

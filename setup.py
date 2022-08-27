@@ -1,4 +1,4 @@
-"""ZARP CLI package definition"""
+"""ZARP CLI package definition."""
 
 import os
 from typing import List
@@ -11,15 +11,13 @@ root_dir: str = os.path.dirname(os.path.abspath(__file__))
 
 # Read long description from file
 FILE_NAME: str = os.path.join(root_dir, "README.md")
-if os.path.isfile(FILE_NAME):
-    with open(FILE_NAME, encoding="utf-8") as _f:
-        LONG_DESCRIPTION: str = _f.read()
+with open(FILE_NAME, encoding="utf-8") as _f:
+    LONG_DESCRIPTION: str = _f.read()
 
 # Read requirements from file
-FILE_NAME: str = os.path.join(root_dir, "requirements.txt")
-if os.path.isfile(FILE_NAME):
-    with open(FILE_NAME, encoding="utf-8") as _f:
-        INSTALL_REQUIRES: List = _f.read().splitlines()
+FILE_NAME = os.path.join(root_dir, "requirements.txt")
+with open(FILE_NAME, encoding="utf-8") as _f:
+    INSTALL_REQUIRES: List = _f.read().splitlines()
 
 setup(
     name="zarp",
@@ -48,21 +46,24 @@ setup(
         "Topic :: Utilities",
     ],
     entry_points={
-        'console_scripts': [
-            'zarp = zarp.zarp:main',
+        "console_scripts": [
+            "zarp = zarp.cli:main",
         ],
     },
     keywords=[
-        'bioinformatics',
-        'workflow',
-        'ngs',
-        'high-throughput sequencing',
+        "bioinformatics",
+        "workflow",
+        "ngs",
+        "high-throughput sequencing",
     ],
     project_urls={
-        "Repository":
-        "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli",
-        "Tracker":
-        "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli/-/issues",
+        "Repository": (
+            "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli"
+        ),
+        "Tracker": (
+            "https://git.scicore.unibas.ch/zavolan_group/"
+            "tools/zarp-cli/-/issues"
+        ),
     },
     packages=find_packages(),
     include_package_data=True,
