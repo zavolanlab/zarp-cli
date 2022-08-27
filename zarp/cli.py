@@ -9,13 +9,11 @@ from typing import Dict
 
 from rich.logging import RichHandler
 
-from zarp import (
-    ConfigParser,
-    Initializer,
-    ZARP,
-)
 from zarp.config.args import ArgParser
 from zarp.config.enums import LogLevels
+from zarp.config.init import Initializer
+from zarp.config.parser import ConfigParser
+from zarp.zarp import ZARP
 
 LOGGER = logging.getLogger(__name__)
 
