@@ -97,6 +97,7 @@ def main() -> None:
             sys.exit(1)
 
     except KeyboardInterrupt:
+        print()
         LOGGER.error("Execution interrupted.")
         sys.exit(128 + signal.SIGINT)
 

@@ -2,6 +2,7 @@
 
 import importlib.util
 from pathlib import Path
+from shutil import copyfile
 import sys
 
 import pytest
@@ -14,6 +15,9 @@ from zarp.cli import (
 from zarp.config.init import Initializer
 from zarp.config.parser import ConfigParser
 from zarp.zarp import ZARP
+
+TEST_FILE_DIR: Path = Path(__file__).parent.absolute() / "files"
+CONFIG_FILE: Path = TEST_FILE_DIR / "config_valid.yaml"
 
 
 def test_main_as_script():
@@ -34,16 +38,38 @@ class TestMain:
             main()
         assert exc.value.code == 1
 
-    def test_normal_mode_with_args(self, monkeypatch):
+    def test_normal_mode_with_args(self, monkeypatch, tmpdir):
         """Call with args."""
-        monkeypatch.setattr(sys, "argv", ["zarp", "SRR1234567"])
+        TMP_CONFIG_FILE = Path(tmpdir / "config.yaml")
+        copyfile(CONFIG_FILE, TMP_CONFIG_FILE)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "zarp",
+                "SRR1234567",
+                "--config-file",
+                str(TMP_CONFIG_FILE),
+            ],
+        )
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code == 0
 
-    def test_normal_mode_with_runtime_error(self, monkeypatch):
+    def test_normal_mode_with_runtime_error(self, monkeypatch, tmpdir):
         """Call with runtime error being raised."""
-        monkeypatch.setattr(sys, "argv", ["zarp", "SRR1234567"])
+        TMP_CONFIG_FILE = Path(tmpdir / "config.yaml")
+        copyfile(CONFIG_FILE, TMP_CONFIG_FILE)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "zarp",
+                "SRR1234567",
+                "--config-file",
+                str(TMP_CONFIG_FILE),
+            ],
+        )
         monkeypatch.setattr(ZARP, "set_up_run", RaiseError(exc=ValueError))
         with pytest.raises(SystemExit) as exc:
             main()
