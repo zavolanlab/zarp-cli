@@ -55,7 +55,7 @@ class TestInitializer:
         """Test method `.set_from_file()` with invalid file."""
         initializer: Initializer = Initializer()
         config_file: Path = Path(tmpdir / "config_file")
-        with open(config_file, "w") as _file:
+        with open(config_file, "w", encoding="utf-8") as _file:
             _file.write("INVALID")
         with pytest.raises(ValueError):
             initializer.set_from_file(config_file=config_file)
