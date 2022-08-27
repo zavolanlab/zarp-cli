@@ -46,7 +46,31 @@ zarp \
 
 ## Installation
 
-TBA
+Clone this repository and traverse into the app directory:
+
+```sh
+git clone git@github.com:zavolanlab/zarp-cli.git
+cd zarp-cli
+```
+
+Install the app:
+
+```sh
+pip install .
+```
+
+> If you would like to contribute to ZARP-cli development, we recommend
+> installing the app in editable mode:
+>
+> ```sh
+> pip install -e .
+> ```
+
+Optionally, install required packages for testing and development:
+
+```sh
+pip install -r requirements_dev.txt
+```
 
 ## Contributing
 
@@ -64,6 +88,7 @@ by email: <zavolab-biozentrum@unibas.ch>
 
 &copy; 2021 [Zavolab, Biozentrum, University of Basel][contact]
 
+[contact]: <zavolab-biozentrum@unibas.ch>
 [badge-build-status]: <https://travis-ci.com/zavolanlab/zarp-cli.svg?branch=dev>
 [badge-coverage]: <https://img.shields.io/coveralls/github/zavolanlab/zarp-cli>
 [badge-docs]: <https://readthedocs.org/projects/zarp-cli/badge/?version=latest>
@@ -76,5 +101,4 @@ by email: <zavolab-biozentrum@unibas.ch>
 [badge-url-github-tag]: <https://github.com/zavolanlab/zarp-cli/releases>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-pypi]: <https://pypi.python.org/pypi/zarp-cli>
-[contact]: <https://zavolan.biozentrum.unibas.ch/>
 [issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
