@@ -50,6 +50,8 @@ class TestMain:
                 "SRR1234567",
                 "--config-file",
                 str(TMP_CONFIG_FILE),
+                "--working-directory",
+                str(tmpdir),
             ],
         )
         with pytest.raises(SystemExit) as exc:

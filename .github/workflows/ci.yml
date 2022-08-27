@@ -93,6 +93,6 @@ jobs:
 
       - name: integration test - normal mode
         run: |
-          mkdir ~/.zarp
+          mkdir -p ~/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
           zarp SRR1234567

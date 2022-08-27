@@ -45,6 +45,7 @@ class ArgParser:
             "identifier",
             "resources_version",
             "snakemake_config",
+            "working_directory",
         ],
         "user": [
             "affiliations",
@@ -461,6 +462,13 @@ class ArgParser:
                 "command-line options for Snakemake; will be interpolated into"
                 " the Snakemake calls"
             ),
+        )
+        argument_group.add_argument(
+            "--working-directory",
+            default=None,
+            type=lambda p: Path(p).absolute(),
+            metavar="PATH",
+            help="directory in which the ZARP run is executed",
         )
 
     @staticmethod
