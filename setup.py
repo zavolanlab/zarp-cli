@@ -11,12 +11,12 @@ root_dir: str = os.path.dirname(os.path.abspath(__file__))
 
 # Read long description from file
 FILE_NAME: str = os.path.join(root_dir, "README.md")
-with open(FILE_NAME) as _f:
+with open(FILE_NAME, encoding="utf-8") as _f:
     LONG_DESCRIPTION: str = _f.read()
 
 # Read requirements from file
 FILE_NAME = os.path.join(root_dir, "requirements.txt")
-with open(FILE_NAME) as _f:
+with open(FILE_NAME, encoding="utf-8") as _f:
     INSTALL_REQUIRES: List = _f.read().splitlines()
 
 setup(
