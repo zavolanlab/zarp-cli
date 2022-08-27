@@ -99,7 +99,7 @@ class ConfigParser:
             ValueError: File is not valid YAML.
         """
         try:
-            with open(path) as _file:
+            with open(path, encoding="utf-8") as _file:
                 try:
                     return safe_load(_file)
                 except YAMLError as exc:
@@ -107,10 +107,6 @@ class ConfigParser:
                         f"file is not valid YAML: {path}"
                     ) from exc
         except FileNotFoundError as exc:
-            raise FileNotFoundError(
-                f"file does not exist: {path}"
-            ) from exc
+            raise FileNotFoundError(f"file does not exist: {path}") from exc
         except OSError as exc:
-            raise OSError(
-                f"file could not be read: {path}"
-            ) from exc
+            raise OSError(f"file could not be read: {path}") from exc

@@ -148,8 +148,7 @@ class SampleProcessor:
         table = SampleTableProcessor()
         table.read(path=path)
         LOGGER.warning(table.records)
-        for record_index in range(len(table.records)):
-            record = table.records[record_index]
+        for index, record in enumerate(table.records):
             deref = SampleReference()
             # sequence archive identifier
             if record["paths"][0] is None and self._is_unnamed_seq_identifier(
@@ -194,14 +193,14 @@ class SampleProcessor:
             else:
                 LOGGER.warning(
                     "Cannot determine type of sample reference for row "
-                    f"{record_index + 1} of sample table '{path}'. Check "
-                    "spelling and refer to documentation for supported "
-                    "syntax. Skipping."
+                    f"{index + 1} of sample table '{path}'. Check spelling "
+                    "and refer to documentation for supported syntax. "
+                    "Skipping."
                 )
                 continue
             LOGGER.debug(
-                f"Type of sample reference for row {record_index + 1} of "
-                f"sample table '{path}': {deref.type}"
+                f"Type of sample reference for row {index + 1} of sample "
+                f"table '{path}': {deref.type}"
             )
 
     def _set_sample_from_local_lib(

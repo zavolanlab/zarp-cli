@@ -188,7 +188,7 @@ having entered a value. Make sure to enter only _one_ value per query.
                 exist_ok=True,
             )
         try:
-            with open(path, "w") as _file:
+            with open(path, "w", encoding="utf-8") as _file:
                 try:
                     safe_dump(jsonref.loads(contents.json()), _file)
                 except (JSONDecodeError, YAMLError) as exc:

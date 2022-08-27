@@ -90,7 +90,7 @@ class TestMain:
                 str(tmpdir / "config.yaml"),
             ],
         )
-        open(tmpdir / "config.yaml", "w").close()
+        open(tmpdir / "config.yaml", "w", encoding="utf-8").close()
         monkeypatch.setattr(
             Initializer,
             "set_from_user_input",
