@@ -100,6 +100,31 @@ class TestMain:
             main()
         assert exc.value.code == 0
 
+    def test_init_mode_no_default_config(self, monkeypatch, tmpdir):
+        """Test init mode when no default config file is available."""
+
+        def patched_set_from_user_input(self):
+            pass
+
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "zarp",
+                "SRR1234567",
+                "--config-file",
+                str(tmpdir / "config.yaml"),
+            ],
+        )
+        monkeypatch.setattr(
+            Initializer,
+            "set_from_user_input",
+            patched_set_from_user_input,
+        )
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 0
+
     def test_init_mode_write_error(self, monkeypatch, tmpdir):
         """Test init mode with write error."""
 
