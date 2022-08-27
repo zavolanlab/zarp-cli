@@ -31,7 +31,7 @@ def setup_logging(
     )
 
 
-def main() -> None:
+def main() -> None:  # pylint: disable=R0915
     """Entry point for CLI executable."""
     try:
         # create stack for log messages before logging is set up
