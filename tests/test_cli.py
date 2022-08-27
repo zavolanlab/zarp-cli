@@ -1,4 +1,4 @@
-"""Unit tests for module `zarp.cli`."""
+"""Unit tests for ``:mod:zarp.cli``."""
 
 import importlib.util
 from pathlib import Path
@@ -6,21 +6,20 @@ import sys
 
 import pytest
 
-from zarp.config.cli import (
+from tests.utils import RaiseError
+from zarp.cli import (
     main,
-    parse_args,
     setup_logging,
 )
-
-# Test parameters
-MAIN_FILE = Path(__file__).parents[1].absolute() / "zarp" / "config" / "cli.py"
-OPT_LOG_LEVEL = "DEBUG"
-OPT_INVALID = "-+-+-"
+from zarp.config.init import Initializer
+from zarp.config.parser import ConfigParser
+from zarp.zarp import ZARP
 
 
 def test_main_as_script():
     """Run as script."""
-    spec = importlib.util.spec_from_file_location('__main__', MAIN_FILE)
+    MAIN_FILE = Path(__file__).parents[1].absolute() / "zarp" / "cli.py"
+    spec = importlib.util.spec_from_file_location("__main__", MAIN_FILE)
     module = importlib.util.module_from_spec(spec)  # type: ignore
     with pytest.raises(SystemExit):
         spec.loader.exec_module(module)  # type: ignore
@@ -29,100 +28,115 @@ def test_main_as_script():
 class TestMain:
     """Test `main()` function."""
 
-    def test_main(self):
+    def test_normal_mode_without_args(self):
         """Call without args."""
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code == 1
 
-    def test_main_with_args(self, monkeypatch):
+    def test_normal_mode_with_args(self, monkeypatch):
         """Call with args."""
+        monkeypatch.setattr(sys, "argv", ["zarp", "SRR1234567"])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 0
+
+    def test_normal_mode_with_runtime_error(self, monkeypatch):
+        """Call with runtime error being raised."""
+        monkeypatch.setattr(sys, "argv", ["zarp", "SRR1234567"])
+        monkeypatch.setattr(ZARP, "set_up_run", RaiseError(exc=ValueError))
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 1
+
+    def test_init_mode(self, monkeypatch, tmpdir):
+        """Test init mode."""
+
+        def patched_set_from_user_input(self):
+            pass
+
         monkeypatch.setattr(
-            sys, 'argv', [
-                'zarp',
-                'path',
-            ]
+            sys,
+            "argv",
+            [
+                "zarp",
+                "--init",
+                "--config-file",
+                str(tmpdir / "config.yaml"),
+            ],
+        )
+        monkeypatch.setattr(
+            Initializer,
+            "set_from_user_input",
+            patched_set_from_user_input,
         )
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code == 0
 
-    def test_main_with_args_init(self, monkeypatch):
-        """Call with args."""
+    def test_init_mode_write_error(self, monkeypatch, tmpdir):
+        """Test init mode with write error."""
+
+        def patched_set_from_user_input(self):
+            pass
+
         monkeypatch.setattr(
-            sys, 'argv', [
-                'zarp',
-                '--init',
-            ]
+            sys,
+            "argv",
+            [
+                "zarp",
+                "--init",
+                "--config-file",
+                str(tmpdir / "config.yaml"),
+            ],
         )
+        open(tmpdir / "config.yaml", "w").close()
+        monkeypatch.setattr(
+            Initializer,
+            "set_from_user_input",
+            patched_set_from_user_input,
+        )
+        monkeypatch.setattr(
+            Initializer,
+            "write_yaml",
+            RaiseError(exc=OSError),
+        )
+        monkeypatch.setattr(ConfigParser, "parse_yaml", lambda path: {})
+        with pytest.raises(OSError):
+            main()
+
+    def test_help_mode(self, monkeypatch):
+        """Test help mode."""
+        monkeypatch.setattr(sys, "argv", ["zarp", "--help"])
+        with pytest.raises(SystemExit) as exc:
+            main()
+        assert exc.value.code == 0
+
+    def test_version_mode(self, monkeypatch):
+        """Test version mode."""
+        monkeypatch.setattr(sys, "argv", ["zarp", "--version"])
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code == 0
 
     def test_keyboard_interrupt(self, monkeypatch):
         """Test keyboard interrupt."""
-
-        class RaiseValueError:
-            def __init__(self, *args, **kwargs):
-                raise ValueError
-
+        monkeypatch.setattr(sys, "argv", ["zarp", "SRR1234567"])
         monkeypatch.setattr(
-            'builtins.KeyboardInterrupt',
-            ValueError,
-        )
-        monkeypatch.setattr(
-            'zarp.config.cli.parse_args',
-            RaiseValueError,
+            "zarp.cli.setup_logging", RaiseError(exc=KeyboardInterrupt)
         )
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code >= 128
 
 
-class TestParseArgs:
-    """Test `parse_args()` function."""
-
-    def test_help_option(self, monkeypatch):
-        """Test help option."""
-        with pytest.raises(SystemExit) as exc:
-            parse_args(["--help"])
-        assert exc.value.code == 0
-
-    def test_no_args(self):
-        """Call without args."""
-        with pytest.raises(SystemExit) as exc:
-            parse_args([])
-        assert exc.value.code == 1
-
-    def test_invalid_option(self):
-        """Test invalid argument."""
-        with pytest.raises(SystemExit) as exc:
-            parse_args([OPT_INVALID])
-        assert exc.value.code == 2
-
-    def test_one_sample(self):
-        """Call with one positional arg."""
-        args = parse_args(["path1"])
-        assert args.samples == [Path("path1"), None]
-
-    def test_two_samples(self):
-        """Call with two positional args."""
-        args = parse_args(["path1", "path2"])
-        assert args.samples == [Path("path1"), Path("path2")]
-
-    def test_too_many_samples(self):
-        """Call with too many (2+) positional args."""
-        with pytest.raises(SystemExit):
-            parse_args(["path1", "path2", "path3"])
-
-
 class TestSetupLogging:
     """Test `setup_logging()` function."""
 
     def test_log_level_no_args(self):
-        "Call without args."
+        """Call without args."""
         setup_logging()
 
     def test_log_level(self):
-        "Manually set log level."
-        setup_logging(verbosity=OPT_LOG_LEVEL)
+        """Manually set log level."""
+        setup_logging(verbosity="DEBUG")

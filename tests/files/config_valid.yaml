@@ -1,0 +1,18 @@
+run:
+  cleanup_strategy:
+  - CONFIG
+  - LOGS
+  - RESULTS
+  cores: 1
+  dependency_embedding: CONDA
+  execution_mode: RUN
+  htsinfer_config: null
+  resources_version: null
+  snakemake_config: null
+  working_directory: /home/uniqueg/Dropbox/repos/__bioninfo__/zarp-cli
+user:
+  affiliations: null
+  author: test_author
+  emails: null
+  logo: null
+  urls: null

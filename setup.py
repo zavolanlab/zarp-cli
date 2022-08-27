@@ -1,4 +1,4 @@
-"""ZARP CLI package definition"""
+"""ZARP CLI package definition."""
 
 import os
 from typing import List
@@ -11,15 +11,13 @@ root_dir: str = os.path.dirname(os.path.abspath(__file__))
 
 # Read long description from file
 FILE_NAME: str = os.path.join(root_dir, "README.md")
-if os.path.isfile(FILE_NAME):
-    with open(FILE_NAME) as _f:
-        LONG_DESCRIPTION: str = _f.read()
+with open(FILE_NAME) as _f:
+    LONG_DESCRIPTION: str = _f.read()
 
 # Read requirements from file
-FILE_NAME: str = os.path.join(root_dir, "requirements.txt")
-if os.path.isfile(FILE_NAME):
-    with open(FILE_NAME) as _f:
-        INSTALL_REQUIRES: List = _f.read().splitlines()
+FILE_NAME = os.path.join(root_dir, "requirements.txt")
+with open(FILE_NAME) as _f:
+    INSTALL_REQUIRES: List = _f.read().splitlines()
 
 setup(
     name="zarp",
@@ -49,7 +47,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'zarp = zarp.config.cli:main',
+            'zarp = zarp.cli:main',
         ],
     },
     keywords=[

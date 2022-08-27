@@ -99,4 +99,4 @@ by email: <zavolab-biozentrum@unibas.ch>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-pypi]: <https://pypi.python.org/pypi/zarp-cli>
 [contact]: <https://zavolan.biozentrum.unibas.ch/>
-[issue-tracker]: <https://github.com/zavolanlab/htsinfer/issues>
+[issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
