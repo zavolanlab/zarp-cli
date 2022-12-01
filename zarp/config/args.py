@@ -44,6 +44,7 @@ class ArgParser:
             "htsinfer_config",
             "identifier",
             "resources_version",
+            "rule_config",
             "snakemake_config",
             "working_directory",
         ],
@@ -451,6 +452,16 @@ class ArgParser:
             help=(
                 "version of Ensembl genome resources to use when resources are"
                 " not explicitly provided; uses latest version by default"
+            ),
+        )
+        argument_group.add_argument(
+            "--rule-config",
+            default=None,
+            type=lambda p: Path(p).absolute(),
+            metavar="PATH",
+            help=(
+                "ZARP rule configuration; refer to ZARP documentation for"
+                " details"
             ),
         )
         argument_group.add_argument(
