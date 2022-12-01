@@ -23,7 +23,7 @@ jobs:
         run: flake8
 
       - name: pylint
-        run: pylint --rcfile pylint.cfg setup.py zarp/
+        run: pylint --rcfile pylint.cfg zarp/
 
       - name: mypy
         run: mypy zarp

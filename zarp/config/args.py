@@ -10,13 +10,13 @@ from typing import (
 from pathlib import Path
 import sys
 
-from zarp import __version__
 from zarp.config.enums import (
     DependencyEmbeddingStrategies,
     ExecModes,
     LogLevels,
     OutputFileGroups,
 )
+from zarp.version import __version__
 
 
 class ArgParser:

@@ -1,7 +1,5 @@
 """Sphinx configuration."""
 
-from zarp import __version__
-
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -14,13 +12,16 @@ from zarp import __version__
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
+from pathlib import Path
 import sys
 
 from sphinx.ext import apidoc
 
-sys.path.insert(0, os.path.abspath('../..'))
+root_dir = Path.cwd().resolve().parents[1]
 
+sys.path.insert(0, root_dir)
+
+exec(open(root_dir / "zarp" / "version.py", encoding="utf-8").read())
 
 # -- Project information -----------------------------------------------------
 
@@ -29,8 +30,7 @@ copyright = '2021, Zavolan Lab'
 author = 'Zavolan Lab'
 
 # The full version, including alpha/beta/rc tags
-release = __version__
-
+release = __version__  # noqa: F821
 
 # -- General configuration ---------------------------------------------------
 

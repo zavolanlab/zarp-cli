@@ -1,27 +1,27 @@
 """ZARP CLI package definition."""
 
-import os
+from pathlib import Path
 from typing import List
 
-from setuptools import setup, find_packages
+from setuptools import (setup, find_packages)
 
-from zarp import __version__
+ROOT_DIR: Path = Path(__file__).parent.resolve()
 
-root_dir: str = os.path.dirname(os.path.abspath(__file__))
+exec(open(ROOT_DIR / "zarp" / "version.py", encoding="utf-8").read())
 
 # Read long description from file
-FILE_NAME: str = os.path.join(root_dir, "README.md")
+FILE_NAME: Path = ROOT_DIR / "README.md"
 with open(FILE_NAME, encoding="utf-8") as _f:
     LONG_DESCRIPTION: str = _f.read()
 
 # Read requirements from file
-FILE_NAME = os.path.join(root_dir, "requirements.txt")
+FILE_NAME = ROOT_DIR / 'requirements.txt'
 with open(FILE_NAME, encoding="utf-8") as _f:
     INSTALL_REQUIRES: List = _f.read().splitlines()
 
 setup(
     name="zarp",
-    version=__version__,
+    version=__version__,  # noqa: F821
     description=(
         "User-friendly command-line interface for the ZARP RNA-Seq analysis "
         "pipeline"
