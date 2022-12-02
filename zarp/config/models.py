@@ -77,6 +77,7 @@ class InitRun(CustomBaseModel):
         htsinfer_config: Configuration options for parameter inference.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided
+        rule_config: ZARP rule configuration.
         snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
 
@@ -88,6 +89,7 @@ class InitRun(CustomBaseModel):
         htsinfer_config: Configuration options for parameter inference.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
+        rule_config: ZARP rule configuration.
         snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
     """
@@ -106,6 +108,7 @@ class InitRun(CustomBaseModel):
     resources_version: Optional[int] = None
     htsinfer_config: Optional[str] = None
     snakemake_config: Optional[str] = None
+    rule_config: Optional[Path] = None
 
 
 class InitSample(CustomBaseModel):

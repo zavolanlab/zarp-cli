@@ -85,16 +85,18 @@ having entered a value. Make sure to enter only _one_ value per query.
 """
         )
         schema_full = jsonref.loads(InitConfig.schema_json())
-        for config_group in schema_full["properties"]:
+        for config_group in schema_full["properties"]:  # type: ignore
             for param, default in getattr(self.config, config_group):
-                schema = schema_full["properties"][config_group]["allOf"][0][
-                    "properties"
-                ][param]
+                schema = schema_full["properties"][  # type: ignore
+                    config_group
+                ]["allOf"][0]["properties"][
+                    param
+                ]  # type: ignore
                 choices: List = []
                 user_inputs: List = []
                 default = self._format_default(value=default)
                 param_type, param_class, item_type = self._get_param_type(
-                    schema=schema,
+                    schema=schema,  # type: ignore
                 )
                 if param_class is not None and (
                     param_type == "enum" or item_type == "enum"
