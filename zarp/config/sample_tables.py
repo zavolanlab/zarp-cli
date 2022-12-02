@@ -92,7 +92,7 @@ class SampleTableProcessor:
             sep="\t",
             keep_default_na=False,
         )
-        self.records = data.to_dict("records")
+        self.records = data.to_dict("records")  # type: ignore
         self._to_model_records(table_dir=path.parent)
         LOGGER.debug(f"Sample table records found: {len(self.records)}")
 
@@ -241,7 +241,7 @@ class SampleTableProcessor:
             else self.key_mapping.inv
         )
         data_renamed = data.rename(columns=mapping)
-        self.records = data_renamed.to_dict("records")
+        self.records = data_renamed.to_dict("records")  # type: ignore
 
     @staticmethod
     def resolve_path(anchor: Union[Path, str], path: Union[Path, str]) -> Path:

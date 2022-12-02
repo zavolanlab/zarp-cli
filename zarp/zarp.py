@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 
 from zarp.config import models
+from zarp.config.run_config import RunConfigFileProcessor
 from zarp.config.samples import SampleProcessor
 from zarp.utils import generate_id
 
@@ -69,3 +70,15 @@ class ZARP:
         self.config.run.sample_table = sample_processor.write_sample_table()
         LOGGER.info(f"Sample table: {self.config.run.sample_table}")
         LOGGER.info("Samples processed")
+
+    def prepare_run_config(self) -> None:
+        """Prepare run configuration."""
+        LOGGER.info("Preparing run configuration file...")
+        run_config_processor = RunConfigFileProcessor(
+            run_config=self.config.run,
+            user_config=self.config.user,
+        )
+        self.config.run.run_config = run_config_processor.write_run_config()
+        LOGGER.info(
+            f"Run configuration file prepared: {self.config.run.run_config}"
+        )
