@@ -52,7 +52,7 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
             )
         path: Path = self.run_config.run_directory / "config.yml"
         content: str = self._get_file_content()
-        with open(path, "w") as _file:
+        with open(path, "w", encoding="utf-8") as _file:
             _file.write(content)
         return path
 
