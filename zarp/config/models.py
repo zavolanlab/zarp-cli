@@ -179,6 +179,7 @@ class ConfigRun(InitRun):
     identifier: Optional[str] = None
     run_directory: Optional[Path] = None
     sample_table: Optional[Path] = None
+    run_config: Optional[Path] = None
 
 
 class ConfigSample(InitSample):
