@@ -1,230 +1,351 @@
-"""Models and enumerators."""
+"""Configuration models."""
 
-from enum import Enum
-from typing import (Optional, List, Tuple)
+from pathlib import Path
+from typing import (
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import (  # pylint: disable=no-name-in-module
+    BaseModel,
+    EmailStr,
+    FilePath,
+    HttpUrl,
+)
+from pydantic_collections import BaseCollectionModel  # type: ignore
+
+from zarp.config.enums import (
+    DependencyEmbeddingStrategies,
+    ExecModes,
+    OutputFileGroups,
+    ReadOrientation,
+    SampleReferenceTypes,
+)
 
 # pylint: disable=too-few-public-methods
 
 
-# Sample-specific enumerators and models
-class SampleIds(BaseModel):
-    """Sample identifiers and aliases.
+class CustomBaseModel(BaseModel):
+    """Base model that all other models derive from."""
+
+    class Config:
+        """Configuration class."""
+
+        use_enum_values = True
+        validate_assignment = True
+
+
+class InitUser(CustomBaseModel):
+    """User-specific parameters for initialization.
 
     Args:
-        name: Human-friendly sample name.
-        sra: SRA sample or run identifier.
+        affiliations: Affiliations of the person running the analysis.
+        author: Name of the person running the analysis.
+        emails: Email addresses of the person running the analysis.
+        logo: Path or URL pointing to image file to be used as a logo
+            in the run report.
+        urls: One or more URLs with additional information about the author or
+            their affiliation.
 
     Attributes:
-        name: Human-friendly sample name.
-        sra: SRA sample or run identifier.
+        affiliations: Affiliations of the person running the analysis.
+        author: Name of the person running the analysis.
+        emails: Email addresses of the person running the analysis.
+        logo: Path or URL pointing to image file to be used as a logo
+            in the run report.
+        urls: One or more URLs with additional information about the author or
+            their affiliation.
     """
-    name: Optional[str] = None
-    sra: Optional[str] = None
+
+    author: Optional[str] = None
+    emails: Optional[List[EmailStr]] = None
+    affiliations: Optional[List[str]] = None
+    urls: Optional[List[HttpUrl]] = None
+    logo: Optional[Union[HttpUrl, FilePath]] = None
 
 
-class ReadLayout(BaseModel):
-    """Adapters and linkers that may be present in a library's reads.
+class InitRun(CustomBaseModel):
+    """Run-specific parameters for initialization.
 
     Args:
-        three: 3'-end adapter, truncated during preprocessing.
+        cleanup_strategy: Types of output files to keep.
+        cores: Cores to be used by the workflow engine.
+        dependency_embedding: Dependency embedding strategy to use.
+        execution_mode: Execution mode to use.
+        htsinfer_config: Configuration options for parameter inference.
+        resources_version: Version of Ensembl genome resources to use when
+            resources are not provided
+        rule_config: ZARP rule configuration.
+        snakemake_config: Configuration options for execution environment.
+        working_directory: Root directory for all runs.
 
     Attributes:
-        three: 3'-end adapter, truncated during preprocessing.
+        cleanup_strategy: Types of output files to keep.
+        cores: Cores to be used by the workflow engine.
+        dependency_embedding: Dependency embedding strategy to use.
+        execution_mode: Execution mode to use.
+        htsinfer_config: Configuration options for parameter inference.
+        resources_version: Version of Ensembl genome resources to use when
+            resources are not provided.
+        rule_config: ZARP rule configuration.
+        snakemake_config: Configuration options for execution environment.
+        working_directory: Root directory for all runs.
     """
-    three: Optional[str] = None
+
+    working_directory: Optional[Path] = None
+    cleanup_strategy: Optional[List[OutputFileGroups]] = [
+        OutputFileGroups.CONFIG,
+        OutputFileGroups.LOGS,
+        OutputFileGroups.RESULTS,
+    ]
+    execution_mode: Optional[ExecModes] = ExecModes.RUN
+    dependency_embedding: Optional[
+        DependencyEmbeddingStrategies
+    ] = DependencyEmbeddingStrategies.CONDA
+    cores: Optional[int] = 1
+    resources_version: Optional[int] = None
+    htsinfer_config: Optional[str] = None
+    snakemake_config: Optional[str] = None
+    rule_config: Optional[Path] = None
 
 
-class FragLenDist(BaseModel):
-    """Fragment length distribution parameters of the sequencing library.
-
-    Required for single-end libraries. If not provided, default values will be
-    used. For paired-end libraries any provided values will be ignored, as
-    values will be automatically inferred.
+class InitSample(CustomBaseModel):
+    """Sample-specific parameters for initialization.
 
     Args:
-        mean: Mean of the fragment length distribution.
-        sd: Standard deviation of the fragment length distribution.
+        fragment_length_distribution_mean: Mean of the fragment length
+            distribution.
+        fragment_length_distribution_sd: Standard deviation of the fragment
+            length distribution.
+        trim_poly_a: Whether to remove poly-A tails from reads.
 
     Attributes:
-        mean: Mean of the fragment length distribution.
-        sd: Standard deviation of the fragment length distribution.
+        fragment_length_distribution_mean: Mean of the fragment length
+            distribution.
+        fragment_length_distribution_sd: Standard deviation of the fragment
+            length distribution.
     """
-    mean: float = 300
-    sd: float = 100
+
+    fragment_length_distribution_mean: Optional[float] = 300
+    fragment_length_distribution_sd: Optional[float] = 100
 
 
-class GenomeResources(BaseModel):
-    """Genome resources to be used for mapping reads and annotating alignments.
+class InitConfig(CustomBaseModel):
+    """ZARP-cli user default configuration set during initialization.
 
     Args:
-        reference_sequences: Path to FASTA file containing reference sequences
-            to align reads against, typically chromosome sequences.
-        annotations: Path to GTF file containing gene annotations for the
-            `reference_sequences`.
+        run: Run-specific parameters.
+        user: User-specific parameters.
+        sample: Sample-specific parameters.
 
     Attributes:
-        reference_sequences: Path to FASTA file containing reference sequences
-            to align reads against, typically chromosome sequences.
-        annotations: Path to GTF file containing gene annotations for the
-            `reference_sequences`.
+        run: Run-specific parameters.
+        user: User-specific parameters.
+        sample: Sample-specific parameters.
     """
-    reference_sequences: Optional[str] = None
-    annotations: Optional[str] = None
+
+    user: InitUser = InitUser()
+    run: InitRun = InitRun(
+        cleanup_strategy=[
+            OutputFileGroups.CONFIG,
+            OutputFileGroups.LOGS,
+            OutputFileGroups.RESULTS,
+        ]
+    )
+    sample: InitSample = InitSample()
 
 
-class Sample(BaseModel):
-    """Sample-specific parameters.
-
-    Args:
-        file_paths: Paths to FASTQ files of a sequencing library. Either a
-            tuple of two paths (paired-end library) or a tuple of one path and
-            `None` (for single-end libraries).
-        ids: Sample identifiers and aliases.
-        read_layout: Adapters and linkers that may be present in a library's
-            reads.
-        fragment_length_distribution: Fragment length distribution parameters
-            of the sequencing library.
-
-    Attributes:
-        file_paths: Paths to FASTQ files of a sequencing library.
-        ids: Sample identifiers and aliases.
-        read_layout: Adapters and linkers that may be present in a library's
-            reads.
-        fragment_length_distribution: Fragment length distribution parameters
-            of the sequencing library.
-    """
-    file_paths: Optional[Tuple[str, Optional[None]]] = None
-    ids: SampleIds = SampleIds()
-    read_layout: ReadLayout = ReadLayout()
-    fragment_length_distribution: FragLenDist = FragLenDist()
-
-
-# Run-specific enumerators and models
-class ExecModes(Enum):
-    """Execution modes.
-
-    Args:
-        DRY_RUN: Do not download any files, infer parameters or start the
-            analysis workflow.
-        PREPARE_RUN: Download files and infer parameters, but do not start the
-            analysis workflow.
-        RUN:  Download files, infer parameters and start the analysis workflow.
-
-    Attributes:
-        DRY_RUN: Do not download any files, infer parameters or start the
-            analysis workflow.
-        PREPARE_RUN: Download files and infer parameters, but do not start the
-            analysis workflow.
-        RUN:  Download files, infer parameters and start the analysis workflow.
-    """
-    DRY_RUN = "dry_run"
-    PREPARE_RUN = "prepare_run"
-    RUN = "run"
-
-
-class ToolPackaging(Enum):
-    """Supported tool packaging options.
-
-    Args:
-        CONDA: Use binaries from Conda.
-        SINGULARITY: Use Singularity containers.
-
-    Attributes:
-        CONDA: Use binaries from Conda.
-        SINGULARITY: Use Singularity containers.
-    """
-    CONDA = "--use-conda"
-    SINGULARITY = "--use-singularity"
-
-
-class OutputFiles(Enum):
-    """Output file types.
-
-    Args:
-        CONFIGS: Configuration files.
-        LOGS: Log files.
-        RESULTS: Result files.
-        TEMPORARY: Temporary files.
-
-    Attributes:
-        CONFIGS: Configuration files.
-        LOGS: Log files.
-        RESULTS: Result files.
-        TEMPORARY: Temporary files.
-    """
-    CONFIGS = "configs"
-    LOGS = "logs"
-    RESULTS = "results"
-    TEMPORARY = "temporary"
-
-
-class Run(BaseModel):
+class ConfigRun(InitRun):
     """Run-specific parameters.
 
     Args:
-        identifier: Unique identifier for a run.
         description: Run description.
-        cores: Cores to use when running the analysis workflow.
-        configuration: Configuration file for parameter inference, general
-            Snakemake parameters and workflow-specific parameters.
-        execution_mode: Execution mode to use.
-        tool_packaging: Tool packaging option to use.
-        execution_profile: Configuration options for execution environment.
-        keep_files: Types of output files to keep.
+        identifier: Unique identifier for a run.
+        run_directory: Directory where files for the current run will be
+            stored.
+        sample_table: Path to ZARP sample table.
+
+    Attributes:
+        description: Run description.
+        identifier: Unique identifier for a run.
+        run_directory: Directory where files for the current run will be
+            stored.
+        sample_table: Path to ZARP sample table.
     """
-    identifier: Optional[str] = None
+
     description: Optional[str] = None
-    cores: int = 1
-    htsinfer_config: Optional[str] = None
-    execution_mode: ExecModes = ExecModes.RUN
-    tool_packaging: ToolPackaging = ToolPackaging.CONDA
-    execution_profile: Optional[str] = None
-    snakemake_config: Optional[str] = None
-    keep_files: List[OutputFiles] = [
-        OutputFiles.CONFIGS,
-        OutputFiles.LOGS,
-        OutputFiles.RESULTS,
-    ]
+    identifier: Optional[str] = None
+    run_directory: Optional[Path] = None
+    sample_table: Optional[Path] = None
+    run_config: Optional[Path] = None
 
 
-# User-specific enumerators and models
-class User(BaseModel):
-    """User-specific parameters.
+class ConfigSample(InitSample):
+    """Sample-specific parameters.
 
     Args:
-        surname: Surname of the person running the analysis.
-        other_names: First/other names of the person running the analysis.
-        email: Email address of the person running the analysis.
-        affiliations: Affiliations of the person running the analysis.
-        url: One or more URLs with additional information about the author or
-            their affiliation.
-        logo_location: Path or URL pointing to image file to be used as a logo
-            in the run report.
+        adapter_3p: Tuple of adapter sequences to truncate from the 3'-ends of
+            single-end/first and second mate libraries, respectively.
+        adapter_5p: Tuple of adapter sequences to truncate from the 5'-ends of
+            single-end/first and second mate libraries, respectively.
+        adapter_poly_3p: Tuple of polynucleotide stretch sequences to truncate
+            from the 3'-ends of single-end/first and second mate libraries,
+            respectively.
+        adapter_poly_5p: Tuple of polynucleotide stretch sequences to truncate
+            from the 3'-ends of single-end/first and second mate libraries,
+            respectively.
+        annotations: Path to GTF file containing gene annotations for the
+            `reference_sequences`.
+        read_orientation: Orientation of reads in sequencing library. Cf.
+            https://salmon.readthedocs.io/en/latest/library_type.html.
+        reference_sequences: Path to FASTA file containing reference sequences
+            to align reads against, typically chromosome sequences.
+        source: Origin of the sample as either a NCBI taxonomy database
+            identifier, e.g, `9606` for humans, or the corresponding full name,
+            e.g., "Homo sapiens".
+        star_sjdb_overhang: Overhang length for splice junctions in STAR (
+            parameter `sjdbOverhang`). Ideally the maximum read length minus 1.
+            Lower values may result in decreased mapping accuracy, while higher
+            values may result in longer processing times. Cf.
+            https://github.com/alexdobin/STAR/blob/3ae0966bc604a944b1993f49aaeb597e809eb5c9/doc/STARmanual.pdf
+        salmon_kmer_size: Size of k-mers for building the Salmon index. The
+            default value typically works fine for reads of 75 bp or longer.
+            Consider using lower values if dealing with shorter reads. Cf.
+            https://salmon.readthedocs.io/en/latest/salmon.html#preparing-transcriptome-indices-mapping-based-mode
+    Attributes:
+        adapter_3p: Tuple of adapter sequences to truncate from the 3'-ends of
+            single-end/first and second mate libraries, respectively.
+        adapter_5p: Tuple of adapter sequences to truncate from the 5'-ends of
+            single-end/first and second mate libraries, respectively.
+        adapter_poly_3p: Tuple of polynucleotide stretch sequences to truncate
+            from the 3'-ends of single-end/first and second mate libraries,
+            respectively.
+        adapter_poly_5p: Tuple of polynucleotide stretch sequences to truncate
+            from the 3'-ends of single-end/first and second mate libraries,
+            respectively.
+        annotations: Path to GTF file containing gene annotations for the
+            `reference_sequences`.
+        read_orientation: Orientation of reads in sequencing library. Cf.
+            https://salmon.readthedocs.io/en/latest/library_type.html.
+        reference_sequences: Path to FASTA file containing reference sequences
+            to align reads against, typically chromosome sequences.
+        source: Origin of the sample as either a NCBI taxonomy database
+            identifier, e.g, `9606` for humans, or the corresponding full name,
+            e.g., "Homo sapiens".
+        star_sjdb_overhang: Overhang length for splice junctions in STAR (
+            parameter `sjdbOverhang`). Ideally the maximum read length minus 1.
+            Lower values may result in decreased mapping accuracy, while higher
+            values may result in longer processing times. Cf.
+            https://github.com/alexdobin/STAR/blob/3ae0966bc604a944b1993f49aaeb597e809eb5c9/doc/STARmanual.pdf
+        salmon_kmer_size: Size of k-mers for building the Salmon index. The
+            default value typically works fine for reads of 75 bp or longer.
+            Consider using lower values if dealing with shorter reads. Cf.
+            https://salmon.readthedocs.io/en/latest/salmon.html#preparing-transcriptome-indices-mapping-based-mode
     """
-    surname: Optional[str] = None
-    first_name: Optional[str] = None
-    email: Optional[str] = None
-    affiliations: Optional[List[str]] = None
-    urls: Optional[List[str]] = None
-    logo_location: Optional[str] = None
+
+    adapter_3p: Optional[Tuple[Optional[str], Optional[str]]] = None
+    adapter_5p: Optional[Tuple[Optional[str], Optional[str]]] = None
+    adapter_poly_3p: Optional[Tuple[Optional[str], Optional[str]]] = None
+    adapter_poly_5p: Optional[Tuple[Optional[str], Optional[str]]] = None
+    annotations: Optional[Path] = None
+    read_orientation: Optional[ReadOrientation] = None
+    reference_sequences: Optional[Path] = None
+    source: Optional[Union[int, str]] = None
+    star_sjdb_overhang: Optional[int] = None
+    salmon_kmer_size: int = 31
 
 
-# Unified config model
-class Config(BaseModel):
+class ConfigUser(InitUser):
+    """User-specific parameters."""
+
+
+class Config(CustomBaseModel):
     """ZARP-cli main configuration.
 
     Args:
-        sample: Sample-specific parameters.
+        ref: References to individual sequencing libraries by local file path
+            or read archive identifiers OR paths to ZARP sample tables; see
+            documentation for details.
         run: Run-specific parameters.
+        sample: Sample-specific parameters.
         user: User-specific parameters.
 
     Attributes:
-        sample: Sample-specific parameters.
+        ref: References to individual sequencing libraries by local file path
+            or read archive identifiers OR paths to ZARP sample tables; see
+            documentation for details.
         run: Run-specific parameters.
+        sample: Sample-specific parameters.
         user: User-specific parameters.
     """
-    samples: List[Sample] = []
-    run: Run = Run()
-    user: User = User()
+
+    ref: List[str] = []
+    run: ConfigRun = ConfigRun()
+    sample: ConfigSample = ConfigSample()
+    user: ConfigUser = ConfigUser()
+
+
+class SampleReference(CustomBaseModel):
+    """Sample reference information.
+
+    Args:
+        identifier: Read archive identifier.
+        lib_paths: Path (single-ended) or paths (paired-ended) to files
+            containing sequencing reads.
+        name: Sample name.
+        ref: References to individual sequencing libraries by local file path
+            or read archive identifiers OR paths to ZARP sample tables; see
+            documentation for details.
+        table_path: Path to ZARP sample table.
+        type: Type of sample reference.
+
+    Attributes:
+        identifier: Read archive identifier.
+        lib_paths: Path (single-ended) or paths (paired-ended) to files
+            containing sequencing reads.
+        name: Sample name.
+        ref: References to individual sequencing libraries by local file path
+            or read archive identifiers OR paths to ZARP sample tables; see
+            documentation for details.
+        table_path: Path to ZARP sample table.
+        type: Type of sample reference.
+    """
+
+    identifier: Optional[str] = None
+    lib_paths: Optional[Tuple[FilePath, Optional[FilePath]]] = None
+    name: Optional[str] = None
+    ref: Optional[str] = None
+    table_path: Optional[FilePath] = None
+    type: SampleReferenceTypes = SampleReferenceTypes.INVALID
+
+
+class Sample(ConfigSample):
+    """Sample-specific parameters.
+
+    Args:
+        type: Type of sample, local (single/paired) or remote.
+        identifier: Read archive identifier.
+        name: Sample name; if not provided, a sample name will be set based on
+            the input file name or read archive identifier.
+        paths: Path (single-ended) or paths (paired-ended) to files containing
+            sequencing reads.
+
+    Attributes:
+        type: Type of sample, local (single/paired) or remote.
+        identifier: Read archive identifier.
+        name: Sample name; if not provided, a sample name will be set based on
+            the input file name or read archive identifier.
+        paths: Path (single-ended) or paths (paired-ended) to files containing
+            sequencing reads.
+    """
+
+    type: Optional[SampleReferenceTypes] = None
+    identifier: Optional[str] = None
+    name: Optional[str] = None
+    paths: Optional[Tuple[FilePath, Optional[FilePath]]] = None
+
+
+class SampleCollection(BaseCollectionModel[Sample]):
+    """Collection of samples."""

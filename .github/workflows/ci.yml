@@ -1,0 +1,98 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+
+  static-code-analysis:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+
+      - name: check out repository
+        uses: actions/checkout@v2
+
+      - name: install requirements
+        run: |
+          pip install -e .
+          pip install -r requirements_dev.txt
+
+      - name: flake8
+        run: flake8
+
+      - name: pylint
+        run: pylint --rcfile pylint.cfg zarp/
+
+      - name: mypy
+        run: mypy zarp
+
+  unit-testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+
+    name: unit-testing-Python-${{ matrix.python-version }}
+
+    steps:
+
+      - name: check out repository
+        uses: actions/checkout@v2
+
+      - name: install requirements
+        run: |
+          pip install -e .
+          pip install -r requirements_dev.txt
+
+      - name: run unit tests
+        run: |
+          coverage run --source zarp -m pytest
+          coverage xml
+
+      - name: submit coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+
+  integration-testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+
+    name: integration-testing-Python-${{ matrix.python-version }}
+
+    steps:
+
+      - name: check out repository
+        uses: actions/checkout@v2
+
+      - name: install requirements
+        run: pip install -e .
+
+      - name: integration test - help screen
+        run: zarp --help
+
+      - name: integration test - version screen
+        run: zarp --version
+
+      - name: integration test - normal mode
+        run: |
+          mkdir -p ~/.zarp
+          cp tests/files/config_valid.yaml ~/.zarp/user.yaml
+          zarp SRR1234567

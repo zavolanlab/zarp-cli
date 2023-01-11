@@ -49,7 +49,7 @@ the [communication channels](#communication) outlined below.
 Send us an [email][contact] if you want to reach out to us
 work on)
 
-## Code style & testing
+## Code style and testing
 
 To make it easier for everyone to maintain, read and contribute to the code,
 as well as to ensure that the code base is robust and of high quality, we
@@ -121,9 +121,9 @@ happen smoothly:
    code changes
 3. If applicable, update relevant sections of the [documentation][docs]
 4. Add or update tests; untested code will not be merged; refer to the
-   [guidelines](#code-style-&-testing) above for details
+   [guidelines](#code-style-and-testing) above for details
 5. Ensure that your coding style is in line with the
-   [guidelines](#code-style-&-testing) described above
+   [guidelines](#code-style-and-testing) described above
 6. Ensure that all tests and linter checks configured in the [Travis
    CI][travis-docs] [continuous integration][ci-cd] (CI) pipeline pass without
    issues
@@ -153,11 +153,10 @@ know. You can reach us by [email][contact].
 [conv-commits-blog]: <https://nitayneeman.com/posts/understanding-semantic-commit-messages-using-git-and-angular/>
 [conv-commits-lint]: <https://github.com/conventional-changelog/commitlint>
 [docs]: README.md
-[feature-request]: .github/ISSUE_TEMPLATE/feature_request.md
 [git]: <https://git-scm.com/>
 [git-flow]: <https://nvie.com/posts/a-successful-git-branching-model/>
 [github]: <https://github.com>
-[issue-tracker]: <https://github.com/zavolanlab/htsinfer/issues>
+[issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
 [pull-request]: PULL_REQUEST_TEMPLATE.md
 [py]: <https://www.python.org/>
 [py-flake8]: <https://gitlab.com/pycqa/flake8>

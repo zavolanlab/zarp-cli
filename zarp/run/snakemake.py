@@ -1,4 +1,4 @@
-"""Module for running snakemake."""
+"""Module for executing Snakemake workflows."""
 
 import subprocess
 from typing import List, Optional
