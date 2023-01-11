@@ -48,20 +48,19 @@ class SnakemakeExecutor:
         """
         return self.run_list
 
-    def prepare_run(self, snkfile: str, workdir: str = None) -> None:
+    def prepare_run(self, snkfile: str) -> None:
         """Configure list of strings for execution.
 
         Args:
             snkfile (str): Path to Snakefile.
-            workdir (str): Optional path to working directory. (default None).
-
         """
         run_list = ["snakemake"]
         # Snakemake config
         run_list.extend(["--snakefile", snkfile])
         run_list.extend(["--cores", str(self.run_dict["cores"])])
-        if workdir is not None:
-            run_list.extend(["--directory", workdir])
+        if not self.run_dict["working_directory"] is None:
+            run_list.extend(["--directory",
+                            str(self.run_dict["working_directory"])])
         # execution profile
         if "execution_profile" in self.run_dict:
             prof = ["--profile", self.run_dict['execution_profile']]
