@@ -3,14 +3,14 @@
 import subprocess
 from typing import List, Optional
 
-from zarp.config.models import ExecModes, Run, ToolPackaging
+from zarp.config.models import ExecModes, InitRun, DependencyEmbeddingStrategies
 
 
 class SnakemakeExecutor:
     """Run snakemake with system calls.
 
     Args:
-        run (Run): Run-specific parameters.
+        run (InitRun): Run-specific parameters.
 
     Attributes:
         run_dict (dict): Dictionary with run-specific parameters.
@@ -21,14 +21,14 @@ class SnakemakeExecutor:
         The example below expects a valid `Snakefile` (e.g. `touch Snakefile`)
         in the current working directory.
         It constructs a run with default values and runs it.
-        >>> mysnk = SnakemakeExecutor(Run())
+        >>> mysnk = SnakemakeExecutor(InitRun())
         >>> mysnk.prepare_run(snkfile = "Snakefile")
         >>> mysnk.run()
         >>> assert mysnk.get_success()
 
     """
 
-    def __init__(self, run: Run) -> None:
+    def __init__(self, run: InitRun) -> None:
         """Class constructor."""
         self.run_dict = run.dict()
         self.success: Optional[bool] = None
@@ -65,19 +65,19 @@ class SnakemakeExecutor:
         if workdir is not None:
             run_list.extend(["--directory", workdir])
         # execution profile
-        if not self.run_dict['execution_profile'] is None:
+        if "execution_profile" in self.run_dict:
             prof = ["--profile", self.run_dict['execution_profile']]
             run_list.extend(prof)
         else:
             # tool packaging (conda or singularity)
             # only applies if execution_profile not defined.
-            if self.run_dict["tool_packaging"] == ToolPackaging.CONDA:
+            if self.run_dict["dependency_embedding"] == DependencyEmbeddingStrategies.CONDA.value:
                 run_list.extend(["--use-conda"])
-            if self.run_dict["tool_packaging"] == ToolPackaging.SINGULARITY:
+            if self.run_dict["dependency_embedding"] == DependencyEmbeddingStrategies.SINGULARITY.value:
                 run_list.extend(["--use-singularity"])
         # execution mode (e.g. dry-run)
-        if self.run_dict["execution_mode"] == ExecModes.DRY_RUN or \
-           self.run_dict["execution_mode"] == ExecModes.PREPARE_RUN:
+        if self.run_dict["execution_mode"] in [ExecModes.DRY_RUN.value,
+          ExecModes.PREPARE_RUN.value]:
             run_list.extend(["--dry-run"])
         # configfile
         if not self.run_dict["snakemake_config"] is None:
