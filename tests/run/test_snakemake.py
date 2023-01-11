@@ -1,6 +1,7 @@
-"""Tests for module `zarp.run.snakemake`"""
+"""Tests for module `zarp.run.snakemake`."""
 
-from zarp.config.models import ExecModes, InitRun, DependencyEmbeddingStrategies
+from zarp.config.models import (ExecModes, InitRun,
+                                DependencyEmbeddingStrategies)
 from zarp.run import snakemake
 import os
 import subprocess
@@ -8,7 +9,11 @@ import pytest
 
 
 def create_test_files():
-    # Setup
+    """Create test files.
+
+    Returns:
+        example: path to file with example Snakefile.
+    """
     example = "example_snakefile.smk"
     with open(example, "w") as f:
         f.write("""
@@ -75,7 +80,7 @@ class TestSnakemakeExecutor:
         assert not snke.get_success()
 
     def test_set_run_list(self):
-        """Test setting a new run_list"""
+        """Test setting a new run_list."""
         snke = snakemake.SnakemakeExecutor(InitRun())
         assert snke.get_run_list() == []
         snke.set_run_list(["snakemake"])
@@ -150,13 +155,15 @@ class TestSnakemakeExecutor:
 
     def test_tool_packaging(self):
         """Test supply of conda or singularity."""
-        conda_run = InitRun(dependency_embedding=DependencyEmbeddingStrategies.CONDA)
+        conda_run = InitRun(
+            dependency_embedding=DependencyEmbeddingStrategies.CONDA)
         snke = snakemake.SnakemakeExecutor(conda_run)
         snke.prepare_run("Snakefile")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
                                        "--use-conda"]
-        singularity_run = InitRun(dependency_embedding=DependencyEmbeddingStrategies.SINGULARITY)
+        singularity_run = InitRun(
+            dependency_embedding=DependencyEmbeddingStrategies.SINGULARITY)
         snke = snakemake.SnakemakeExecutor(singularity_run)
         snke.prepare_run("Snakefile")
         assert snke.get_run_list() == ["snakemake", "--snakefile",

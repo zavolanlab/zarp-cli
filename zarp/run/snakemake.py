@@ -3,7 +3,8 @@
 import subprocess
 from typing import List, Optional
 
-from zarp.config.models import ExecModes, InitRun, DependencyEmbeddingStrategies
+from zarp.config.models import (ExecModes, InitRun,
+                                DependencyEmbeddingStrategies)
 
 
 class SnakemakeExecutor:
@@ -68,13 +69,15 @@ class SnakemakeExecutor:
         else:
             # tool packaging (conda or singularity)
             # only applies if execution_profile not defined.
-            if self.run_dict["dependency_embedding"] == DependencyEmbeddingStrategies.CONDA.value:
+            if (self.run_dict["dependency_embedding"] ==
+                    DependencyEmbeddingStrategies.CONDA.value):
                 run_list.extend(["--use-conda"])
-            if self.run_dict["dependency_embedding"] == DependencyEmbeddingStrategies.SINGULARITY.value:
+            if (self.run_dict["dependency_embedding"] ==
+                    DependencyEmbeddingStrategies.SINGULARITY.value):
                 run_list.extend(["--use-singularity"])
         # execution mode (e.g. dry-run)
         if self.run_dict["execution_mode"] in [ExecModes.DRY_RUN.value,
-          ExecModes.PREPARE_RUN.value]:
+                                               ExecModes.PREPARE_RUN.value]:
             run_list.extend(["--dry-run"])
         # configfile
         if not self.run_dict["snakemake_config"] is None:
