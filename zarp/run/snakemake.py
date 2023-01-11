@@ -54,9 +54,6 @@ class SnakemakeExecutor:
             snkfile (str): Path to Snakefile.
             workdir (str): Optional path to working directory. (default None).
 
-        Raises:
-            KeyError: If `execution_profile` not in run_dict.
-
         """
         run_list = ["snakemake"]
         # Snakemake config
