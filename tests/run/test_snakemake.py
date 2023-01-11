@@ -103,8 +103,8 @@ class TestSnakemakeExecutor:
         # default working directory: None.
         snke_no_wd.prepare_run("Snakefile")
         assert snke_no_wd.get_run_list() == ["snakemake", "--snakefile",
-                                       "Snakefile", "--cores", "1",
-                                       "--use-conda"]
+                                             "Snakefile", "--cores", "1",
+                                             "--use-conda"]
         # Manually set working directory.
         snke = snakemake.SnakemakeExecutor(InitRun(working_directory="."))
         snke.prepare_run(snkfile="Snakefile")
