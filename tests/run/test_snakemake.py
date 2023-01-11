@@ -85,29 +85,29 @@ class TestSnakemakeExecutor:
         assert snke.get_run_list() == []
         snke.set_run_list(["snakemake"])
         assert snke.get_run_list() == ["snakemake"]
-        snke.prepare_run(snkfile="Snakefile", workdir=".")
+        snke.prepare_run(snkfile="Snakefile")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
-                                       "--directory", ".",
                                        "--use-conda"]
 
     def test_validate_run(self):
         """Test validation of run."""
         snke = snakemake.SnakemakeExecutor(InitRun())
         assert not snke.validate_run()
-        snke.prepare_run(snkfile="Snakefile", workdir=".")
+        snke.prepare_run(snkfile="Snakefile")
         assert snke.validate_run()
 
     def test_working_dir(self, tmpdir):
         """Test proper setting of working directory."""
-        snke = snakemake.SnakemakeExecutor(InitRun())
+        snke_no_wd = snakemake.SnakemakeExecutor(InitRun())
         # default working directory: None.
-        snke.prepare_run("Snakefile")
-        assert snke.get_run_list() == ["snakemake", "--snakefile",
+        snke_no_wd.prepare_run("Snakefile")
+        assert snke_no_wd.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
                                        "--use-conda"]
         # Manually set working directory.
-        snke.prepare_run(snkfile="Snakefile", workdir=".")
+        snke = snakemake.SnakemakeExecutor(InitRun(working_directory="."))
+        snke.prepare_run(snkfile="Snakefile")
         assert snke.get_run_list() == ["snakemake", "--snakefile",
                                        "Snakefile", "--cores", "1",
                                        "--directory", ".",
@@ -115,7 +115,7 @@ class TestSnakemakeExecutor:
         # Run with "." as working directory.
         os.chdir(tmpdir)
         snkfile = create_test_files()
-        snke.prepare_run(snkfile=snkfile, workdir=".")
+        snke.prepare_run(snkfile=snkfile)
         snke.run()
         assert snke.get_success()
 
