@@ -1,102 +1,76 @@
 """Module for executing Snakemake workflows."""
 
+from pathlib import Path
 import subprocess
-from typing import List, Optional
+from typing import List
 
-from zarp.config.models import (ExecModes, InitRun,
-                                DependencyEmbeddingStrategies)
+from zarp.config.enums import SnakemakeRunState
+from zarp.config.models import (
+    ExecModes,
+    InitRun,
+    DependencyEmbeddingStrategies,
+)
 
 
 class SnakemakeExecutor:
     """Run snakemake with system calls.
 
     Args:
-        run (InitRun): Run-specific parameters.
+        run_params: Run-specific parameters.
 
     Attributes:
-        run_dict (dict): Dictionary with run-specific parameters.
-        success (bool): Indicator for successful snakemake run.
-        run_list (list[str]): List containing strings for snakemake call.
+        run_params: Run-specific parameters.
+        success: Indicator for successful snakemake run.
+        run_list: Command used to to trigger Snakemake run.  Initially, i.e.,
+            before the command was assembled, an empty list.
 
     Example:
         The example below expects a valid `Snakefile` (e.g. `touch Snakefile`)
         in the current working directory.
         It constructs a run with default values and runs it.
-        >>> mysnk = SnakemakeExecutor(InitRun())
-        >>> mysnk.prepare_run(snkfile = "Snakefile")
-        >>> mysnk.run()
-        >>> assert mysnk.get_success()
-
+        >>> my_run = SnakemakeExecutor(run_params=InitRun())
+        >>> my_run.prepare_run(snakefile="Snakefile")
+        >>> my_run.run()
+        >>> assert my_run.success == SnakemakeRunState.SUCCESS
     """
 
-    def __init__(self, run: InitRun) -> None:
+    def __init__(self, run_params: InitRun) -> None:
         """Class constructor."""
-        self.run_dict = run.dict()
-        self.success: Optional[bool] = None
-        self.run_list: List[str] = []
+        self.run_params: InitRun = run_params
+        self.success: SnakemakeRunState = SnakemakeRunState.UNKNOWN
+        self.command: List[str] = []
 
-    def set_run_list(self, run_list: list) -> None:
-        """Set run list."""
-        self.run_list = run_list
-
-    def get_run_list(self) -> list:
-        """Get run list.
-
-        Returns:
-            run_list (list): list of strings for system call.
-
-        """
-        return self.run_list
-
-    def prepare_run(self, snkfile: str) -> None:
-        """Configure list of strings for execution.
+    def set_command(self, snakefile: Path) -> None:
+        """Compile Snakemake command as list of strings.
 
         Args:
             snkfile (str): Path to Snakefile.
         """
-        run_list = ["snakemake"]
-        # Snakemake config
-        run_list.extend(["--snakefile", snkfile])
-        run_list.extend(["--cores", str(self.run_dict["cores"])])
-        if not self.run_dict["working_directory"] is None:
-            run_list.extend(["--directory",
-                            str(self.run_dict["working_directory"])])
-        # execution profile
-        if "execution_profile" in self.run_dict:
-            prof = ["--profile", self.run_dict['execution_profile']]
-            run_list.extend(prof)
-        else:
-            # tool packaging (conda or singularity)
-            # only applies if execution_profile not defined.
-            if (self.run_dict["dependency_embedding"] ==
-                    DependencyEmbeddingStrategies.CONDA.value):
-                run_list.extend(["--use-conda"])
-            if (self.run_dict["dependency_embedding"] ==
-                    DependencyEmbeddingStrategies.SINGULARITY.value):
-                run_list.extend(["--use-singularity"])
-        # execution mode (e.g. dry-run)
-        if self.run_dict["execution_mode"] in [ExecModes.DRY_RUN.value,
-                                               ExecModes.PREPARE_RUN.value]:
-            run_list.extend(["--dry-run"])
-        # configfile
-        if not self.run_dict["snakemake_config"] is None:
-            conf = ["--configfile", self.run_dict["snakemake_config"]]
-            run_list.extend(conf)
-        self.set_run_list(run_list)
-
-    def validate_run(self) -> bool:
-        """Ensure the list of strings is a correct Snakemake call.
-
-        Returns:
-            bool: True, if constructed run_list is a valid snakemake call,
-                False otherwise.
-
-        """
-        valid_run = False
-        # in minimum snakemake command must be called
-        if len(self.run_list) > 0 and self.run_list[0] == "snakemake":
-            valid_run = True
-        return valid_run
+        cmd_ls = ["snakemake"]
+        cmd_ls.extend(["--snakefile", str(snakefile)])
+        cmd_ls.extend(["--cores", str(self.run_params.cores)])
+        if self.run_params.working_directory is not None:
+            cmd_ls.extend(
+                ["--directory", str(self.run_params.working_directory)]
+            )
+        if (
+            self.run_params.dependency_embedding
+            == DependencyEmbeddingStrategies.CONDA
+        ):
+            cmd_ls.extend(["--use-conda"])
+        elif (
+            self.run_params.dependency_embedding
+            == DependencyEmbeddingStrategies.SINGULARITY
+        ):
+            cmd_ls.extend(["--use-singularity"])
+        if self.run_params.execution_mode in [
+            ExecModes.DRY_RUN,
+            ExecModes.PREPARE_RUN,
+        ]:
+            cmd_ls.extend(["--dry-run"])
+        if self.run_params.snakemake_config is not None:
+            cmd_ls.extend(["--configfile", self.run_params.snakemake_config])
+        self.command = cmd_ls
 
     def run(self) -> None:
         """Execute Snakemake with system call.
@@ -104,23 +78,11 @@ class SnakemakeExecutor:
         Run Snakemake with a system call, errors there are not handed over.
 
         Raises:
-            CalledProcessError: by `subprocess.run()`
-
+            CalledProcessError: If Snakemake or by `subprocess.run()`
         """
         try:
-            subprocess.run(self.run_list, check=True)
-            print("Successfully finished!")
-            self.success = True
+            subprocess.run(self.command, check=True)
+            self.success = SnakemakeRunState.SUCCESS
         except subprocess.CalledProcessError as process_error:
-            self.success = False
+            self.success = SnakemakeRunState.ERROR
             raise process_error
-
-    def get_success(self) -> Optional[bool]:
-        """Obtain whether run successful or not.
-
-        If not yet run, success == None.
-
-        Returns:
-            bool: True, if Snakemake exited with code 0, False otherwise.
-        """
-        return self.success
