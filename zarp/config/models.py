@@ -34,6 +34,7 @@ class CustomBaseModel(BaseModel):
         """Configuration class."""
 
         use_enum_values = True
+        validate_all = True
         validate_assignment = True
 
 
@@ -107,7 +108,7 @@ class InitRun(CustomBaseModel):
     cores: Optional[int] = 1
     resources_version: Optional[int] = None
     htsinfer_config: Optional[str] = None
-    snakemake_config: Optional[str] = None
+    snakemake_config: Optional[Path] = None
     rule_config: Optional[Path] = None
 
 

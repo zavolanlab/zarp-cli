@@ -1,1 +1,1 @@
-"""Package for running ZARP workflow."""
+"""Package for running Snakemake workflows."""

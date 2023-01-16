@@ -124,3 +124,19 @@ class SampleReferenceTypes(Enum):
     REMOTE_LIB = "REMOTE_LIB"
     TABLE = "TABLE"
     INVALID = "INVALID"
+
+
+class SnakemakeRunState(Enum):
+    """Snakemake run states.
+
+    Attributes:
+        UNKNOWN: The Snakemake run state is unknown. This is typically the case
+            when a run was initialized but the state has not yet been updated
+            to a definite state.
+        SUCCESS: The Snakemake run completed successfully.
+        ERROR: The Snakemake run failed.
+    """
+
+    UNKNOWN = "UNKNOWN"
+    ERROR = "ERROR"
+    SUCCESS = "SUCCESS"
