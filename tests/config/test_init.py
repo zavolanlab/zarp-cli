@@ -48,7 +48,7 @@ class TestInitializer:
             path=config_file,
         )
         initializer.set_from_file(config_file=config_file)
-        assert exec_mode_before_update == ExecModes.RUN
+        assert exec_mode_before_update == ExecModes.RUN.value
         assert initializer.config.run.execution_mode == ExecModes.DRY_RUN.value
 
     def test_set_from_file_invalid(self, tmpdir):
