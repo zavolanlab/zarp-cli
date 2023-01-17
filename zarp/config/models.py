@@ -81,6 +81,7 @@ class InitRun(CustomBaseModel):
         rule_config: ZARP rule configuration.
         snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
+        zarp_directory: Rot directory of the ZARP repository.
 
     Attributes:
         cleanup_strategy: Types of output files to keep.
@@ -93,8 +94,10 @@ class InitRun(CustomBaseModel):
         rule_config: ZARP rule configuration.
         snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
+        zarp_directory: Rot directory of the ZARP repository.
     """
 
+    zarp_directory: Optional[Path] = Path.cwd()
     working_directory: Optional[Path] = None
     cleanup_strategy: Optional[List[OutputFileGroups]] = [
         OutputFileGroups.CONFIG,
