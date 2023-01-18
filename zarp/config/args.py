@@ -47,6 +47,7 @@ class ArgParser:
             "rule_config",
             "snakemake_config",
             "working_directory",
+            "zarp_directory",
         ],
         "user": [
             "affiliations",
@@ -480,6 +481,13 @@ class ArgParser:
             type=lambda p: Path(p).absolute(),
             metavar="PATH",
             help="directory in which the ZARP run is executed",
+        )
+        argument_group.add_argument(
+            "--zarp-directory",
+            default=None,
+            type=lambda p: Path(p).absolute(),
+            metavar="PATH",
+            help="root directory of the ZARP repository",
         )
 
     @staticmethod

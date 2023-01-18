@@ -1,8 +1,8 @@
 run:
   cleanup_strategy:
-  - CONFIG
-  - LOGS
-  - RESULTS
+    - CONFIG
+    - LOGS
+    - RESULTS
   cores: 1
   dependency_embedding: CONDA
   execution_mode: RUN
@@ -10,6 +10,7 @@ run:
   resources_version: null
   snakemake_config: null
   working_directory: null
+  zarp_config: /path/to/zarp/repo
 sample:
   fragment_length_distribution_mean: 300.0
   fragment_length_distribution_sd: 100.0
