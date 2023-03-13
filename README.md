@@ -46,12 +46,15 @@ zarp \
 
 ## Installation
 
+
 Clone this repository and traverse into the app directory:
 
 ```sh
 git clone git@github.com:zavolanlab/zarp-cli.git
 cd zarp-cli
 ```
+
+### Via pip (option 1)
 
 Install the app:
 
@@ -70,6 +73,37 @@ Optionally, install required packages for testing and development:
 
 ```sh
 pip install -r requirements_dev.txt
+```
+
+### Via mamba/conda (option 2)
+
+```sh
+mamba env create -f environment.yaml
+```
+
+or
+
+```sh
+conda env create -f environment.yaml
+```
+
+
+While for the development version
+
+```sh
+mamba env create -f environment_dev.yaml
+```
+
+or
+
+```sh
+conda env create -f environment_dev.yaml
+```
+
+You can activate the generated environment by
+
+```sh
+conda activate zarp-cli
 ```
 
 ## Contributing

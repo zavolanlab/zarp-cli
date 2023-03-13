@@ -1,0 +1,17 @@
+name: zarp-cli
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - addict
+  - bidict
+  - email-validator
+  - jsonref
+  - pandas
+  - pydantic
+  - Pygments
+  - rich
+  - snakemake
+  - pip:
+    - pydantic-collections
+    - .
