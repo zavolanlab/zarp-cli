@@ -26,7 +26,7 @@ jobs:
       - name: Create markdown documents
         run: |
           lazydocs \
-              --output-path="./docs/docstrings" \
+              --output-path="./docs/docstring" \
               --overview-file="README.md" \
               --src-base-url="https://github.com/zavolanlab/zarp-cli/blob/main/" \
               --validate \

@@ -40,7 +40,7 @@ class SnakemakeExecutor:
         """Compile Snakemake command as list of strings.
 
         Args:
-            snkfile (str): Path to Snakefile.
+            snakefile: Path to Snakefile.
         """
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
