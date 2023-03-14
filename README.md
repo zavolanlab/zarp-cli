@@ -72,6 +72,12 @@ Optionally, install required packages for testing and development:
 pip install -r requirements_dev.txt
 ```
 
+## Documentation
+
+We have designed _ZARP-cli_ to be easy to use. However, there are still a lot
+of ways in which execution can be tweaked. For the full documentation of
+features visit <https://zavolanlab.github.io/zarp-cli>!
+
 ## Contributing
 
 This project lives off your contributions, be it in the form of bug reports,

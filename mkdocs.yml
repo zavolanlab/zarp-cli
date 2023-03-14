@@ -1,0 +1,15 @@
+site_name: py-tes documentation
+site_url: https://zavolanlab.github.io/zarp-cli
+site_author: Zavolab <zavolab-biozentrum@unibas.ch>
+
+repo_name: zarp-cli
+repo_url: https://github.com/zavolanlab/zarp-cli
+edit_uri: edit/main/docs
+docs_dir: docs
+
+theme:
+  name: material
+
+plugins:
+  - awesome-pages
+  - search

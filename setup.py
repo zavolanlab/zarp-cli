@@ -55,15 +55,12 @@ setup(
         "workflow",
         "ngs",
         "high-throughput sequencing",
+        "rna-seq",
     ],
     project_urls={
-        "Repository": (
-            "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli"
-        ),
-        "Tracker": (
-            "https://git.scicore.unibas.ch/zavolan_group/"
-            "tools/zarp-cli/-/issues"
-        ),
+        "Documentation": "https://zavolanlab.github.io/zarp-cli",
+        "Repository": "https://github.com/zavolanlab/zarp-cli",
+        "Tracker": "https://github.com/zavolanlab/zarp-cli/issues",
     },
     packages=find_packages(),
     include_package_data=True,
