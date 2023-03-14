@@ -21,6 +21,7 @@ from zarp.config.models import (
     SampleReference,
 )
 from zarp.config.sample_tables import SampleTableProcessor
+from zarp.run.snakemake import SnakemakeExecutor
 
 
 LOGGER = logging.getLogger(__name__)
@@ -95,31 +96,64 @@ class SampleProcessor:
                 )
         LOGGER.debug(self.samples)
 
-    def fetch_remote_libraries(self, dry_run: bool = False) -> None:
+    def fetch_remote_libraries(
+        self,
+        dry_run: bool = False,
+        workflow_path_suffix: str = "workflow/rules/sra_download.smk",
+    ) -> None:
         """Fetch remote sequencing libraries.
 
         Args:
             dry_run: If ``True``, do not actually download any files.
+            workflow_path_suffix: Path to Snakemake workflow file for fetching
+                SRA libraries, relative to the ZARP workflow repository path.
         """
         samples_to_fetch = [
-            sample.identifier
-            for sample in self.samples
+            sample in self.samples
             if sample.type == SampleReferenceTypes.REMOTE_LIB.name
         ]
+        if not samples_to_fetch:
+            LOGGER.info("No remote libraries to fetch.")
+            return None
+
         LOGGER.debug(
             "Attempting to fetch sequencing libraries for records: "
             f"{samples_to_fetch}"
         )
-        if dry_run:
-            LOGGER.info(
-                "Dry run: not actually fetching any sequencing libraries"
+        self.write_sample_table(
+            samples=samples_to_fetch,
+            outpath_suffix="samples_remote.tsv",
+        )
+        if self.run_config.zarp_directory is None:
+            raise ValueError(
+                "Cannot fetch remote libraries, ZARP directory not set"
             )
+        elif dry_run:
+            LOGGER.info("Dry run: not actually fetching sequencing libraries")
         else:
-            LOGGER.info("Fetching any sequencing libraries...")
+            LOGGER.info("Fetching sequencing libraries...")
+            executor = SnakemakeExecutor(run_config=self.run_config)
+            smk = self.run_config.zarp_directory / workflow_path_suffix
+            if not smk.exists():
+                raise FileNotFoundError(
+                    f"Cannot find SRA download workflow at '{smk}'. Make sure"
+                    " the ZARP workflow repository path is set correctly in"
+                    " the configuration; currently set to:"
+                    f" {self.run_config.zarp_directory}"
+                )
+            executor.set_command(snakefile=smk)
+            executor.run()
 
-    def write_sample_table(self) -> Path:
+    def write_sample_table(
+        self,
+        samples: List[Sample],
+        outpath_suffix: str = "samples.tsv",
+    ) -> Path:
         """Write table of samples to file.
 
+        Args:
+            samples: List of sample objects.
+            outpath_suffix: Suffix to append to run directory.
         Returns:
             Path to sample table.
 

@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import subprocess
-from typing import List
+from typing import Dict, List, Optional
 
 from zarp.config.enums import SnakemakeRunState
 from zarp.config.models import InitRun
@@ -36,11 +36,21 @@ class SnakemakeExecutor:
         self.run_state: SnakemakeRunState = SnakemakeRunState.UNKNOWN
         self.command: List[str] = []
 
-    def set_command(self, snakefile: Path) -> None:
+    def set_command(
+        self,
+        snakefile: Path,
+        config_file: Path,
+        config: Optional[Dict] = None,
+    ) -> None:
         """Compile Snakemake command as list of strings.
 
         Args:
-            snakefile: Path to Snakefile.
+            snakefile: Path to Snakemake workflow file.
+            config_file: Either the path to the configuration file for the
+                Snakemake workflow (if `config` is `None`), or the path suffix,
+                relative to the run directory, where the configuration file is
+                to be written, based on the contents of `config`). file is to be stored (if `config`)
+            config: Configuration for Snakemake workflow.
         """
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])

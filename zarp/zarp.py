@@ -67,7 +67,15 @@ class ZARP:
         LOGGER.info(f"Samples found: {len(sample_processor.samples)}")
         if len(sample_processor.samples) == 0:
             raise ValueError("No samples found. Aborting.")
-        self.config.run.sample_table = sample_processor.write_sample_table()
+
+        is_dry_run: bool = False
+        if self.config.run.execution_mode == "dry_run":
+            is_dry_run = True
+        sample_processor.fetch_remote_libraries(dry_run=is_dry_run)
+
+        self.config.run.sample_table = sample_processor.write_sample_table(
+            samples=sample_processor.samples
+        )
         LOGGER.info(f"Sample table: {self.config.run.sample_table}")
         LOGGER.info("Samples processed")
 
