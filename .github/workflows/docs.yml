@@ -24,8 +24,11 @@ jobs:
           key: ${{ github.ref }}
           path: .cache
 
-      - name: Install requirements
+      - name: Install doc requirements
         run: pip install -r docs/requirements.txt
+
+      - name: Install app & requirements
+        run: pip install -e .
 
       - name: Create markdown documents
         run: |
