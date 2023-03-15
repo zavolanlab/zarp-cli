@@ -38,7 +38,7 @@ class TestZarp:
         """Test setting up run environment when working directory is unset."""
         config = Config()
         config.run.working_directory = None
-        monkeypatch.setattr("os.getcwd", lambda: tmpdir)
+        monkeypatch.setattr("pathlib.Path.cwd", lambda: tmpdir)
         zarp = ZARP(config=config)
         zarp.set_up_run()
         assert hasattr(zarp, "config")

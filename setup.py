@@ -38,10 +38,10 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Utilities",
     ],
@@ -55,15 +55,12 @@ setup(
         "workflow",
         "ngs",
         "high-throughput sequencing",
+        "rna-seq",
     ],
     project_urls={
-        "Repository": (
-            "https://git.scicore.unibas.ch/zavolan_group/tools/zarp-cli"
-        ),
-        "Tracker": (
-            "https://git.scicore.unibas.ch/zavolan_group/"
-            "tools/zarp-cli/-/issues"
-        ),
+        "Documentation": "https://zavolanlab.github.io/zarp-cli",
+        "Repository": "https://github.com/zavolanlab/zarp-cli",
+        "Tracker": "https://github.com/zavolanlab/zarp-cli/issues",
     },
     packages=find_packages(),
     include_package_data=True,

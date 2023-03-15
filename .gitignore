@@ -325,3 +325,4 @@ pip-selfcheck.json
 # Custom additions
 .vscode
 .snakemake
+docs/docstring/*md

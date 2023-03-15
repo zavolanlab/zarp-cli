@@ -674,8 +674,7 @@ class ArgParser:
             setattr(self.args_parsed, "adapter_poly_5p", adapter_poly_5p)
 
     def set_argument_groups(self, attr: str = "grouped") -> None:
-        """
-        Parse command line (CLI) arguments.
+        """Parse command line (CLI) arguments.
 
         Returns:
             Parsed CLI arguments
