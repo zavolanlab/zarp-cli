@@ -95,15 +95,15 @@ by email: <zavolab-biozentrum@unibas.ch>
 &copy; 2021 [Zavolab, Biozentrum, University of Basel][contact]
 
 [contact]: <zavolab-biozentrum@unibas.ch>
-[badge-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/ci.yml/badge.svg>
+[badge-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/tests.yml/badge.svg>
 [badge-coverage]: <https://codecov.io/gh/zavolanlab/zarp-cli/branch/dev/graph/badge.svg?branch=dev&token=0KQZYULZ88>
-[badge-docs]: <https://readthedocs.org/projects/zarp-cli/badge/?version=latest>
+[badge-docs]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/docs.yml/badge.svg>
 [badge-github-tag]: <https://img.shields.io/github/v/tag/zavolanlab/zarp-cli?color=C39BD3>
 [badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
 [badge-pypi]: <https://img.shields.io/pypi/v/zarp.svg?style=flat&color=C39BD3>
-[badge-url-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/ci.yml>
+[badge-url-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/tests.yml>
 [badge-url-coverage]: <https://codecov.io/gh/zavolanlab/zarp-cli?branch=dev>
-[badge-url-docs]: <https://zarp-cli.readthedocs.io/en/latest/?badge=latest>
+[badge-url-docs]: <https://zavolanlab.github.io/zarp-cli>
 [badge-url-github-tag]: <https://github.com/zavolanlab/zarp-cli/releases>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [badge-url-pypi]: <https://pypi.python.org/pypi/zarp>
