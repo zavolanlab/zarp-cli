@@ -607,7 +607,7 @@ class ArgParser:
             setattr(
                 self.args_parsed,
                 "execution_mode",
-                ExecModes[self.args_parsed.execution_mode],
+                ExecModes[self.args_parsed.execution_mode].value,
             )
         if self.args_parsed.dependency_embedding is not None:
             setattr(

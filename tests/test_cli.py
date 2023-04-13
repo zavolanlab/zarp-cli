@@ -32,8 +32,9 @@ def test_main_as_script():
 class TestMain:
     """Test `main()` function."""
 
-    def test_normal_mode_without_args(self):
+    def test_normal_mode_without_args(self, monkeypatch):
         """Call without args."""
+        monkeypatch.setattr(sys, "argv", ["zarp"])
         with pytest.raises(SystemExit) as exc:
             main()
         assert exc.value.code == 1
@@ -52,6 +53,8 @@ class TestMain:
                 str(TMP_CONFIG_FILE),
                 "--working-directory",
                 str(tmpdir),
+                "--zarp-directory",
+                str(Path(__file__).parent / "files" / "zarp"),
             ],
         )
         with pytest.raises(SystemExit) as exc:
@@ -180,7 +183,7 @@ class TestMain:
         )
         with pytest.raises(SystemExit) as exc:
             main()
-        assert exc.value.code >= 128
+        assert exc.value.code in range(127, 256)
 
 
 class TestSetupLogging:

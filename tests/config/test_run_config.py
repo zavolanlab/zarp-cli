@@ -29,16 +29,16 @@ class TestRunConfigFileProcessor:
     def test_write_run_config(self, tmp_path):
         """Test write run configuration file."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(),
         )
         path = processor.write_run_config()
         assert path.exists()
 
-    def test_write_run_config_no_run_directory(self):
-        """Test write run configuration file with no run directory."""
+    def test_write_run_config_no_working_directory(self):
+        """Test write run configuration file with no working directory."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=None),
+            run_config=ConfigRun(working_directory=None),
             user_config=ConfigUser(),
         )
         with pytest.raises(ValueError):
@@ -47,7 +47,7 @@ class TestRunConfigFileProcessor:
     def test_get_file_content(self, tmp_path):
         """Test get file content."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(),
         )
         content = processor._get_file_content()
@@ -58,7 +58,7 @@ class TestRunConfigFileProcessor:
     def test_get_required_params(self, tmp_path):
         """Test get required parameters."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(),
         )
         params = processor._get_required_params()
@@ -66,10 +66,10 @@ class TestRunConfigFileProcessor:
         assert params.startswith("samples: ")
         assert params.endswith("\n")
 
-    def test_get_required_params_no_run_directory(self):
-        """Test get required parameters with no run directory."""
+    def test_get_required_params_no_working_directory(self):
+        """Test get required parameters with no working directory."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=None),
+            run_config=ConfigRun(working_directory=None),
             user_config=ConfigUser(),
         )
         with pytest.raises(ValueError):
@@ -78,7 +78,7 @@ class TestRunConfigFileProcessor:
     def test_get_optional_params_all_none(self, tmp_path):
         """Test get optional parameters with no params."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(),
         )
         params = processor._get_optional_params()
@@ -89,7 +89,7 @@ class TestRunConfigFileProcessor:
         """Test get optional parameters with atomic parameter."""
         processor = RunConfigFileProcessor(
             run_config=ConfigRun(
-                run_directory=tmp_path,
+                working_directory=tmp_path,
                 description="Test description",
             ),
             user_config=ConfigUser(),
@@ -101,7 +101,7 @@ class TestRunConfigFileProcessor:
     def test_get_optional_params_with_empty_list(self, tmp_path):
         """Test get optional parameters with empty list parameter."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(emails=[]),
         )
         params = processor._get_optional_params()
@@ -111,7 +111,7 @@ class TestRunConfigFileProcessor:
     def test_get_optional_params_with_list(self, tmp_path):
         """Test get optional parameters with list parameter."""
         processor = RunConfigFileProcessor(
-            run_config=ConfigRun(run_directory=tmp_path),
+            run_config=ConfigRun(working_directory=tmp_path),
             user_config=ConfigUser(emails=["abc@de.fg"]),  # type: ignore
         )
         params = processor._get_optional_params()

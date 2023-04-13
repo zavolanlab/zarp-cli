@@ -210,7 +210,7 @@ class TestArgParser:
         parser.set_arguments()
         parser.parse_arguments()
         parser.process_arguments()
-        assert parser.args_parsed.execution_mode == ExecModes[test_input]
+        assert parser.args_parsed.execution_mode == ExecModes[test_input].value
 
     @pytest.mark.parametrize(
         "test_input",

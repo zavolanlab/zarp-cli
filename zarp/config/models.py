@@ -14,7 +14,6 @@ from pydantic import (  # pylint: disable=no-name-in-module
     FilePath,
     HttpUrl,
 )
-from pydantic_collections import BaseCollectionModel  # type: ignore
 
 from zarp.config.enums import (
     DependencyEmbeddingStrategies,
@@ -97,7 +96,7 @@ class InitRun(CustomBaseModel):
         zarp_directory: Root directory of the ZARP repository.
     """
 
-    zarp_directory: Optional[Path] = Path.cwd()
+    zarp_directory: Optional[Path] = None
     working_directory: Optional[Path] = None
     cleanup_strategy: Optional[List[OutputFileGroups]] = [
         OutputFileGroups.CONFIG,
@@ -167,21 +166,16 @@ class ConfigRun(InitRun):
     Args:
         description: Run description.
         identifier: Unique identifier for a run.
-        run_directory: Directory where files for the current run will be
-            stored.
         sample_table: Path to ZARP sample table.
 
     Attributes:
         description: Run description.
         identifier: Unique identifier for a run.
-        run_directory: Directory where files for the current run will be
-            stored.
         sample_table: Path to ZARP sample table.
     """
 
     description: Optional[str] = None
     identifier: Optional[str] = None
-    run_directory: Optional[Path] = None
     sample_table: Optional[Path] = None
     run_config: Optional[Path] = None
 
@@ -349,7 +343,3 @@ class Sample(ConfigSample):
     identifier: Optional[str] = None
     name: Optional[str] = None
     paths: Optional[Tuple[FilePath, Optional[FilePath]]] = None
-
-
-class SampleCollection(BaseCollectionModel[Sample]):
-    """Collection of samples."""

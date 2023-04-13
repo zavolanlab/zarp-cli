@@ -91,8 +91,30 @@ jobs:
       - name: integration test - version screen
         run: zarp --version
 
+      - name: set up Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          mamba-version: "*"
+          channels: conda-forge
+          auto-activate-base: false
+
       - name: integration test - normal mode
         run: |
           mkdir -p ~/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
-          zarp SRR1234567
+          ZARP_REPO_PATH=~/zarp_workflow
+          git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
+          zarp \
+            my_other_sample@tests/files/empty \
+            tests/files/empty,tests/files/empty \
+            SRR1525892 \
+            ERR2248142 \
+            table:tests/files/sample_table.tsv \
+            NotASample \
+            /path/to/* \
+            table:$PWD/tests/files/empty \
+            --execution-mode=RUN \
+            --dependency-embedding=SINGULARITY \
+            --zarp-directory=$ZARP_REPO_PATH \
+            --verbosity=DEBUG

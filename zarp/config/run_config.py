@@ -44,13 +44,14 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
             Path to run configuration file.
 
         Raises:
-            ValueError: Cannot write table because run directory is not set.
+            ValueError: Cannot write table because working directory is not
+                set.
         """
-        if self.run_config.run_directory is None:
+        if self.run_config.working_directory is None:
             raise ValueError(
-                "Cannot write sample table, run directory not set."
+                "Cannot write sample table, working directory not set."
             )
-        path: Path = self.run_config.run_directory / "config.yml"
+        path: Path = self.run_config.working_directory / "config.yml"
         content: str = self._get_file_content()
         with open(path, "w", encoding="utf-8") as _file:
             _file.write(content)
@@ -75,13 +76,13 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
             Multiline string with required parameters.
 
         Raises:
-            ValueError: Cannot generate string because run directory is not
+            ValueError: Cannot generate string because working directory is not
                 set.
         """
-        run_dir: Optional[Path] = self.run_config.run_directory
+        run_dir: Optional[Path] = self.run_config.working_directory
         if run_dir is None:
             raise ValueError(
-                "Cannot write sample table, run directory not set."
+                "Cannot write sample table, working directory not set."
             )
         return f"""samples: "{self.run_config.sample_table}"
   output_dir: "{run_dir / 'results'}"

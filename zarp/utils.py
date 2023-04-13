@@ -9,7 +9,7 @@ from typing import (
 
 
 def generate_id(length: int = 6) -> str:
-    """Generate random string composed of specified character set.
+    """Generate random string.
 
     Args:
         length: Length of string to generate.
