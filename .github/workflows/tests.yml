@@ -97,9 +97,6 @@ jobs:
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
           ZARP_REPO_PATH=~/zarp_workflow
           git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
-          sed -r "s~zarp_directory: null~zarp_directory: $ZARP_REPO_PATH~" \
-            ~/.zarp/user.yaml
-          cat ~/.zarp/user.yaml
           zarp \
             my_other_sample@tests/files/empty \
             tests/files/empty,tests/files/empty \
@@ -111,3 +108,4 @@ jobs:
             table:$PWD/tests/files/empty \
             --execution-mode=RUN \
             --dependency-embedding=SINGULARITY
+            --zarp-directory=$ZARP_REPO_PATH
