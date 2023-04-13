@@ -96,6 +96,7 @@ jobs:
         with:
           auto-update-conda: true
           mamba-version: "*"
+          channels: conda-forge
           auto-activate-base: false
 
       - name: integration test - normal mode
