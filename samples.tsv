@@ -1,2 +1,9 @@
 sample	fq1	fq2	organism	gtf	genome	gtf	libtype	fq1_3p	fq2_3p	fq1_5p	fq2_5p	fq1_polya_3p	fq2_polya_3p	fq1_polya_5p	fq2_polya_5p	mean	sd	index_size	kmer
-SRR1234567																300.0	100.0		31
+my_other_sample	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	None														333.3	99.9		31
+empty	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty														333.3	99.9		31
+SRR1525892	/home/uniqueg/.zarp/runs/sra_download/sra/SRR1525892/SRR1525892.fastq.gz	None														333.3	99.9		31
+paired	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	homo_sapiens		/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty		ISF	ACGTACGT	ACGTACGT			AAAAAAAA	XXXXXXXX		TTTTTTTT	333.3	25	199	31
+single	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	None	12345	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	/home/uniqueg/Work/zavolab/zarp-cli/tests/files/empty	SF	ACGTACGT	XXXXXXXX	XXXXXXXX		AAAAAAAA				250	99.9		31
+SRR9004891	/home/uniqueg/.zarp/runs/sra_download/sra/SRR9004891/SRR9004891.fastq.gz	None					ISF		ACGTACGT		XXXXXXXX	AAAAAAAA	XXXXXXXX	XXXXXXXX	TTTTTTTT	350	100	34	15
+SRR9004893	/home/uniqueg/.zarp/runs/sra_download/sra/SRR9004893/SRR9004893.fastq.gz	None														333.3	99.9		31
+SRR18549672	/home/uniqueg/.zarp/runs/sra_download/sra/SRR18549672/SRR18549672_1.fastq.gz	/home/uniqueg/.zarp/runs/sra_download/sra/SRR18549672/SRR18549672_2.fastq.gz														333.3	99.9		31

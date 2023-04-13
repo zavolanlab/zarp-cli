@@ -189,6 +189,9 @@ class SampleProcessor:
                 )
                 if sample is not None:
                     if "fq1" not in data.columns or row["fq1"] == "":
+                        self.samples = [
+                            smpl for smpl in self.samples if smpl != sample
+                        ]
                         LOGGER.warning(
                             "No FASTQ path available, sample skipped:"
                             f" '{row['sample']}'"

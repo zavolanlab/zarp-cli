@@ -59,9 +59,6 @@ class ZARP:
         if len(sample_processor.samples_remote) > 0:
             LOGGER.info("Fetching remote libraries...")
             sample_table = sample_processor.fetch_remote_libraries()
-            with open(sample_table, encoding="utf-8") as _file:
-                LOGGER.warning("SAMPLE TABLE")
-                LOGGER.warning(_file.read())
             LOGGER.info("Remote libraries fetched")
             LOGGER.info("Updating paths of fetched libraries...")
             sample_processor.update_sample_paths(sample_table=sample_table)
