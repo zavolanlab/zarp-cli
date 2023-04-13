@@ -144,8 +144,8 @@ class SnakemakeExecutor:
         if isinstance(config, Path):
             shutil.copyfile(config, self.config_file)
         elif isinstance(config, dict):
-            with open(self.config_file, "w") as file:
-                yaml.dump(config, file)
+            with open(self.config_file, "w", encoding="utf-8") as _file:
+                yaml.dump(config, _file)
         else:
             raise TypeError(
                 "Value of config must be either a path to a configuration "

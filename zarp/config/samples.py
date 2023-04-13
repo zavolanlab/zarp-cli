@@ -171,7 +171,7 @@ class SampleProcessor:
         Args:
             sample_table: Path to sample table.
         """
-        with open(sample_table, "r") as _file:
+        with open(sample_table, encoding="utf-8") as _file:
             data = pd.read_csv(
                 _file,
                 comment="#",
@@ -368,7 +368,7 @@ class SampleProcessor:
         if outpath is None:
             outpath = Path.cwd() / "samples_remote.tsv"
         sra_ids = [sample.identifier for sample in samples]
-        with open(outpath, "w") as _file:
+        with open(outpath, "w", encoding="utf-8") as _file:
             _file.write("sample\n")
             for sra_id in sra_ids:
                 _file.write(f"{sra_id}\n")
