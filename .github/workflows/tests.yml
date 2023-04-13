@@ -91,6 +91,13 @@ jobs:
       - name: integration test - version screen
         run: zarp --version
 
+      - name: set up Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          mamba-version: "*"
+          auto-activate-base: false
+
       - name: integration test - normal mode
         run: |
           mkdir -p ~/.zarp
