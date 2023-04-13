@@ -188,6 +188,12 @@ class SampleProcessor:
                     None,
                 )
                 if sample is not None:
+                    if "fq1" not in data.columns or row["fq1"] == "":
+                        LOGGER.warning(
+                            "No FASTQ path available, sample skipped:"
+                            f" '{row['sample']}'"
+                        )
+                        continue
                     row["fq1"] = self._normalize_path(
                         _path=row["fq1"], anchor=sample_table.parent
                     )

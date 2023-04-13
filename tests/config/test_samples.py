@@ -23,6 +23,7 @@ REF_FILE_EMPTY_2: Path = TEST_FILE_DIR / "em@pt:y"
 REF_INVALID: Path = Path("path/does/not/exist").absolute()
 REF_SRA_TABLE: Path = TEST_FILE_DIR / "sra_table.tsv"
 REF_SRA_TABLE_2COLS: Path = TEST_FILE_DIR / "sra_table_2cols.tsv"
+REF_SRA_TABLE_NO_FILES: Path = TEST_FILE_DIR / "sra_table_no_files.tsv"
 REF_SRA_TABLE_EMPTY: Path = TEST_FILE_DIR / "sra_table_empty.tsv"
 
 
@@ -253,6 +254,24 @@ class TestSampleTableProcessor:
         processor.set_samples()
         processor.run_config.working_directory = tmpdir
         processor.update_sample_paths(sample_table=REF_SRA_TABLE_EMPTY)
+
+    def test_update_sample_paths_table_no_files(self, tmpdir):
+        """Test method ``.update_sample_paths()``.
+
+        Table has one record that has no FASTQ files.
+        """
+        refs = [
+            f"sample@{REF_ID}",
+            f"table:{REF_TABLE}",
+        ]
+        processor = SampleProcessor(
+            *refs,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        processor.set_samples()
+        processor.run_config.working_directory = tmpdir
+        processor.update_sample_paths(sample_table=REF_SRA_TABLE_NO_FILES)
 
     def test_update_sample_paths_table_has_extra_data(self, tmpdir):
         """Test method ``.update_sample_paths()``.

@@ -1,0 +1,2 @@
+sample	fq1	fq2	organism	gtf	genome	gtf	libtype	fq1_3p	fq2_3p	fq1_5p	fq2_5p	fq1_polya_3p	fq2_polya_3p	fq1_polya_5p	fq2_polya_5p	mean	sd	index_size	kmer
+SRR1234567																300.0	100.0		31
