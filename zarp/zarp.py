@@ -29,11 +29,7 @@ class ZARP:
         self.config: models.Config = config
 
     def set_up_run(self) -> None:
-        """Set up run.
-
-        Raises:
-            FileExistsError: The run directory exists already.
-        """
+        """Set up run."""
         if self.config.run.working_directory is None:
             self.config.run.working_directory = Path.cwd()
         self.config.run.working_directory.mkdir(parents=True, exist_ok=True)
@@ -41,18 +37,11 @@ class ZARP:
         if self.config.run.identifier is None:
             self.config.run.identifier = generate_id()
         LOGGER.info(f"Run identifier: {self.config.run.identifier}")
-        self.config.run.run_directory = (
-            self.config.run.working_directory / self.config.run.identifier
+        self.config.run.working_directory.mkdir(
+            parents=True,
+            exist_ok=True,
         )
-        try:
-            self.config.run.run_directory.mkdir(parents=False, exist_ok=False)
-        except FileExistsError as exc:
-            raise FileExistsError(
-                f"Run directory '{self.config.run.run_directory}' already "
-                "exists. Please choose a different run identifier or "
-                "working directory."
-            ) from exc
-        LOGGER.info(f"Run directory: {self.config.run.run_directory}")
+        LOGGER.info(f"Working directory: {self.config.run.working_directory}")
         LOGGER.info("Run set up")
 
     def process_samples(self) -> None:
@@ -67,14 +56,21 @@ class ZARP:
         LOGGER.info(f"Samples found: {len(sample_processor.samples)}")
         if len(sample_processor.samples) == 0:
             raise ValueError("No samples found. Aborting.")
-
-        is_dry_run: bool = False
-        if self.config.run.execution_mode == "dry_run":
-            is_dry_run = True
-        sample_processor.fetch_remote_libraries(dry_run=is_dry_run)
-
+        if len(sample_processor.samples_remote) > 0:
+            LOGGER.info("Fetching remote libraries...")
+            sample_table = sample_processor.fetch_remote_libraries()
+            LOGGER.info("Remote libraries fetched")
+            LOGGER.info("Updating paths of fetched libraries...")
+            sample_processor.update_sample_paths(sample_table=sample_table)
+            LOGGER.info("Paths updated...")
+        if self.config.run.working_directory is None:
+            self.config.run.working_directory = Path.cwd()
+            LOGGER.warning(
+                "Working directory not set. Using current working directory."
+            )
         self.config.run.sample_table = sample_processor.write_sample_table(
-            samples=sample_processor.samples
+            samples=sample_processor.samples,
+            outpath=self.config.run.working_directory / "sample_table.tsv",
         )
         LOGGER.info(f"Sample table: {self.config.run.sample_table}")
         LOGGER.info("Samples processed")

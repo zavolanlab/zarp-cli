@@ -179,13 +179,13 @@ class TestSampleTableProcessor:
             run_config=ConfigRun(),
         )
         processor.set_samples()
-        processor.run_config.run_directory = tmpdir
+        processor.run_config.working_directory = tmpdir
         processor.write_sample_table()
 
     def test_write_sample_table_run_dir_unset(self, tmpdir):
         """Test method ``.write_sample_table()``.
 
-        Use various sample references when run directory is unset.
+        Use various sample references when working directory is unset.
         """
         processor = SampleProcessor(
             f"{REF_ID}",
@@ -193,7 +193,7 @@ class TestSampleTableProcessor:
             run_config=ConfigRun(),
         )
         processor.set_samples()
-        processor.run_config.run_directory = None
+        processor.run_config.working_directory = None
         with pytest.raises(ValueError):
             processor.write_sample_table()
 

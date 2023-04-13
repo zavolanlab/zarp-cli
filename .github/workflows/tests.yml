@@ -96,3 +96,14 @@ jobs:
           mkdir -p ~/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
           zarp SRR1234567
+          zarp \
+            my_other_sample@tests/files/empty \
+            tests/files/empty,tests/files/empty \
+            SRR1525892 \
+            ERR2248142 \
+            table:tests/files/sample_table.tsv \
+            NotASample \
+            /path/to/* \
+            table:$PWD/tests/files/empty \
+            --execution-mode=RUN \
+            --dependency-embedding=SINGULARITY

@@ -78,7 +78,7 @@ class TestSnakemakeExecutor:
 
     def test_init(self):
         """Initialise object."""
-        my_run = SnakemakeExecutor(run_config=default_run_config)
+        my_run = SnakemakeExecutor(workflow_config=default_run_config)
         assert my_run.run_state == SnakemakeRunState.UNKNOWN
 
     def test_set_command(self, tmpdir):
@@ -93,7 +93,7 @@ class TestSnakemakeExecutor:
             "1",
             "--use-conda",
         ]
-        my_run = SnakemakeExecutor(run_config=default_run_config)
+        my_run = SnakemakeExecutor(workflow_config=default_run_config)
         my_run.set_command(snakefile=snakefile)
         assert my_run.command == expected_command
         os.chdir(default_cwd)
@@ -103,7 +103,7 @@ class TestSnakemakeExecutor:
         snakefile = create_snakefile(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.working_directory = tmpdir
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         assert "--directory" in my_run.command
         assert str(tmpdir) in my_run.command
@@ -120,7 +120,7 @@ class TestSnakemakeExecutor:
         snakefile = create_snakefile(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.dependency_embedding = dependency_embedding
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         my_param = f"--use-{dependency_embedding.value.lower()}"
         assert my_param in my_run.command
@@ -133,7 +133,7 @@ class TestSnakemakeExecutor:
         snakefile = create_snakefile(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.execution_mode = exec_mode
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         if exec_mode == ExecModes.RUN:
             assert "--dry-run" not in my_run.command
@@ -146,7 +146,7 @@ class TestSnakemakeExecutor:
         config_file = create_config_file(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.snakemake_config = config_file
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         assert "--configfile" in my_run.command
         assert str(config_file) in my_run.command
@@ -156,7 +156,7 @@ class TestSnakemakeExecutor:
         os.chdir(tmpdir)
         snakefile = create_snakefile(dir=tmpdir)
         create_input_file(dir=tmpdir)
-        my_run = SnakemakeExecutor(run_config=default_run_config)
+        my_run = SnakemakeExecutor(workflow_config=default_run_config)
         my_run.set_command(snakefile=snakefile)
         my_run.run()
         assert my_run.run_state == SnakemakeRunState.SUCCESS
@@ -166,7 +166,7 @@ class TestSnakemakeExecutor:
     def test_run_invalid_snakefile(self, tmpdir):
         """Execute an invalid run."""
         os.chdir(tmpdir)
-        my_run = SnakemakeExecutor(run_config=default_run_config)
+        my_run = SnakemakeExecutor(workflow_config=default_run_config)
         my_run.set_command(snakefile=Path("not_a_snakefile"))
         with pytest.raises(subprocess.CalledProcessError):
             my_run.run()
@@ -179,7 +179,7 @@ class TestSnakemakeExecutor:
         create_input_file(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.working_directory = tmpdir
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         my_run.run()
         assert my_run.run_state == SnakemakeRunState.SUCCESS
@@ -199,7 +199,7 @@ class TestSnakemakeExecutor:
         create_input_file(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.dependency_embedding = dependency_embedding
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         my_run.run()
         assert my_run.run_state == SnakemakeRunState.SUCCESS
@@ -218,7 +218,7 @@ class TestSnakemakeExecutor:
         create_input_file(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.execution_mode = exec_mode
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         my_run.run()
         assert my_run.run_state == SnakemakeRunState.SUCCESS
@@ -238,7 +238,7 @@ class TestSnakemakeExecutor:
         create_input_file(dir=tmpdir)
         run_config = default_run_config.copy()
         run_config.snakemake_config = config_file
-        my_run = SnakemakeExecutor(run_config=run_config)
+        my_run = SnakemakeExecutor(workflow_config=run_config)
         my_run.set_command(snakefile=snakefile)
         my_run.run()
         assert my_run.run_state == SnakemakeRunState.SUCCESS

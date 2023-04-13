@@ -10,6 +10,7 @@ from typing import (
     Optional,
 )
 
+import pandas as pd  # type: ignore
 from pandas.errors import EmptyDataError  # type: ignore
 
 from zarp.config.enums import SampleReferenceTypes
@@ -17,7 +18,6 @@ from zarp.config.models import (
     ConfigRun,
     ConfigSample,
     Sample,
-    SampleCollection,
     SampleReference,
 )
 from zarp.config.sample_tables import SampleTableProcessor
@@ -47,6 +47,7 @@ class SampleProcessor:
         sample_config: Sample configuration parameters.
         run_config: Run configuration parameters.
         samples: List of sample objects.
+        samples_remote: List of remote sample objects.
     """
 
     def __init__(
@@ -60,6 +61,7 @@ class SampleProcessor:
         self.sample_config: ConfigSample = sample_config
         self.run_config: ConfigRun = run_config
         self.samples: List[Sample] = []
+        self.samples_remote: List[Sample] = []
 
     def set_samples(self) -> None:
         """Resolve sample references and set sample configuration."""
@@ -95,83 +97,104 @@ class SampleProcessor:
                     "syntax. Skipping."
                 )
         LOGGER.debug(self.samples)
+        self._set_samples_remote()
+        LOGGER.debug(self.samples_remote)
 
     def fetch_remote_libraries(
         self,
-        dry_run: bool = False,
         workflow_path_suffix: str = "workflow/rules/sra_download.smk",
-    ) -> None:
-        """Fetch remote sequencing libraries.
+    ) -> Path:
+        """Fetch remote sequencing libraries and convert to FASTQ.
 
         Args:
             dry_run: If ``True``, do not actually download any files.
             workflow_path_suffix: Path to Snakemake workflow file for fetching
-                SRA libraries, relative to the ZARP workflow repository path.
-        """
-        samples_to_fetch = [
-            sample in self.samples
-            if sample.type == SampleReferenceTypes.REMOTE_LIB.name
-        ]
-        if not samples_to_fetch:
-            LOGGER.info("No remote libraries to fetch.")
-            return None
+                remote libraries, relative to the ZARP workflow repository
+                path.
 
-        LOGGER.debug(
-            "Attempting to fetch sequencing libraries for records: "
-            f"{samples_to_fetch}"
-        )
-        self.write_sample_table(
-            samples=samples_to_fetch,
-            outpath_suffix="samples_remote.tsv",
-        )
-        if self.run_config.zarp_directory is None:
-            raise ValueError(
-                "Cannot fetch remote libraries, ZARP directory not set"
-            )
-        elif dry_run:
-            LOGGER.info("Dry run: not actually fetching sequencing libraries")
-        else:
-            LOGGER.info("Fetching sequencing libraries...")
-            executor = SnakemakeExecutor(run_config=self.run_config)
-            smk = self.run_config.zarp_directory / workflow_path_suffix
-            if not smk.exists():
-                raise FileNotFoundError(
-                    f"Cannot find SRA download workflow at '{smk}'. Make sure"
-                    " the ZARP workflow repository path is set correctly in"
-                    " the configuration; currently set to:"
-                    f" {self.run_config.zarp_directory}"
-                )
-            executor.set_command(snakefile=smk)
-            executor.run()
-
-    def write_sample_table(
-        self,
-        samples: List[Sample],
-        outpath_suffix: str = "samples.tsv",
-    ) -> Path:
-        """Write table of samples to file.
-
-        Args:
-            samples: List of sample objects.
-            outpath_suffix: Suffix to append to run directory.
         Returns:
-            Path to sample table.
+            Path to sample table with FASTQ paths of remote files.
 
         Raises:
-            ValueError: Cannot write table because run directory is not set.
+            FileNotFoundError: If the Snakemake workflow file cannot be found.
+            ValueError: If the ZARP workflow repository path is not set in the
+                configuration.
         """
-        if self.run_config.run_directory is None:
+        executor: SnakemakeExecutor = SnakemakeExecutor(
+            run_config=self.run_config,
+            workflow_id="sra_download",
+        )
+        executor.setup()
+        sample_table_out: Path = executor.run_dir / "samples_remote_loc.tsv"
+        ids = ", ".join(
+            [str(sample.identifier) for sample in self.samples_remote]
+        )
+        LOGGER.info(f"Fetching: {ids}")
+        sample_table: Path = self.write_remote_sample_table(
+            samples=self.samples_remote,
+            outpath=executor.run_dir / "samples_remote.tsv",
+        )
+        config: Dict = {
+            "samples": str(sample_table),
+            "outdir": str(executor.exec_dir / "sra"),
+            "samples_out": str(sample_table_out),
+            "log_dir": str(executor.exec_dir / "logs"),
+            "cluster_log_dir": str(executor.exec_dir / "logs" / "cluster"),
+        }
+        executor.set_configuration_file(config=config)
+        LOGGER.debug(f"Run configuration file created: {executor.config_file}")
+        if self.run_config.zarp_directory is None:
             raise ValueError(
-                "Cannot write sample table, run directory not set."
+                "ZARP workflow repository path is not set in the configuration"
             )
-        # take care of adapter_3p etc. / remove trim_poly_a & adapt_three
-        path: Path = self.run_config.run_directory / "samples.tsv"
-        records = SampleCollection(  # pylint: disable=E1101
-            self.samples
-        ).dict()
-        table = SampleTableProcessor(records=records)
-        table.write(path=path)
-        return path
+        smk: Path = self.run_config.zarp_directory / workflow_path_suffix
+        if not smk.exists():
+            raise FileNotFoundError(
+                f"Cannot find SRA download workflow at '{smk}'. Make sure"
+                " the ZARP workflow repository path is set correctly in"
+                " the configuration; currently set to:"
+                f" {self.run_config.zarp_directory}"
+            )
+        executor.set_command(snakefile=smk)
+        LOGGER.debug(
+            f"Snakemake command compiled: {' '.join(executor.command)}"
+        )
+        LOGGER.debug("Starting SRA download workflow...")
+        executor.run()
+        LOGGER.info(f"Sample table with FASTQ paths: {sample_table_out}")
+        LOGGER.info("SRA download workflow completed")
+        return sample_table_out
+
+    def update_sample_paths(self, sample_table: Path) -> None:
+        """Update sample paths from SRA download workflow ouptput sample table.
+
+        Args:
+            sample_table: Path to sample table.
+        """
+        with open(sample_table, "r") as _file:
+            data = pd.read_csv(
+                _file,
+                comment="#",
+                sep="\t",
+                keep_default_na=False,
+            )
+            for _, row in data.iterrows():
+                sample = next(
+                    (
+                        sample
+                        for sample in self.samples
+                        if sample.identifier == row["sample"]
+                    ),
+                    None,
+                )
+                if sample is not None:
+                    if "fq2" not in data.columns or row["fq2"] == "":
+                        row["fq2"] = None
+                    sample.paths = (row["fq1"], row["fq2"])
+                else:
+                    LOGGER.warning(
+                        f"Sample '{row['sample']}' not found in sample table"
+                    )
 
     def _process_sample_table(self, path: Path) -> None:
         """Set sample configuration for all samples in a sample table.
@@ -181,7 +204,6 @@ class SampleProcessor:
         """
         table = SampleTableProcessor()
         table.read(path=path)
-        LOGGER.warning(table.records)
         for index, record in enumerate(table.records):
             deref = SampleReference()
             # sequence archive identifier
@@ -261,7 +283,7 @@ class SampleProcessor:
             paths=ref.lib_paths,
             **self.sample_config.dict(),
         )
-        self.samples.append(sample.copy(update=update))
+        self.samples.append(sample.copy(update=update))  # type: ignore
 
     def _set_sample_from_remote_lib(
         self,
@@ -286,7 +308,15 @@ class SampleProcessor:
             name=ref.name,
             **self.sample_config.dict(),
         )
-        self.samples.append(sample.copy(update=update))
+        self.samples.append(sample.copy(update=update))  # type: ignore
+
+    def _set_samples_remote(self) -> None:
+        """Subset sample configuration for remote samples."""
+        self.samples_remote = [
+            sample
+            for sample in self.samples
+            if sample.type == SampleReferenceTypes.REMOTE_LIB.name
+        ]
 
     @staticmethod
     def resolve_sample_reference(
@@ -463,3 +493,47 @@ class SampleProcessor:
             and parts[0] == "table"
             and Path(parts[1]).is_file()
         )
+
+    @staticmethod
+    def write_sample_table(
+        samples: List[Sample],
+        outpath: Optional[Path],
+    ) -> Path:
+        """Write table of samples to file.
+
+        Args:
+            samples: List of sample objects.
+            outpath: Path to write sample table to.
+
+        Returns:
+            Path to sample table.
+        """
+        if outpath is None:
+            outpath = Path.cwd() / "samples.tsv"
+        records = [sample.dict() for sample in samples]
+        table = SampleTableProcessor(records=records)
+        table.write(path=outpath)
+        return outpath
+
+    @staticmethod
+    def write_remote_sample_table(
+        samples: List[Sample],
+        outpath: Optional[Path],
+    ) -> Path:
+        """Write table of remote samples to file.
+
+        Args:
+            samples: List of sample objects.
+            outpath: Path to write sample table to.
+
+        Returns:
+            Path to sample table.
+        """
+        if outpath is None:
+            outpath = Path.cwd() / "samples_remote.tsv"
+        sra_ids = [sample.identifier for sample in samples]
+        with open(outpath, "w") as _file:
+            _file.write("sample\n")
+            for sra_id in sra_ids:
+                _file.write(f"{sra_id}\n")
+        return outpath

@@ -69,26 +69,40 @@ class TestZarp:
         assert zarp.config.run.identifier is not None
         assert len(zarp.config.run.identifier) == 6
 
-    def test_set_up_run_env_run_dir_exists(self, tmpdir):
-        """Test setting up run environment when run directory exists."""
+    def test_process_samples_abs_file_ref(self, monkeypatch, tmpdir):
+        """Test processing samples with absolute local file ref."""
+        config = Config()
+        config.run.zarp_directory = Path(__file__).parent / "files" / "zarp"
+        config.run.identifier = "test"
+        config.ref = [str(Path(__file__).parent / "files/empty")]
+        zarp = ZARP(config=config)
+        zarp.set_up_run()
+        monkeypatch.setattr("pathlib.Path.cwd", lambda: tmpdir)
+        config.run.working_directory = None
+        zarp.process_samples()
+
+    def test_process_samples_seq_archive_id_ref_file_not_found(self, tmpdir):
+        """Test processing samples with sequence archive identifier ref."""
         config = Config()
         config.run.working_directory = tmpdir
+        config.run.zarp_directory = tmpdir
         config.run.identifier = "test"
-        tmpdir.mkdir(config.run.identifier)
+        config.ref = ["SRR1234567"]
         zarp = ZARP(config=config)
-        with pytest.raises(FileExistsError):
-            zarp.set_up_run()
+        zarp.set_up_run()
+        with pytest.raises(FileNotFoundError):
+            zarp.process_samples()
 
     def test_process_samples_seq_archive_id_ref(self, tmpdir):
         """Test processing samples with sequence archive identifier ref."""
         config = Config()
         config.run.working_directory = tmpdir
+        config.run.zarp_directory = Path(__file__).parent / "files" / "zarp"
         config.run.identifier = "test"
         config.ref = ["SRR1234567"]
         zarp = ZARP(config=config)
         zarp.set_up_run()
         zarp.process_samples()
-        assert Path(tmpdir / "test" / "samples.tsv").is_file()
 
     def test_process_samples_invalid_ref(self, tmpdir):
         """Test processing samples with invalid ref."""
@@ -100,3 +114,12 @@ class TestZarp:
         zarp.set_up_run()
         with pytest.raises(ValueError):
             zarp.process_samples()
+
+    def test_prepare_run_config(self, tmpdir):
+        """Test run configuration preparation."""
+        config = Config()
+        config.run.working_directory = tmpdir
+        config.run.identifier = "test"
+        zarp = ZARP(config=config)
+        zarp.set_up_run()
+        zarp.prepare_run_config()
