@@ -107,5 +107,6 @@ jobs:
             /path/to/* \
             table:$PWD/tests/files/empty \
             --execution-mode=RUN \
-            --dependency-embedding=SINGULARITY
-            --zarp-directory=$ZARP_REPO_PATH
+            --dependency-embedding=SINGULARITY \
+            --zarp-directory=$ZARP_REPO_PATH \
+            --verbosity=DEBUG
