@@ -95,6 +95,10 @@ jobs:
         run: |
           mkdir -p ~/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
+          ZARP_REPO_PATH=~/zarp_workflow
+          git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
+          sed -r "s~zarp_directory: null~zarp_directory: $ZARP_REPO_PATH~" \
+            tests/files/config_valid.yaml
           zarp \
             my_other_sample@tests/files/empty \
             tests/files/empty,tests/files/empty \
