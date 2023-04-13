@@ -64,13 +64,17 @@ class ZARP:
             sample_processor.update_sample_paths(sample_table=sample_table)
             LOGGER.info("Paths updated...")
         if self.config.run.working_directory is None:
-            self.config.run.working_directory = Path.cwd()
+            self.config.run.working_directory = Path.cwd() / "runs"
+            self.config.run.working_directory.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
             LOGGER.warning(
-                "Working directory not set. Using current working directory."
+                "Working directory not set. Using:"
+                f" {self.config.run.working_directory}"
             )
         self.config.run.sample_table = sample_processor.write_sample_table(
-            samples=sample_processor.samples,
-            outpath=self.config.run.working_directory / "sample_table.tsv",
+            samples=sample_processor.samples
         )
         LOGGER.info(f"Sample table: {self.config.run.sample_table}")
         LOGGER.info("Samples processed")

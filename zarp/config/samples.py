@@ -66,7 +66,7 @@ class SampleProcessor:
     def set_samples(self) -> None:
         """Resolve sample references and set sample configuration."""
         for ref_str in self.references:
-            ref = self.resolve_sample_reference(ref=ref_str)
+            ref = self._resolve_sample_reference(ref=ref_str)
             LOGGER.debug(f"Type of sample reference '{ref_str}': {ref.type}")
             if (
                 ref.type == SampleReferenceTypes.TABLE.name
@@ -188,9 +188,21 @@ class SampleProcessor:
                     None,
                 )
                 if sample is not None:
-                    if "fq2" not in data.columns or row["fq2"] == "":
+                    row["fq1"] = self._normalize_path(
+                        _path=row["fq1"], anchor=sample_table.parent
+                    )
+                    if "fq2" in data.columns:
+                        row["fq2"] = self._normalize_path(
+                            _path=row["fq2"], anchor=sample_table.parent
+                        )
+                        if row["fq2"] == "":
+                            row["fq2"] = None
+                    else:
                         row["fq2"] = None
-                    sample.paths = (row["fq1"], row["fq2"])
+                    sample.paths = (
+                        Path(row["fq1"]).absolute(),
+                        row["fq2"],
+                    )
                 else:
                     LOGGER.warning(
                         f"Sample '{row['sample']}' not found in sample table"
@@ -319,7 +331,51 @@ class SampleProcessor:
         ]
 
     @staticmethod
-    def resolve_sample_reference(
+    def write_sample_table(
+        samples: List[Sample],
+        outpath: Optional[Path] = None,
+    ) -> Path:
+        """Write table of samples to file.
+
+        Args:
+            samples: List of sample objects.
+            outpath: Path to write sample table to.
+
+        Returns:
+            Path to sample table.
+        """
+        if outpath is None:
+            outpath = Path.cwd() / "samples.tsv"
+        records = [sample.dict() for sample in samples]
+        table = SampleTableProcessor(records=records)
+        table.write(path=outpath)
+        return outpath
+
+    @staticmethod
+    def write_remote_sample_table(
+        samples: List[Sample],
+        outpath: Optional[Path] = None,
+    ) -> Path:
+        """Write table of remote samples to file.
+
+        Args:
+            samples: List of sample objects.
+            outpath: Path to write sample table to.
+
+        Returns:
+            Path to sample table.
+        """
+        if outpath is None:
+            outpath = Path.cwd() / "samples_remote.tsv"
+        sra_ids = [sample.identifier for sample in samples]
+        with open(outpath, "w") as _file:
+            _file.write("sample\n")
+            for sra_id in sra_ids:
+                _file.write(f"{sra_id}\n")
+        return outpath
+
+    @staticmethod
+    def _resolve_sample_reference(
         ref: str,
     ) -> SampleReference:
         """Resolve sample reference.
@@ -495,45 +551,15 @@ class SampleProcessor:
         )
 
     @staticmethod
-    def write_sample_table(
-        samples: List[Sample],
-        outpath: Optional[Path],
-    ) -> Path:
-        """Write table of samples to file.
+    def _normalize_path(_path: str, anchor: Path = Path.cwd()) -> str:
+        """Normalize relative paths to absolute paths.
 
         Args:
-            samples: List of sample objects.
-            outpath: Path to write sample table to.
-
-        Returns:
-            Path to sample table.
+            _path: Path to normalize.
+            anchor: Anchor path to use if ``_path`` is relative.
         """
-        if outpath is None:
-            outpath = Path.cwd() / "samples.tsv"
-        records = [sample.dict() for sample in samples]
-        table = SampleTableProcessor(records=records)
-        table.write(path=outpath)
-        return outpath
-
-    @staticmethod
-    def write_remote_sample_table(
-        samples: List[Sample],
-        outpath: Optional[Path],
-    ) -> Path:
-        """Write table of remote samples to file.
-
-        Args:
-            samples: List of sample objects.
-            outpath: Path to write sample table to.
-
-        Returns:
-            Path to sample table.
-        """
-        if outpath is None:
-            outpath = Path.cwd() / "samples_remote.tsv"
-        sra_ids = [sample.identifier for sample in samples]
-        with open(outpath, "w") as _file:
-            _file.write("sample\n")
-            for sra_id in sra_ids:
-                _file.write(f"{sra_id}\n")
-        return outpath
+        if _path == "":
+            return ""
+        if not Path(_path).is_absolute():
+            return str(anchor / _path)
+        return _path

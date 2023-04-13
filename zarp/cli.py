@@ -99,7 +99,6 @@ def main() -> None:  # pylint: disable=R0915
             sys.exit(1)
 
     except KeyboardInterrupt:
-        print()
         LOGGER.error("Execution interrupted.")
         sys.exit(128 + signal.SIGINT)
 

@@ -53,15 +53,20 @@ class SnakemakeExecutor:
         self.command: List[str] = []
         self.exec_dir: Path = Path()
         self.run_dir: Path = Path()
-        self.config_file: Path = Path()
+        self.config_file: Path = Path() / "config.yaml"
         self.run_state: SnakemakeRunState = SnakemakeRunState.UNKNOWN
 
     def setup(self) -> None:
         """Set up Snakemake run."""
         if self.run_config.working_directory is None:
-            self.run_config.working_directory = Path.cwd()
+            self.run_config.working_directory = Path.cwd() / "runs"
+            self.run_config.working_directory.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
             LOGGER.warning(
-                "Working directory not set. Using current working directory."
+                "Working directory not set. Using:"
+                f" {self.run_config.working_directory}"
             )
         self.exec_dir = self.run_config.working_directory / self.workflow_id
         if self.run_config.identifier is None:
@@ -132,6 +137,9 @@ class SnakemakeExecutor:
         Args:
             config: Either the path to a Snakemake configuration file, or a
                 dictionary with configuration parameters.
+
+        Raises:
+            TypeError: If `config` is neither a path nor a dictionary.
         """
         if isinstance(config, Path):
             shutil.copyfile(config, self.config_file)

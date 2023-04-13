@@ -95,7 +95,6 @@ jobs:
         run: |
           mkdir -p ~/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
-          zarp SRR1234567
           zarp \
             my_other_sample@tests/files/empty \
             tests/files/empty,tests/files/empty \

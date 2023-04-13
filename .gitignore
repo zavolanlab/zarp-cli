@@ -326,3 +326,4 @@ pip-selfcheck.json
 .vscode
 .snakemake
 docs/docstring/*md
+runs/

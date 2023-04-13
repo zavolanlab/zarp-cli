@@ -10,7 +10,7 @@ run:
   resources_version: null
   snakemake_config: null
   working_directory: null
-  zarp_directory: zarp
+  zarp_directory: null
 sample:
   fragment_length_distribution_mean: 300.0
   fragment_length_distribution_sd: 100.0

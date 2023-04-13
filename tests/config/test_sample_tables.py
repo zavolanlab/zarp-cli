@@ -105,7 +105,6 @@ class TestSampleTableProcessor:
         processor.read(path=SAMPLE_TABLE)
         processor._to_sample_table_records()
         record = processor.records[0]
-        print(record)
         assert all(item not in record for item in DELETED)
         assert all(item in record for item in NEW)
 

@@ -17,9 +17,13 @@ TEST_FILE_DIR: Path = Path(__file__).parents[1].absolute() / "files"
 REF_ID: str = "SRR1234567"
 REF_FILE: Path = TEST_FILE_DIR / "config_valid.yaml"
 REF_TABLE: Path = TEST_FILE_DIR / "sample_table.tsv"
+REF_TABLE_FAULTY: Path = TEST_FILE_DIR / "sample_table_faulty.tsv"
 REF_FILE_EMPTY: Path = TEST_FILE_DIR / "empty"
 REF_FILE_EMPTY_2: Path = TEST_FILE_DIR / "em@pt:y"
 REF_INVALID: Path = Path("path/does/not/exist").absolute()
+REF_SRA_TABLE: Path = TEST_FILE_DIR / "sra_table.tsv"
+REF_SRA_TABLE_2COLS: Path = TEST_FILE_DIR / "sra_table_2cols.tsv"
+REF_SRA_TABLE_EMPTY: Path = TEST_FILE_DIR / "sra_table_empty.tsv"
 
 
 class TestSampleTableProcessor:
@@ -153,16 +157,268 @@ class TestSampleTableProcessor:
         processor = SampleProcessor(
             f"{REF_ID}",
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=ConfigRun(
+                identifier="test",
+                zarp_directory=Path(__file__).parents[1].absolute()
+                / "files"
+                / "zarp",
+            ),
         )
         processor.set_samples()
         processor.fetch_remote_libraries()
-        processor.fetch_remote_libraries(dry_run=True)
 
-    def test_write_sample_table(self, tmpdir):
-        """Test method ``.write_sample_table()``.
+    def test_fetch_remote_libraries_no_zarp_dir(self):
+        """Test method ``.fetch_remote_libraries()``.
 
-        Use various sample references.
+        No ZARP directory set.
+        """
+        processor = SampleProcessor(
+            f"{REF_ID}",
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(identifier="test"),
+        )
+        processor.set_samples()
+        with pytest.raises(ValueError):
+            processor.fetch_remote_libraries()
+
+    def test_fetch_remote_libraries_no_workflow(self):
+        """Test method ``.fetch_remote_libraries()``.
+
+        Workflow is unavailable.
+        """
+        processor = SampleProcessor(
+            f"{REF_ID}",
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(
+                identifier="test",
+                zarp_directory=Path(__file__).parents[1].absolute()
+                / "files"
+                / "zarp",
+            ),
+        )
+        processor.set_samples()
+        with pytest.raises(FileNotFoundError):
+            processor.fetch_remote_libraries(workflow_path_suffix="n/a")
+
+    def test_update_sample_paths(self, tmpdir):
+        """Test method ``.update_sample_paths()``.
+
+        Table has all columns ``sample``, ``fq1``, and ``fq2``.
+        """
+        refs = [
+            f"sample@{REF_ID}",
+            f"table:{REF_TABLE}",
+        ]
+        processor = SampleProcessor(
+            *refs,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        processor.set_samples()
+        processor.run_config.working_directory = tmpdir
+        processor.update_sample_paths(sample_table=REF_SRA_TABLE)
+
+    def test_update_sample_paths_table_2_cols(self, tmpdir):
+        """Test method ``.update_sample_paths()``.
+
+        Table has two columns ``sample``, and ``fq1``.
+        """
+        refs = [
+            f"sample@{REF_ID}",
+            f"table:{REF_TABLE}",
+        ]
+        processor = SampleProcessor(
+            *refs,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        processor.set_samples()
+        processor.run_config.working_directory = tmpdir
+        processor.update_sample_paths(sample_table=REF_SRA_TABLE_2COLS)
+
+    def test_update_sample_paths_table_empty(self, tmpdir):
+        """Test method ``.update_sample_paths()``.
+
+        Table has one column ``sample`` and no data.
+        """
+        refs = [
+            f"sample@{REF_ID}",
+            f"table:{REF_TABLE}",
+        ]
+        processor = SampleProcessor(
+            *refs,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        processor.set_samples()
+        processor.run_config.working_directory = tmpdir
+        processor.update_sample_paths(sample_table=REF_SRA_TABLE_EMPTY)
+
+    def test_update_sample_paths_table_has_extra_data(self, tmpdir):
+        """Test method ``.update_sample_paths()``.
+
+        Table has all columns ``sample``, ``fq1``, and ``fq2``, as well as
+        additional data for which no sample information is available.
+        """
+        refs = [
+            f"sample@{REF_ID}",
+        ]
+        processor = SampleProcessor(
+            *refs,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        processor.set_samples()
+        processor.update_sample_paths(sample_table=REF_SRA_TABLE)
+
+    def test__process_sample_table(self):
+        """Test method ``._process_write_sample_table()``.
+
+        Use sample table with entries accounting for all conditions.
+        """
+        ref_str = f"table:{REF_TABLE}"
+        processor = SampleProcessor(
+            ref_str,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        ref = processor._resolve_sample_reference(ref=ref_str)
+        assert ref.table_path is not None
+        processor._process_sample_table(path=ref.table_path)
+
+    def test__process_sample_table_faulty(self):
+        """Test method ``._process_write_sample_table()``.
+
+        Sample table contains faulty reference.
+        """
+        ref_str = f"table:{REF_TABLE_FAULTY}"
+        processor = SampleProcessor(
+            ref_str,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        ref = processor._resolve_sample_reference(ref=ref_str)
+        assert ref.table_path is not None
+        processor._process_sample_table(path=ref.table_path)
+
+    def test__set_sample_from_local_lib_single(self):
+        """Test method ``._set_sample_from_local_lib()``.
+
+        Use reference for single-ended local library.
+        """
+        ref = str(REF_FILE_EMPTY)
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_local_lib(ref=deref)
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths == (REF_FILE_EMPTY, None)
+        assert processor.samples[0].identifier is None
+
+    def test__set_sample_from_local_lib_single_config_update(self):
+        """Test method ``._set_sample_from_local_lib()``.
+
+        Use reference for single-ended local library and update configuration.
+        """
+        ref = str(REF_FILE_EMPTY)
+        update = ConfigSample(source="test")
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_local_lib(ref=deref, update=update.dict())
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths == (REF_FILE_EMPTY, None)
+        assert processor.samples[0].identifier is None
+        assert processor.samples[0].source == "test"
+
+    def test__set_sample_from_local_lib_paired(self):
+        """Test method ``._set_sample_from_local_lib()``.
+
+        Use reference for paired-ended local library.
+        """
+        ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_local_lib(ref=deref)
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths == (REF_FILE_EMPTY, REF_FILE_EMPTY)
+        assert processor.samples[0].identifier is None
+
+    def test__set_sample_from_local_lib_paired_config_update(self):
+        """Test method ``._set_sample_from_local_lib()``.
+
+        Use reference for paired-ended local library and update configuration.
+        """
+        ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
+        update = ConfigSample(source="test")
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_local_lib(ref=deref, update=update.dict())
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths == (REF_FILE_EMPTY, REF_FILE_EMPTY)
+        assert processor.samples[0].identifier is None
+        assert processor.samples[0].source == "test"
+
+    def test__set_sample_from_remote_lib(self):
+        """Test method ``._set_sample_from_remote_lib()``.
+
+        Use reference for remote library.
+        """
+        ref = REF_ID
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_remote_lib(ref=deref)
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths is None
+        assert processor.samples[0].identifier == REF_ID
+
+    def test__set_sample_from_remote_lib_config_update(self):
+        """Test method ``._set_sample_from_remote_lib()``.
+
+        Use reference for remote library and update configuration.
+        """
+        ref = REF_ID
+        update = ConfigSample(source="test")
+        processor = SampleProcessor(
+            ref,
+            sample_config=ConfigSample(),
+            run_config=ConfigRun(),
+        )
+        assert len(processor.samples) == 0
+        deref = processor._resolve_sample_reference(ref=ref)
+        processor._set_sample_from_remote_lib(ref=deref, update=update.dict())
+        assert len(processor.samples) == 1
+        assert processor.samples[0].paths is None
+        assert processor.samples[0].identifier == REF_ID
+        assert processor.samples[0].source == "test"
+
+    def test__set_samples_remote(self):
+        """Test method ``._set_samples_remote()``.
+
+        Use references for remote libraries.
         """
         refs = [
             f"{REF_ID}",
@@ -179,152 +435,73 @@ class TestSampleTableProcessor:
             run_config=ConfigRun(),
         )
         processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.write_sample_table()
+        processor.samples_remote = []
+        processor._set_samples_remote()
+        assert len(processor.samples_remote) == 5
+        assert len(processor.samples) == 11
 
-    def test_write_sample_table_run_dir_unset(self, tmpdir):
+    def test_write_sample_table(self, tmpdir):
         """Test method ``.write_sample_table()``.
 
-        Use various sample references when working directory is unset.
+        Use various sample references.
         """
+        refs = [f"{REF_ID}"]
         processor = SampleProcessor(
-            f"{REF_ID}",
+            *refs,
             sample_config=ConfigSample(),
             run_config=ConfigRun(),
         )
         processor.set_samples()
-        processor.run_config.working_directory = None
-        with pytest.raises(ValueError):
-            processor.write_sample_table()
+        processor.write_sample_table(samples=processor.samples)
 
-    def test_process_sample_table(self):
-        """Test method ``._process_write_sample_table()``.
+    def test_write_sample_table_outpath_set(self, tmpdir):
+        """Test method ``.write_sample_table()``.
 
-        Use sample table with entries account for all conditions.
+        Output path is set explicitly.
         """
-        ref_str = f"table:{REF_TABLE}"
+        refs = [f"{REF_ID}"]
         processor = SampleProcessor(
-            ref_str,
+            *refs,
             sample_config=ConfigSample(),
             run_config=ConfigRun(),
         )
-        ref = processor.resolve_sample_reference(ref=ref_str)
-        assert ref.table_path is not None
-        processor._process_sample_table(path=ref.table_path)
+        processor.set_samples()
+        processor.write_sample_table(
+            samples=processor.samples,
+            outpath=tmpdir / "samples.tsv",
+        )
 
-    def test_set_sample_from_local_lib_single(self):
-        """Test method ``._set_sample_from_local_lib()``.
+    def test_write_remote_sample_table(self, tmpdir):
+        """Test method ``.write_remote_sample_table()``.
 
-        Use reference for single-ended local library.
+        Use various sample references.
         """
-        ref = str(REF_FILE_EMPTY)
+        refs = [f"{REF_ID}"]
         processor = SampleProcessor(
-            ref,
+            *refs,
             sample_config=ConfigSample(),
             run_config=ConfigRun(),
         )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_local_lib(ref=deref)
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths == (REF_FILE_EMPTY, None)
-        assert processor.samples[0].identifier is None
+        processor.set_samples()
+        processor.run_config.working_directory = tmpdir
+        processor.write_remote_sample_table(samples=processor.samples)
 
-    def test_set_sample_from_local_lib_single_config_update(self):
-        """Test method ``._set_sample_from_local_lib()``.
+    def test_write_remote_sample_table_outpath_set(self, tmpdir):
+        """Test method ``.write_sample_table()``.
 
-        Use reference for single-ended local library and update configuration.
+        Output path is set explicitly.
         """
-        ref = str(REF_FILE_EMPTY)
-        update = ConfigSample(source="test")
+        refs = [f"{REF_ID}"]
         processor = SampleProcessor(
-            ref,
+            *refs,
             sample_config=ConfigSample(),
             run_config=ConfigRun(),
         )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_local_lib(ref=deref, update=update.dict())
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths == (REF_FILE_EMPTY, None)
-        assert processor.samples[0].identifier is None
-        assert processor.samples[0].source == "test"
-
-    def test_set_sample_from_local_lib_paired(self):
-        """Test method ``._set_sample_from_local_lib()``.
-
-        Use reference for paired-ended local library.
-        """
-        ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
-        processor = SampleProcessor(
-            ref,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+        processor.set_samples()
+        processor.write_remote_sample_table(
+            samples=processor.samples,
+            outpath=tmpdir / "samples.tsv",
         )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_local_lib(ref=deref)
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths == (REF_FILE_EMPTY, REF_FILE_EMPTY)
-        assert processor.samples[0].identifier is None
-
-    def test_set_sample_from_local_lib_paired_config_update(self):
-        """Test method ``._set_sample_from_local_lib()``.
-
-        Use reference for paired-ended local library and update configuration.
-        """
-        ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
-        update = ConfigSample(source="test")
-        processor = SampleProcessor(
-            ref,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_local_lib(ref=deref, update=update.dict())
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths == (REF_FILE_EMPTY, REF_FILE_EMPTY)
-        assert processor.samples[0].identifier is None
-        assert processor.samples[0].source == "test"
-
-    def test_set_sample_from_remote_lib(self):
-        """Test method ``._set_sample_from_remote_lib()``.
-
-        Use reference for remote library.
-        """
-        ref = REF_ID
-        processor = SampleProcessor(
-            ref,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_remote_lib(ref=deref)
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths is None
-        assert processor.samples[0].identifier == REF_ID
-
-    def test_set_sample_from_remote_lib_config_update(self):
-        """Test method ``._set_sample_from_remote_lib()``.
-
-        Use reference for remote library and update configuration.
-        """
-        ref = REF_ID
-        update = ConfigSample(source="test")
-        processor = SampleProcessor(
-            ref,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        assert len(processor.samples) == 0
-        deref = processor.resolve_sample_reference(ref=ref)
-        processor._set_sample_from_remote_lib(ref=deref, update=update.dict())
-        assert len(processor.samples) == 1
-        assert processor.samples[0].paths is None
-        assert processor.samples[0].identifier == REF_ID
-        assert processor.samples[0].source == "test"
 
     @pytest.mark.parametrize(
         "ref",
@@ -333,12 +510,12 @@ class TestSampleTableProcessor:
             str(REF_FILE_EMPTY_2),
         ],
     )
-    def test_resolve_sample_reference_unnamed_single(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_unnamed_single(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to unnamed single-ended libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.LOCAL_LIB_SINGLE.name
         assert deref.name is None
@@ -355,12 +532,12 @@ class TestSampleTableProcessor:
             f"{REF_FILE_EMPTY_2},{REF_FILE_EMPTY_2}",
         ],
     )
-    def test_resolve_sample_reference_unnamed_paired(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_unnamed_paired(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to unnamed paired-ended libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.LOCAL_LIB_PAIRED.name
         assert deref.name is None
@@ -382,12 +559,12 @@ class TestSampleTableProcessor:
             "srr1234567",
         ],
     )
-    def test_resolve_sample_reference_unnamed_remote(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_unnamed_remote(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to unnamed remote libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
         assert deref.name is None
@@ -402,12 +579,12 @@ class TestSampleTableProcessor:
             f"sample@{REF_FILE_EMPTY_2}",
         ],
     )
-    def test_resolve_sample_reference_named_single(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_named_single(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to named single-ended libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.LOCAL_LIB_SINGLE.name
         assert deref.name == "sample"
@@ -427,12 +604,12 @@ class TestSampleTableProcessor:
             f"sample@{REF_FILE_EMPTY_2},{REF_FILE_EMPTY_2}",
         ],
     )
-    def test_resolve_sample_reference_named_paired(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_named_paired(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to named paired-ended libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.LOCAL_LIB_PAIRED.name
         assert deref.name == "sample"
@@ -453,12 +630,12 @@ class TestSampleTableProcessor:
             "sample@srr1234567",
         ],
     )
-    def test_resolve_sample_reference_named_remote(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_named_remote(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to named remote libaries.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
         assert deref.name == "sample"
@@ -473,12 +650,12 @@ class TestSampleTableProcessor:
             f"table:{REF_FILE_EMPTY_2}",
         ],
     )
-    def test_resolve_sample_reference_sample_table(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_sample_table(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use references to sample tables.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.TABLE.name
         assert deref.name is None
@@ -512,12 +689,12 @@ class TestSampleTableProcessor:
             "illegal^name@SRR1234567",
         ],
     )
-    def test_resolve_sample_reference_invalid(self, ref):
-        """Test method ``.resolve_sample_reference()``.
+    def test__resolve_sample_reference_invalid(self, ref):
+        """Test method ``._resolve_sample_reference()``.
 
         Use various invalid sample references.
         """
-        deref = SampleProcessor.resolve_sample_reference(ref=ref)
+        deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
         assert deref.type == SampleReferenceTypes.INVALID.name
 
@@ -763,3 +940,26 @@ class TestSampleTableProcessor:
         Use references that do not refer to sample tables.
         """
         assert SampleProcessor._is_sample_table(ref=ref) is False
+
+    def test_normalize_path(self):
+        """Test method ``._normalize_relative_path()``.
+
+        Use a relative path.
+        """
+        PATH = "path/to/file"
+        assert SampleProcessor._normalize_path(PATH) == str(Path.cwd() / PATH)
+
+    def test_normalize_path_absolute(self):
+        """Test method ``._normalize_relative_path()``.
+
+        Use an absolute path.
+        """
+        PATH = "/path/to/file"
+        assert SampleProcessor._normalize_path(PATH) == PATH
+
+    def test_normalize_path_empty(self):
+        """Test method ``._normalize_relative_path()``.
+
+        Use an empty path.
+        """
+        assert SampleProcessor._normalize_path("") == ""
