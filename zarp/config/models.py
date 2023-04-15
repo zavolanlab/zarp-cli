@@ -10,6 +10,7 @@ from typing import (
 
 from pydantic import (  # pylint: disable=no-name-in-module
     BaseModel,
+    DirectoryPath,
     EmailStr,
     FilePath,
     HttpUrl,
@@ -22,6 +23,7 @@ from zarp.config.enums import (
     ReadOrientation,
     SampleReferenceTypes,
 )
+from zarp.utils import generate_id
 
 # pylint: disable=too-few-public-methods
 
@@ -96,22 +98,22 @@ class InitRun(CustomBaseModel):
         zarp_directory: Root directory of the ZARP repository.
     """
 
-    zarp_directory: Optional[Path] = None
-    working_directory: Optional[Path] = None
-    cleanup_strategy: Optional[List[OutputFileGroups]] = [
+    cleanup_strategy: List[OutputFileGroups] = [
         OutputFileGroups.CONFIG,
         OutputFileGroups.LOGS,
         OutputFileGroups.RESULTS,
     ]
-    execution_mode: Optional[ExecModes] = ExecModes.RUN
-    dependency_embedding: Optional[
-        DependencyEmbeddingStrategies
-    ] = DependencyEmbeddingStrategies.CONDA
-    cores: Optional[int] = 1
-    resources_version: Optional[int] = None
+    cores: int = 1
+    dependency_embedding: DependencyEmbeddingStrategies = (
+        DependencyEmbeddingStrategies.CONDA
+    )
+    execution_mode: ExecModes = ExecModes.RUN
     htsinfer_config: Optional[str] = None
-    snakemake_config: Optional[Path] = None
+    resources_version: Optional[int] = None
     rule_config: Optional[Path] = None
+    snakemake_config: Optional[Path] = None
+    working_directory: DirectoryPath = Path.cwd()
+    zarp_directory: DirectoryPath
 
 
 class InitSample(CustomBaseModel):
@@ -122,7 +124,6 @@ class InitSample(CustomBaseModel):
             distribution.
         fragment_length_distribution_sd: Standard deviation of the fragment
             length distribution.
-        trim_poly_a: Whether to remove poly-A tails from reads.
 
     Attributes:
         fragment_length_distribution_mean: Mean of the fragment length
@@ -131,8 +132,8 @@ class InitSample(CustomBaseModel):
             length distribution.
     """
 
-    fragment_length_distribution_mean: Optional[float] = 300
-    fragment_length_distribution_sd: Optional[float] = 100
+    fragment_length_distribution_mean: float = 300
+    fragment_length_distribution_sd: float = 100
 
 
 class InitConfig(CustomBaseModel):
@@ -140,24 +141,22 @@ class InitConfig(CustomBaseModel):
 
     Args:
         run: Run-specific parameters.
-        user: User-specific parameters.
         sample: Sample-specific parameters.
+        user: User-specific parameters.
 
     Attributes:
         run: Run-specific parameters.
-        user: User-specific parameters.
         sample: Sample-specific parameters.
+        user: User-specific parameters.
     """
 
-    user: InitUser = InitUser()
-    run: InitRun = InitRun(
-        cleanup_strategy=[
-            OutputFileGroups.CONFIG,
-            OutputFileGroups.LOGS,
-            OutputFileGroups.RESULTS,
-        ]
-    )
+    run: InitRun
     sample: InitSample = InitSample()
+    user: InitUser = InitUser()
+
+
+class ConfigUser(InitUser):
+    """User-specific parameters."""
 
 
 class ConfigRun(InitRun):
@@ -166,18 +165,14 @@ class ConfigRun(InitRun):
     Args:
         description: Run description.
         identifier: Unique identifier for a run.
-        sample_table: Path to ZARP sample table.
 
     Attributes:
         description: Run description.
         identifier: Unique identifier for a run.
-        sample_table: Path to ZARP sample table.
     """
 
     description: Optional[str] = None
-    identifier: Optional[str] = None
-    sample_table: Optional[Path] = None
-    run_config: Optional[Path] = None
+    identifier: str = generate_id()
 
 
 class ConfigSample(InitSample):
@@ -255,10 +250,6 @@ class ConfigSample(InitSample):
     salmon_kmer_size: int = 31
 
 
-class ConfigUser(InitUser):
-    """User-specific parameters."""
-
-
 class Config(CustomBaseModel):
     """ZARP-cli main configuration.
 
@@ -280,9 +271,9 @@ class Config(CustomBaseModel):
     """
 
     ref: List[str] = []
-    run: ConfigRun = ConfigRun()
-    sample: ConfigSample = ConfigSample()
-    user: ConfigUser = ConfigUser()
+    run: ConfigRun
+    sample: ConfigSample
+    user: ConfigUser
 
 
 class SampleReference(CustomBaseModel):
@@ -343,3 +334,32 @@ class Sample(ConfigSample):
     identifier: Optional[str] = None
     name: Optional[str] = None
     paths: Optional[Tuple[FilePath, Optional[FilePath]]] = None
+
+
+class ConfigFileContent(CustomBaseModel):
+    """Snakemake configuration file content."""
+
+
+class ConfigFileSRA(ConfigFileContent):
+    """SRA download workflow configuration file content.
+
+    Args:
+        cluster_log_dir: Path to cluster log directory.
+        log_dir: Path to log directory.
+        outdir: Path to output directory.
+        samples: Path to sample table.
+        samples_out: Path to output sample table.
+
+    Attributes:
+        cluster_log_dir: Path to cluster log directory.
+        log_dir: Path to log directory.
+        outdir: Path to output directory.
+        samples: Path to sample table.
+        samples_out: Path to output sample table.
+    """
+
+    cluster_log_dir: DirectoryPath
+    log_dir: DirectoryPath
+    outdir: DirectoryPath
+    samples: FilePath
+    samples_out: FilePath

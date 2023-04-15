@@ -92,7 +92,6 @@ def main() -> None:  # pylint: disable=R0915
         try:
             zarp.set_up_run()
             zarp.process_samples()
-            zarp.prepare_run_config()
         except Exception as exc:  # pylint: disable=W0703
             LOGGER.error(f"{exc}")
             LOGGER.debug(format_exc())

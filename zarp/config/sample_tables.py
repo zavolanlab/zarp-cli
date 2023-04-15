@@ -56,7 +56,6 @@ class SampleTableProcessor:
         "organism",
         "gtf",
         "genome",
-        "gtf",
         "libtype",
         "fq1_3p",
         "fq2_3p",
@@ -240,7 +239,7 @@ class SampleTableProcessor:
             if direction == FieldNameMappingDirection.TO_MODEL_PROPERTIES
             else self.key_mapping.inv
         )
-        data_renamed = data.rename(columns=mapping)
+        data_renamed = data.rename(columns=mapping)  # type: ignore
         self.records = data_renamed.to_dict("records")  # type: ignore
 
     @staticmethod

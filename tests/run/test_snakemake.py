@@ -13,7 +13,7 @@ from zarp.config.models import (
     ExecModes,
     DependencyEmbeddingStrategies,
 )
-from zarp.run.snakemake import SnakemakeExecutor
+from zarp.snakemake.run import SnakemakeExecutor
 
 
 def create_input_file(dir: Path = Path.cwd()):

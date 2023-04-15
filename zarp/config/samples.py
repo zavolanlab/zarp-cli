@@ -10,7 +10,6 @@ from typing import (
     Optional,
 )
 
-import pandas as pd  # type: ignore
 from pandas.errors import EmptyDataError  # type: ignore
 
 from zarp.config.enums import SampleReferenceTypes
@@ -21,7 +20,6 @@ from zarp.config.models import (
     SampleReference,
 )
 from zarp.config.sample_tables import SampleTableProcessor
-from zarp.run.snakemake import SnakemakeExecutor
 
 
 LOGGER = logging.getLogger(__name__)
@@ -88,7 +86,7 @@ class SampleProcessor:
                 SampleReferenceTypes.LOCAL_LIB_PAIRED.name,
             ]:
                 self._set_sample_from_local_lib(ref=ref)
-            elif ref.type == SampleReferenceTypes.REMOTE_LIB.name:
+            elif ref.type == SampleReferenceTypes.REMOTE_LIB_SRA.name:
                 self._set_sample_from_remote_lib(ref=ref)
             elif ref.type == SampleReferenceTypes.INVALID.name:
                 LOGGER.warning(
@@ -99,123 +97,6 @@ class SampleProcessor:
         LOGGER.debug(self.samples)
         self._set_samples_remote()
         LOGGER.debug(self.samples_remote)
-
-    def fetch_remote_libraries(
-        self,
-        workflow_path_suffix: str = "workflow/rules/sra_download.smk",
-    ) -> Path:
-        """Fetch remote sequencing libraries and convert to FASTQ.
-
-        Args:
-            dry_run: If ``True``, do not actually download any files.
-            workflow_path_suffix: Path to Snakemake workflow file for fetching
-                remote libraries, relative to the ZARP workflow repository
-                path.
-
-        Returns:
-            Path to sample table with FASTQ paths of remote files.
-
-        Raises:
-            FileNotFoundError: If the Snakemake workflow file cannot be found.
-            ValueError: If the ZARP workflow repository path is not set in the
-                configuration.
-        """
-        executor: SnakemakeExecutor = SnakemakeExecutor(
-            run_config=self.run_config,
-            workflow_id="sra_download",
-        )
-        executor.setup()
-        sample_table_out: Path = executor.run_dir / "samples_remote_loc.tsv"
-        ids = ", ".join(
-            [str(sample.identifier) for sample in self.samples_remote]
-        )
-        LOGGER.info(f"Fetching: {ids}")
-        sample_table: Path = self.write_remote_sample_table(
-            samples=self.samples_remote,
-            outpath=executor.run_dir / "samples_remote.tsv",
-        )
-        config: Dict = {
-            "samples": str(sample_table),
-            "outdir": str(executor.exec_dir / "sra"),
-            "samples_out": str(sample_table_out),
-            "log_dir": str(executor.exec_dir / "logs"),
-            "cluster_log_dir": str(executor.exec_dir / "logs" / "cluster"),
-        }
-        executor.set_configuration_file(config=config)
-        LOGGER.debug(f"Run configuration file created: {executor.config_file}")
-        if self.run_config.zarp_directory is None:
-            raise ValueError(
-                "ZARP workflow repository path is not set in the configuration"
-            )
-        smk: Path = self.run_config.zarp_directory / workflow_path_suffix
-        if not smk.exists():
-            raise FileNotFoundError(
-                f"Cannot find SRA download workflow at '{smk}'. Make sure"
-                " the ZARP workflow repository path is set correctly in"
-                " the configuration; currently set to:"
-                f" {self.run_config.zarp_directory}"
-            )
-        executor.set_command(snakefile=smk)
-        LOGGER.debug(
-            f"Snakemake command compiled: {' '.join(executor.command)}"
-        )
-        LOGGER.debug("Starting SRA download workflow...")
-        executor.run()
-        LOGGER.info(f"Sample table with FASTQ paths: {sample_table_out}")
-        LOGGER.info("SRA download workflow completed")
-        return sample_table_out
-
-    def update_sample_paths(self, sample_table: Path) -> None:
-        """Update sample paths from SRA download workflow ouptput sample table.
-
-        Args:
-            sample_table: Path to sample table.
-        """
-        with open(sample_table, encoding="utf-8") as _file:
-            data = pd.read_csv(
-                _file,
-                comment="#",
-                sep="\t",
-                keep_default_na=False,
-            )
-            for _, row in data.iterrows():
-                sample = next(
-                    (
-                        sample
-                        for sample in self.samples
-                        if sample.identifier == row["sample"]
-                    ),
-                    None,
-                )
-                if sample is not None:
-                    if "fq1" not in data.columns or row["fq1"] == "":
-                        self.samples = [
-                            smpl for smpl in self.samples if smpl != sample
-                        ]
-                        LOGGER.warning(
-                            "No FASTQ path available, sample skipped:"
-                            f" '{row['sample']}'"
-                        )
-                        continue
-                    row["fq1"] = self._normalize_path(
-                        _path=row["fq1"], anchor=sample_table.parent
-                    )
-                    if "fq2" in data.columns:
-                        row["fq2"] = self._normalize_path(
-                            _path=row["fq2"], anchor=sample_table.parent
-                        )
-                        if row["fq2"] == "":
-                            row["fq2"] = None
-                    else:
-                        row["fq2"] = None
-                    sample.paths = (
-                        Path(row["fq1"]).absolute(),
-                        row["fq2"],
-                    )
-                else:
-                    LOGGER.warning(
-                        f"Sample '{row['sample']}' not found in sample table"
-                    )
 
     def _process_sample_table(self, path: Path) -> None:
         """Set sample configuration for all samples in a sample table.
@@ -231,7 +112,7 @@ class SampleProcessor:
             if record["paths"][0] is None and self._is_unnamed_seq_identifier(
                 ref=record["name"]
             ):
-                deref.type = SampleReferenceTypes.REMOTE_LIB
+                deref.type = SampleReferenceTypes.REMOTE_LIB_SRA
                 deref.identifier = record["name"].upper()
                 self._set_sample_from_remote_lib(
                     ref=deref,
@@ -336,7 +217,7 @@ class SampleProcessor:
         self.samples_remote = [
             sample
             for sample in self.samples
-            if sample.type == SampleReferenceTypes.REMOTE_LIB.name
+            if sample.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
         ]
 
     @staticmethod
@@ -426,11 +307,11 @@ class SampleProcessor:
                 Path(paths[1]).absolute(),
             )
         elif SampleProcessor._is_unnamed_seq_identifier(ref=ref):
-            deref.type = SampleReferenceTypes.REMOTE_LIB
+            deref.type = SampleReferenceTypes.REMOTE_LIB_SRA
             deref.identifier = ref.upper()
         elif SampleProcessor._is_named_seq_identifier(ref=ref):
             parts = ref.split("@", maxsplit=1)
-            deref.type = SampleReferenceTypes.REMOTE_LIB
+            deref.type = SampleReferenceTypes.REMOTE_LIB_SRA
             deref.name = parts[0]
             deref.identifier = parts[1].upper()
         elif SampleProcessor._is_sample_table(ref=ref):

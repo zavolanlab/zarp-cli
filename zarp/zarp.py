@@ -2,10 +2,11 @@
 
 import logging
 from pathlib import Path
+from typing import Dict, Optional, Tuple
 
 from zarp.config import models
-from zarp.config.run_config import RunConfigFileProcessor
 from zarp.config.samples import SampleProcessor
+from zarp.plugins.sample_fetchers.sra import SampleFetcherSRA
 from zarp.utils import generate_id
 
 LOGGER = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class ZARP:
 
     def __init__(
         self,
-        config: models.Config = models.Config(),
+        config: models.Config,
     ):
         """Class constructor."""
         self.config: models.Config = config
@@ -54,39 +55,20 @@ class ZARP:
         )
         sample_processor.set_samples()
         LOGGER.info(f"Samples found: {len(sample_processor.samples)}")
-        if len(sample_processor.samples) == 0:
-            raise ValueError("No samples found. Aborting.")
-        if len(sample_processor.samples_remote) > 0:
-            LOGGER.info("Fetching remote libraries...")
-            sample_table = sample_processor.fetch_remote_libraries()
-            LOGGER.info("Remote libraries fetched")
-            LOGGER.info("Updating paths of fetched libraries...")
-            sample_processor.update_sample_paths(sample_table=sample_table)
-            LOGGER.info("Paths updated...")
-        if self.config.run.working_directory is None:
-            self.config.run.working_directory = Path.cwd() / "runs"
-            self.config.run.working_directory.mkdir(
-                parents=True,
-                exist_ok=True,
-            )
-            LOGGER.warning(
-                "Working directory not set. Using:"
-                f" {self.config.run.working_directory}"
-            )
-        self.config.run.sample_table = sample_processor.write_sample_table(
-            samples=sample_processor.samples
-        )
-        LOGGER.info(f"Sample table: {self.config.run.sample_table}")
-        LOGGER.info("Samples processed")
 
-    def prepare_run_config(self) -> None:
-        """Prepare run configuration."""
-        LOGGER.info("Preparing run configuration file...")
-        run_config_processor = RunConfigFileProcessor(
-            run_config=self.config.run,
-            user_config=self.config.user,
+        sample_fetcher = SampleFetcherSRA(
+            samples=sample_processor.samples,
+            config=self.config,
         )
-        self.config.run.run_config = run_config_processor.write_run_config()
-        LOGGER.info(
-            f"Run configuration file prepared: {self.config.run.run_config}"
-        )
+        if sample_fetcher.samples:
+            local_paths: Dict[str, Tuple[Path, Optional[Path]]]
+            local_paths = sample_fetcher.fetch(
+                loc=self.config.run.working_directory
+                / "runs"
+                / "sra_download",
+                workflow=self.config.run.zarp_directory
+                / "workflow"
+                / "rules"
+                / "sra_download",
+            )
+            sample_fetcher.update(local_paths)

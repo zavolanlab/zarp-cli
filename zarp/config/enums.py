@@ -114,14 +114,14 @@ class SampleReferenceTypes(Enum):
     Attributes:
         LOCAL_LIB_SINGLE: Local single-ended sequencing library.
         LOCAL_LIB_PAIRED: Local paired-ended sequencing library.
-        REMOTE_LIB: Sequencing library available at read archive.
+        REMOTE_LIB_SRA: Sequencing library available at read archive.
         TABLE: ZARP sample table.
         INVALID: Reference type invalid.
     """
 
     LOCAL_LIB_SINGLE = "LOCAL_LIB_SINGLE"
     LOCAL_LIB_PAIRED = "LOCAL_LIB_PAIRED"
-    REMOTE_LIB = "REMOTE_LIB"
+    REMOTE_LIB_SRA = "REMOTE_LIB_SRA"
     TABLE = "TABLE"
     INVALID = "INVALID"
 

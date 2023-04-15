@@ -585,7 +585,7 @@ class TestSampleTableProcessor:
         """
         deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
-        assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
+        assert deref.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
         assert deref.name is None
         assert deref.lib_paths is None
         assert deref.identifier == ref.upper()
@@ -656,7 +656,7 @@ class TestSampleTableProcessor:
         """
         deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
-        assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
+        assert deref.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
         assert deref.name == "sample"
         assert deref.lib_paths is None
         assert deref.identifier == ref.upper()[7:]

@@ -16,6 +16,7 @@ from zarp.config.enums import (
     LogLevels,
     OutputFileGroups,
 )
+from zarp.utils import generate_id
 from zarp.version import __version__
 
 
@@ -389,7 +390,7 @@ class ArgParser:
         )
         argument_group.add_argument(
             "--cores",
-            default=None,
+            default=1,
             type=int,
             metavar="INT",
             help=(
@@ -401,7 +402,7 @@ class ArgParser:
         argument_group.add_argument(
             "--dependency-embedding",
             choices=[item.value for item in DependencyEmbeddingStrategies],
-            default=None,
+            default=DependencyEmbeddingStrategies.CONDA.value,
             type=str,
             help=(
                 "strategy for embedding dependencies for the execution of"
@@ -418,7 +419,7 @@ class ArgParser:
         argument_group.add_argument(
             "--execution-mode",
             choices=[item.value for item in ExecModes],
-            default=None,
+            default=ExecModes.RUN.value,
             type=str,
             help=(
                 "run identifier; if not provided a random string will be"
@@ -437,7 +438,7 @@ class ArgParser:
         )
         argument_group.add_argument(
             "--identifier",
-            default=None,
+            default=generate_id(),
             type=str,
             metavar="STR",
             help=(

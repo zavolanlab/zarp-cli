@@ -84,7 +84,7 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
             raise ValueError(
                 "Cannot write sample table, working directory not set."
             )
-        return f"""samples: "{self.run_config.sample_table}"
+        return f"""samples: "{run_dir}"
   output_dir: "{run_dir / 'results'}"
   log_dir: "{run_dir / 'logs'}"
   cluster_log_dir: "{run_dir / 'logs/cluster'}"
