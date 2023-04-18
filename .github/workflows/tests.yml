@@ -101,9 +101,9 @@ jobs:
 
       - name: integration test - normal mode
         run: |
-          mkdir -p ~/.zarp
+          mkdir -p $HOME/.zarp
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
-          ZARP_REPO_PATH=~/zarp_workflow
+          ZARP_REPO_PATH=$HOME/.zarp/workflows
           git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
           zarp \
             my_other_sample@tests/files/empty \
@@ -116,5 +116,6 @@ jobs:
             table:$PWD/tests/files/empty \
             --execution-mode=RUN \
             --dependency-embedding=SINGULARITY \
+            --working-directory=$HOME/ \
             --zarp-directory=$ZARP_REPO_PATH \
             --verbosity=DEBUG
