@@ -16,7 +16,6 @@ from zarp.config.enums import (
     LogLevels,
     OutputFileGroups,
 )
-from zarp.utils import generate_id
 from zarp.version import __version__
 
 
@@ -438,7 +437,7 @@ class ArgParser:
         )
         argument_group.add_argument(
             "--identifier",
-            default=generate_id(),
+            default=None,
             type=str,
             metavar="STR",
             help=(

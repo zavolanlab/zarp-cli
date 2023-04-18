@@ -1,4 +1,11 @@
-"""ZARP sample processing."""
+"""ZARP sample processing.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+A replacement will be provided in subpackage
+``:mod:zarp.plugins.sample_dereferencers`` and will implement the abstract
+class ``:class:zarp.abstract_classes.sample_processors.SampleProcessor``.
+"""
 
 import logging
 from os.path import commonprefix
@@ -94,9 +101,7 @@ class SampleProcessor:
                     "Check spelling and refer to documentation for supported "
                     "syntax. Skipping."
                 )
-        LOGGER.debug(self.samples)
         self._set_samples_remote()
-        LOGGER.debug(self.samples_remote)
 
     def _process_sample_table(self, path: Path) -> None:
         """Set sample configuration for all samples in a sample table.
@@ -223,7 +228,7 @@ class SampleProcessor:
     @staticmethod
     def write_sample_table(
         samples: List[Sample],
-        outpath: Optional[Path] = None,
+        outpath: Path,
     ) -> Path:
         """Write table of samples to file.
 
@@ -234,8 +239,6 @@ class SampleProcessor:
         Returns:
             Path to sample table.
         """
-        if outpath is None:
-            outpath = Path.cwd() / "samples.tsv"
         records = [sample.dict() for sample in samples]
         table = SampleTableProcessor(records=records)
         table.write(path=outpath)
@@ -244,7 +247,7 @@ class SampleProcessor:
     @staticmethod
     def write_remote_sample_table(
         samples: List[Sample],
-        outpath: Optional[Path] = None,
+        outpath: Path,
     ) -> Path:
         """Write table of remote samples to file.
 
@@ -255,8 +258,6 @@ class SampleProcessor:
         Returns:
             Path to sample table.
         """
-        if outpath is None:
-            outpath = Path.cwd() / "samples_remote.tsv"
         sra_ids = [sample.identifier for sample in samples]
         with open(outpath, "w", encoding="utf-8") as _file:
             _file.write("sample\n")

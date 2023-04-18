@@ -98,7 +98,7 @@ class InitRun(CustomBaseModel):
         zarp_directory: Root directory of the ZARP repository.
     """
 
-    cleanup_strategy: List[OutputFileGroups] = [
+    cleanup_strategy: Optional[List[OutputFileGroups]] = [
         OutputFileGroups.CONFIG,
         OutputFileGroups.LOGS,
         OutputFileGroups.RESULTS,
@@ -112,8 +112,8 @@ class InitRun(CustomBaseModel):
     resources_version: Optional[int] = None
     rule_config: Optional[Path] = None
     snakemake_config: Optional[Path] = None
-    working_directory: DirectoryPath = Path.cwd()
-    zarp_directory: DirectoryPath
+    working_directory: Optional[Path] = Path.cwd()
+    zarp_directory: Optional[DirectoryPath] = None
 
 
 class InitSample(CustomBaseModel):
@@ -132,8 +132,8 @@ class InitSample(CustomBaseModel):
             length distribution.
     """
 
-    fragment_length_distribution_mean: float = 300
-    fragment_length_distribution_sd: float = 100
+    fragment_length_distribution_mean: Optional[float] = 300
+    fragment_length_distribution_sd: Optional[float] = 100
 
 
 class InitConfig(CustomBaseModel):
@@ -150,7 +150,7 @@ class InitConfig(CustomBaseModel):
         user: User-specific parameters.
     """
 
-    run: InitRun
+    run: InitRun = InitRun()
     sample: InitSample = InitSample()
     user: InitUser = InitUser()
 
@@ -173,6 +173,8 @@ class ConfigRun(InitRun):
 
     description: Optional[str] = None
     identifier: str = generate_id()
+    working_directory: Path = Path.cwd()
+    zarp_directory: Path
 
 
 class ConfigSample(InitSample):
@@ -243,6 +245,8 @@ class ConfigSample(InitSample):
     adapter_poly_3p: Optional[Tuple[Optional[str], Optional[str]]] = None
     adapter_poly_5p: Optional[Tuple[Optional[str], Optional[str]]] = None
     annotations: Optional[Path] = None
+    fragment_length_distribution_mean: float = 300
+    fragment_length_distribution_sd: float = 100
     read_orientation: Optional[ReadOrientation] = None
     reference_sequences: Optional[Path] = None
     source: Optional[Union[int, str]] = None
@@ -358,8 +362,8 @@ class ConfigFileSRA(ConfigFileContent):
         samples_out: Path to output sample table.
     """
 
-    cluster_log_dir: DirectoryPath
-    log_dir: DirectoryPath
-    outdir: DirectoryPath
-    samples: FilePath
-    samples_out: FilePath
+    cluster_log_dir: str
+    log_dir: str
+    outdir: str
+    samples: str
+    samples_out: str

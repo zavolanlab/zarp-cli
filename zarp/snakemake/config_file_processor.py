@@ -35,9 +35,7 @@ class ConfigFileProcessor:
         """Write Snakemake configuration file in YAML format.
 
         Args:
-
-        Returns:
-            Path to run configuration file.
+            path: Path to run configuration file.
         """
         with open(path, "w", encoding="utf-8") as _file:
-            yaml.safe_dump(self.content, _file)
+            yaml.dump(self.content.dict(), _file)

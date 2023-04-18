@@ -39,7 +39,6 @@ class LogLevels(Enum):
     Attributes:
         DEBUG: Logging level for debug messages.
         INFO: Logging level for info messages.
-        WARN: Logging level for warning messages.
         WARNING: Logging level for warning messages.
         ERROR: Logging level for error messages.
         CRITICAL: Logging level for critical error messages.
@@ -47,7 +46,6 @@ class LogLevels(Enum):
 
     DEBUG = logging.DEBUG
     INFO = logging.INFO
-    WARN = logging.WARNING
     WARNING = logging.WARNING
     ERROR = logging.ERROR
     CRITICAL = logging.CRITICAL

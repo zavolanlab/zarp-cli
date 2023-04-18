@@ -1,1 +1,1 @@
-"""Test package for ZARP-cli ``config`` package."""
+"""Unit tests for ``:mod:zarp.config``."""

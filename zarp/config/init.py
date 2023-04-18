@@ -1,4 +1,9 @@
-"""Handle initialization mode."""
+"""Handle initialization mode.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+A replacement will be provided in the package ``:mod:zarp``.
+"""
 
 from enum import Enum
 from json import JSONDecodeError

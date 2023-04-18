@@ -9,8 +9,8 @@ run:
   htsinfer_config: null
   resources_version: null
   snakemake_config: null
-  working_directory: null
-  zarp_directory: null
+  working_directory: /some/path
+  zarp_directory: /some/path
 sample:
   fragment_length_distribution_mean: 300.0
   fragment_length_distribution_sd: 100.0

@@ -30,7 +30,7 @@ def test_main_as_script():
 
 
 class TestMain:
-    """Test `main()` function."""
+    """Tests for function ``:func:zarp.cli.main``."""
 
     def test_normal_mode_without_args(self, monkeypatch):
         """Call without args."""
@@ -187,7 +187,7 @@ class TestMain:
 
 
 class TestSetupLogging:
-    """Test `setup_logging()` function."""
+    """Tests for function ``:func:zarp.cli.setup_logging``."""
 
     def test_log_level_no_args(self):
         """Call without args."""

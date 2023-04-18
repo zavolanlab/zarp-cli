@@ -1,4 +1,9 @@
-"""ZARP sample table processing."""
+"""ZARP sample table processing.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+Use ``:mod:zarp.samples.sample_table_processor`` instead.
+"""
 
 from copy import deepcopy
 from pathlib import Path

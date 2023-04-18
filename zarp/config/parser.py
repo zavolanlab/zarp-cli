@@ -15,7 +15,13 @@ from yaml import (
     YAMLError,
 )
 
-from zarp.config.models import Config
+from zarp.config.models import (
+    Config,
+    ConfigRun,
+    ConfigSample,
+    ConfigUser,
+    InitConfig,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,7 +43,13 @@ class ConfigParser:
     ):
         """Class constructor."""
         self.config_file: Path = Path(config_file)
-        self.config: Config = Config()
+        self.config: Config = Config(
+            run=ConfigRun(
+                zarp_directory=Path(__file__).parent / "files" / "zarp"
+            ),
+            sample=ConfigSample(),
+            user=ConfigUser(),
+        )
 
     def set_from_file(self) -> None:
         """Set configuration based on configuration file.
@@ -72,7 +84,7 @@ class ConfigParser:
                 are invalid.
         """
         try:
-            override = Config(**config_mapping).dict(exclude_none=True)
+            override = InitConfig(**config_mapping).dict(exclude_none=True)
             config = Addict(self.config.dict())
             config.update(override)
             self.config = Config(**config)

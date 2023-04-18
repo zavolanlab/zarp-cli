@@ -2,37 +2,44 @@
 
 import logging
 from pathlib import Path
-from typing import Dict, Mapping, Optional, Tuple
+from typing import Tuple
 
 import pandas as pd
 
-from zarp.abstract_classes.sample_processor import SampleFetcher
+from zarp.abstract_classes.sample_processors import SampleFetcher
 from zarp.config.enums import SampleReferenceTypes
 from zarp.config.models import ConfigFileSRA
-from zarp.plugins.sample_table_processors.zarp import SampleTableProcessorZARP
-from zarp.snakemake.config_file import ConfigFileProcessor
+from zarp.config.mappings import (
+    columns_sra_in,
+    map_model_to_sra_in,
+    map_sra_out_to_model,
+)
+from zarp.samples import sample_table_processor as stp
+from zarp.snakemake.config_file_processor import ConfigFileProcessor
 from zarp.snakemake.run import SnakemakeExecutor
 
 LOGGER = logging.getLogger(__name__)
 
 
-class SampleFetcherSRA(SampleFetcher):
+class SampleFetcherSRA(
+    SampleFetcher
+):  # pylint: disable=too-few-public-methods
     """Fetch remote samples from SRA.
 
     Args:
-        samples: Sequence of ``Sample`` objects.
+        records: Pandas ``DataFrame`` object.
         config: ``Config`` object.
 
     Attributes:
-        samples: Sequence of ``Sample`` objects.
+        records: Pandas ``DataFrame`` object.
         config: ``Config`` object.
     """
 
-    def fetch(  # pylint: disable=arguments-differ
+    def process(  # pylint: disable=arguments-differ
         self,
         loc: Path = Path.cwd(),
         workflow: Path = Path("Snakefile"),
-    ) -> Dict[str, Tuple[Path, Optional[Path]]]:
+    ) -> pd.DataFrame:
         """Fetch remote samples from SRA.
 
         Args:
@@ -41,64 +48,30 @@ class SampleFetcherSRA(SampleFetcher):
             workflow: Path to Snakemake workflow for fetching samples from SRA.
                 Defaults to ``Snakefile`` in current working directory.
 
-        Returns: Mapping of sample identifiers to local sample paths.
+        Returns: Dataframe with local path information.
         """
-        LOGGER.info(
-            "Fetching:"
-            f" {', '.join([str(smpl.identifier) for smpl in self.samples])}"
-        )
-
+        LOGGER.info("Fetching remote libraries from SRA...")
         conf_file: Path
         conf_content: ConfigFileSRA
-        executor: SnakemakeExecutor
-        paths: Dict[str, Tuple[Path, Optional[Path]]]
-
         conf_file, conf_content = self._configure_run(root_dir=loc)
-        executor = SnakemakeExecutor(
+        executor: SnakemakeExecutor = SnakemakeExecutor(
             run_config=self.config.run,
             config_file=conf_file,
             exec_dir=loc,
         )
         cmd = executor.compile_command(snakefile=workflow)
         executor.run(cmd=cmd)
-        paths = self._get_local_paths(sample_table=conf_content.samples_out)
-
-        LOGGER.info(f"Fetched: {', '.join(paths.keys())}")
-
-        return paths
-
-    def update(  # pylint: disable=arguments-differ
-        self,
-        paths: Optional[Mapping[str, Tuple[Path, Optional[Path]]]] = None,
-    ) -> None:
-        """Update samples with local paths.
-
-        Args:
-            paths: Mapping of sample identifiers to local sample paths.
-        """
-        if paths is None:
-            paths = {}
-        for identifier in paths.keys():
-            for sample in self.samples:
-                if sample.identifier == identifier:
-                    sample.paths = paths[identifier]
-
-    def _set_samples(self) -> None:
-        """Select samples to fetch."""
-        self.samples = [
-            sample
-            for sample in self.samples
-            if sample.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
-        ]
-
-    def _prepare_sample_table(self, sample_table: Path) -> None:
-        """Write sample table with remote sample identifiers."""
-        sample_table_processor = SampleTableProcessorZARP()
-        sample_table_processor.set_samples_from_objects(samples=self.samples)
-        sample_table_processor.write(
-            path=sample_table,
-            columns=["sample"],
+        df: pd.DataFrame = self._process_sample_table(
+            sample_table=Path(conf_content.samples_out)
         )
+        LOGGER.info(f"Fetched: '{', '.join(df['identifier'].values)}'")
+        return df
+
+    def _select_records(self) -> None:
+        """Select dataframe records to fetch."""
+        self.records: pd.DataFrame = self.records[
+            self.records["type"] == SampleReferenceTypes.REMOTE_LIB_SRA.name
+        ]
 
     def _configure_run(
         self,
@@ -119,42 +92,51 @@ class SampleFetcherSRA(SampleFetcher):
         run_dir.mkdir(parents=True, exist_ok=True)
         outdir: Path = root_dir / "sra"
         outdir.mkdir(parents=True, exist_ok=True)
+        cluster_log_dir = root_dir / "logs" / "cluster"
+        cluster_log_dir.mkdir(parents=True, exist_ok=True)
 
         config_file: Path = run_dir / "config.yaml"
 
         content: ConfigFileSRA = ConfigFileSRA(
-            samples=run_dir / "samples_remote.tsv",
-            outdir=root_dir / "sra",
-            samples_out=run_dir / "samples_local.tsv",
-            log_dir=root_dir / "logs",
-            cluster_log_dir=root_dir / "logs" / "cluster",
+            samples=str(run_dir / "samples_remote.tsv"),
+            outdir=str(outdir),
+            samples_out=str(run_dir / "samples_local.tsv"),
+            log_dir=str(root_dir / "logs"),
+            cluster_log_dir=str(cluster_log_dir),
         )
 
         config_file_writer = ConfigFileProcessor()
         config_file_writer.set_content(content=content)
         config_file_writer.write(path=config_file)
 
-        self._prepare_sample_table(sample_table=content.samples)
+        self._prepare_sample_table(sample_table=Path(content.samples))
 
         return config_file, content
 
+    def _prepare_sample_table(self, sample_table: Path) -> None:
+        """Write sample table with remote sample identifiers."""
+        stp.write(
+            df=self.records,
+            path=sample_table,
+            mapping=map_model_to_sra_in,
+            columns=columns_sra_in,
+        )
+
     @staticmethod
-    def _get_local_paths(
+    def _process_sample_table(
         sample_table: Path,
-    ) -> Dict[str, Tuple[Path, Optional[Path]]]:
+    ) -> pd.DataFrame:
         """Get local paths to downloaded samples."""
-        data_dict: Dict
-        data: pd.DataFrame
-        sample_table_processor = SampleTableProcessorZARP()
-        data = sample_table_processor.read(path=sample_table, index_col=0)
-        data["fq1"] = data.get("fq1", "")
-        data["fq2"] = data.get("fq2", "")
-        data = data.where(data != "", None)
-        data_dict = data.to_dict("index")
-        local_paths: Dict[str, Tuple[Path, Optional[Path]]] = {}
-        for identifier, paths in data_dict.items():
-            local_paths[str(identifier)] = (
-                Path(paths["fq1"]),
-                Path(paths["fq2"]) if paths["fq2"] else None,
+        df: pd.DataFrame = stp.read(
+            path=sample_table, mapping=map_sra_out_to_model
+        )
+        df["paths_1"] = df.get("paths_1", "")
+        df["paths_2"] = df.get("paths_2", "")
+        paths_missing: pd.DataFrame = df[df["paths_1"] == ""]
+        if not paths_missing.empty:
+            LOGGER.warning(
+                "No FASTQ paths available for:"
+                f" '{', '.join(paths_missing['identifier'])}'"
             )
-        return local_paths
+            df = df[df["paths_1"] != ""]
+        return df

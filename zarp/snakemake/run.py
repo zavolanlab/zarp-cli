@@ -55,14 +55,15 @@ class SnakemakeExecutor:
         if self.run_config.dependency_embedding == "CONDA":
             cmd_ls.append("--use-conda")
         elif self.run_config.dependency_embedding == "SINGULARITY":
-            # Singularity is currently not supported for SRA download workflow
-            # Reason: https://github.com/snakemake/snakemake/issues/1521
-            LOGGER.warning(
-                "Singularity not supported for SRA download workflow. Using"
-                " Conda instead."
-            )
-            if snakefile.stem == "sra_download.smk":
+            if snakefile.name == "sra_download.smk":
                 cmd_ls.append("--use-conda")
+                # Singularity is currently not supported for the SRA download
+                # workflow; reason:
+                # https://github.com/snakemake/snakemake/issues/1521
+                LOGGER.warning(
+                    "Singularity not supported for SRA download workflow."
+                    " Using Conda instead."
+                )
             else:
                 cmd_ls.append("--use-singularity")
         return cmd_ls

@@ -1,4 +1,9 @@
-"""ZARP run config processing."""
+"""ZARP run config processing.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+Use ``:mod:zarp.snakemake.config_file_processor`` instead.
+"""
 
 import logging
 from pathlib import Path
@@ -47,10 +52,6 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
             ValueError: Cannot write table because working directory is not
                 set.
         """
-        if self.run_config.working_directory is None:
-            raise ValueError(
-                "Cannot write sample table, working directory not set."
-            )
         path: Path = self.run_config.working_directory / "config.yml"
         content: str = self._get_file_content()
         with open(path, "w", encoding="utf-8") as _file:
@@ -80,10 +81,7 @@ class RunConfigFileProcessor:  # pylint: disable=too-few-public-methods
                 set.
         """
         run_dir: Optional[Path] = self.run_config.working_directory
-        if run_dir is None:
-            raise ValueError(
-                "Cannot write sample table, working directory not set."
-            )
+        assert run_dir is not None, "Working directory not set."
         return f"""samples: "{run_dir}"
   output_dir: "{run_dir / 'results'}"
   log_dir: "{run_dir / 'logs'}"
