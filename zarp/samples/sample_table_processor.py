@@ -75,6 +75,6 @@ def write(
             )
             for col in missing_columns:
                 df[col] = ""
-        df = df[columns]
+        df = pd.DataFrame(df[columns])
     df.to_csv(path, sep="\t", index=False)
     LOGGER.debug(f"Records written: {len(df.index)}")
