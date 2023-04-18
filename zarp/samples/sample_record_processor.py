@@ -45,9 +45,10 @@ class SampleRecordProcessor:
         """
         LOGGER.debug("Appending sample records...")
         df = self._sanitize_df(df=df, **kwargs)
-        self.records = self.records.append(df, verify_integrity=True)[
-            self.records.columns
-        ]
+        self.records: pd.DataFrame = self.records.append(  # type: ignore
+            df,
+            verify_integrity=True,
+        )[self.records.columns]
         LOGGER.debug(f"Sample records appended: {len(df.index)}")
 
     def append_from_obj(
