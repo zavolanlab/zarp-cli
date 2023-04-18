@@ -1,7 +1,7 @@
 """Interact with ZARP sample records."""
 
 import logging
-from typing import Any, Optional, Sequence
+from typing import Any, List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -189,6 +189,9 @@ class SampleRecordProcessor:
         ``.2``, etc. to the original column name. Original tuple columns are
         dropped.
 
+        Warning: Behavior is only defined for tuples (of any type) and ``None``
+        singletone.
+
         Args:
             df: Pandas ``DataFrame`` object.
 
@@ -197,19 +200,21 @@ class SampleRecordProcessor:
             original tuple columns removed.
         """
         max_size: int
-        for name, vals in df.iteritems():
+        v_filled: List[Any]
+        n_new: List[str]
+        v_new: pd.DataFrame
+        for name, vals in df.items():
             if any(isinstance(val, tuple) for val in vals):
                 max_size = max(len(x) for x in vals if isinstance(x, tuple))
-                n_new = [f"{name}_{i}" for i in range(1, max_size + 1)]
-                v_filled = vals.apply(
-                    lambda x: list(x) + [None] * (max_size - len(x))
-                    if isinstance(x, tuple)
+                v_filled = [
+                    list(val) + [None] * (max_size - len(val))
+                    if isinstance(val, tuple)
                     else tuple([None] * max_size)
-                )
-                v_new = pd.DataFrame(
-                    {col_name: [None] * len(df) for col_name in n_new}
-                )
-                v_new[n_new] = pd.DataFrame(v_filled.tolist(), index=df.index)
+                    for val in vals
+                ]
+                n_new = [f"{name}_{i}" for i in range(1, max_size + 1)]
+                v_new = pd.DataFrame({col: [None] * len(df) for col in n_new})
+                v_new[n_new] = pd.DataFrame(v_filled, index=df.index)
                 df.drop([name], axis=1, inplace=True)
                 df[n_new] = v_new[n_new]
         return df
