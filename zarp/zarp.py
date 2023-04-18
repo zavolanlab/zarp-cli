@@ -1,12 +1,13 @@
 """Main class and entry point when imported as a library."""
 
 import logging
-from pathlib import Path
+
+import pandas as pd
 
 from zarp.config import models
-from zarp.config.run_config import RunConfigFileProcessor
 from zarp.config.samples import SampleProcessor
-from zarp.utils import generate_id
+from zarp.plugins.sample_fetchers.sra import SampleFetcherSRA
+from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,26 +24,19 @@ class ZARP:
 
     def __init__(
         self,
-        config: models.Config = models.Config(),
+        config: models.Config,
     ):
         """Class constructor."""
         self.config: models.Config = config
 
     def set_up_run(self) -> None:
         """Set up run."""
-        if self.config.run.working_directory is None:
-            self.config.run.working_directory = Path.cwd()
-        self.config.run.working_directory.mkdir(parents=True, exist_ok=True)
         LOGGER.info("Setting up run...")
-        if self.config.run.identifier is None:
-            self.config.run.identifier = generate_id()
-        LOGGER.info(f"Run identifier: {self.config.run.identifier}")
-        self.config.run.working_directory.mkdir(
-            parents=True,
-            exist_ok=True,
+        self.config.run.working_directory.mkdir(parents=True, exist_ok=True)
+        LOGGER.info(
+            f"Run '{self.config.run.identifier}' set up in working directory:"
+            f" '{self.config.run.working_directory}'"
         )
-        LOGGER.info(f"Working directory: {self.config.run.working_directory}")
-        LOGGER.info("Run set up")
 
     def process_samples(self) -> None:
         """Process samples."""
@@ -53,40 +47,25 @@ class ZARP:
             run_config=self.config.run,
         )
         sample_processor.set_samples()
-        LOGGER.info(f"Samples found: {len(sample_processor.samples)}")
-        if len(sample_processor.samples) == 0:
-            raise ValueError("No samples found. Aborting.")
-        if len(sample_processor.samples_remote) > 0:
-            LOGGER.info("Fetching remote libraries...")
-            sample_table = sample_processor.fetch_remote_libraries()
-            LOGGER.info("Remote libraries fetched")
-            LOGGER.info("Updating paths of fetched libraries...")
-            sample_processor.update_sample_paths(sample_table=sample_table)
-            LOGGER.info("Paths updated...")
-        if self.config.run.working_directory is None:
-            self.config.run.working_directory = Path.cwd() / "runs"
-            self.config.run.working_directory.mkdir(
-                parents=True,
-                exist_ok=True,
-            )
-            LOGGER.warning(
-                "Working directory not set. Using:"
-                f" {self.config.run.working_directory}"
-            )
-        self.config.run.sample_table = sample_processor.write_sample_table(
-            samples=sample_processor.samples
-        )
-        LOGGER.info(f"Sample table: {self.config.run.sample_table}")
-        LOGGER.info("Samples processed")
+        LOGGER.info(f"Samples dereferenced: {len(sample_processor.samples)}")
 
-    def prepare_run_config(self) -> None:
-        """Prepare run configuration."""
-        LOGGER.info("Preparing run configuration file...")
-        run_config_processor = RunConfigFileProcessor(
-            run_config=self.config.run,
-            user_config=self.config.user,
+        srp: SRP = SRP()
+        srp.append_from_obj(samples=sample_processor.samples)
+        srp.view()
+
+        sample_fetcher = SampleFetcherSRA(
+            config=self.config,
+            records=srp.records,
         )
-        self.config.run.run_config = run_config_processor.write_run_config()
-        LOGGER.info(
-            f"Run configuration file prepared: {self.config.run.run_config}"
-        )
+        if not sample_fetcher.records.empty:
+            df: pd.DataFrame = sample_fetcher.process(
+                loc=self.config.run.working_directory
+                / "runs"
+                / "sra_download",
+                workflow=self.config.run.zarp_directory
+                / "workflow"
+                / "rules"
+                / "sra_download.smk",
+            )
+            srp.update(df=df, by="identifier")
+            srp.view()

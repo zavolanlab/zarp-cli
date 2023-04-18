@@ -84,15 +84,13 @@ def main() -> None:  # pylint: disable=R0915
         config_parser.set_from_file()
         config_parser.update_from_mapping(config_mapping=args.grouped)
         config_parser.config.ref = args.sample_references
-        LOGGER.info(f"Configuration: {config_parser.config}")
-        LOGGER.info("Configuration set.")
+        LOGGER.info(f"Configuration set: {config_parser.config}")
 
         # run in normal mode
         zarp = ZARP(config=config_parser.config)
         try:
             zarp.set_up_run()
             zarp.process_samples()
-            zarp.prepare_run_config()
         except Exception as exc:  # pylint: disable=W0703
             LOGGER.error(f"{exc}")
             LOGGER.debug(format_exc())

@@ -1,1 +1,1 @@
-"""Package for handling ZARP-cli configuration."""
+"""Subpackage for handling ZARP-cli configuration."""

@@ -1,4 +1,9 @@
-"""ZARP sample table processing."""
+"""ZARP sample table processing.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+Use ``:mod:zarp.samples.sample_table_processor`` instead.
+"""
 
 from copy import deepcopy
 from pathlib import Path
@@ -56,7 +61,6 @@ class SampleTableProcessor:
         "organism",
         "gtf",
         "genome",
-        "gtf",
         "libtype",
         "fq1_3p",
         "fq2_3p",
@@ -240,7 +244,7 @@ class SampleTableProcessor:
             if direction == FieldNameMappingDirection.TO_MODEL_PROPERTIES
             else self.key_mapping.inv
         )
-        data_renamed = data.rename(columns=mapping)
+        data_renamed = data.rename(columns=mapping)  # type: ignore
         self.records = data_renamed.to_dict("records")  # type: ignore
 
     @staticmethod

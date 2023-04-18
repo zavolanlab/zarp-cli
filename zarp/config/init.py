@@ -1,4 +1,9 @@
-"""Handle initialization mode."""
+"""Handle initialization mode.
+
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+A replacement will be provided in the package ``:mod:zarp``.
+"""
 
 from enum import Enum
 from json import JSONDecodeError
@@ -64,7 +69,7 @@ class Initializer:
                     f"{config_file}"
                 ) from exc
 
-    def set_from_user_input(self):  # pylint: disable=R0912,R0915
+    def set_from_user_input(self) -> None:  # pylint: disable=R0912,R0915
         """Update configuration based on user input."""
         sys.stdout.write(
             """
@@ -129,7 +134,7 @@ having entered a value. Make sure to enter only _one_ value per query.
                     elif param_type == "path":
                         try:
                             user_input = (
-                                Path(expandvars(user_input))
+                                Path(expandvars(user_input))  # type: ignore
                                 .expanduser()
                                 .resolve()
                             )
@@ -143,14 +148,14 @@ having entered a value. Make sure to enter only _one_ value per query.
                     # integer
                     elif param_type == "integer":
                         try:
-                            user_input = int(user_input)
+                            user_input = int(user_input)  # type: ignore
                         except (TypeError, ValueError):
                             sys.stdout.write("not an integer\n")
                             continue
                     # float
                     elif param_type == "number":
                         try:
-                            user_input = float(user_input)
+                            user_input = float(user_input)  # type: ignore
                         except (TypeError, ValueError):
                             sys.stdout.write("not a number\n")
                             continue

@@ -30,22 +30,27 @@ REF_SRA_TABLE_EMPTY: Path = TEST_FILE_DIR / "sra_table_empty.tsv"
 class TestSampleTableProcessor:
     """Test ``:cls:zarp.config.samples.SampleProcessor`` class."""
 
+    run_config = ConfigRun(
+        zarp_directory=Path(__file__).parent / "files" / "zarp"
+    )
+
     def test_constructor_without_refs(self):
         """Test class constructor.
 
         Do not provide sample references.
         """
+        run_config = self.run_config.copy()
         attributes = ["references", "sample_config", "run_config", "samples"]
         processor = SampleProcessor(
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         for attribute in attributes:
             assert hasattr(processor, attribute)
         assert isinstance(processor.references, list)
         assert processor.references == []
         assert isinstance(processor.run_config, ConfigRun)
-        assert processor.run_config == ConfigRun()
+        assert processor.run_config == self.run_config
         assert isinstance(processor.sample_config, ConfigSample)
         assert processor.sample_config == ConfigSample()
         assert isinstance(processor.samples, list)
@@ -56,6 +61,7 @@ class TestSampleTableProcessor:
 
         Use various sample_references.
         """
+        run_config = self.run_config.copy()
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -67,7 +73,7 @@ class TestSampleTableProcessor:
         ]
         processor = SampleProcessor(
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
             *refs,
         )
         assert processor.references == refs
@@ -77,9 +83,10 @@ class TestSampleTableProcessor:
 
         Do not provide sample references.
         """
+        run_config = self.run_config.copy()
         processor = SampleProcessor(
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         assert len(processor.samples) == 0
@@ -89,6 +96,7 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
+        run_config = self.run_config.copy()
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -101,7 +109,7 @@ class TestSampleTableProcessor:
         processor = SampleProcessor(
             *refs,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         assert len(processor.samples) > 5
@@ -111,10 +119,11 @@ class TestSampleTableProcessor:
 
         Use invalid sample references.
         """
+        run_config = self.run_config.copy()
         processor = SampleProcessor(
             f"{REF_INVALID}",
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         assert len(processor.samples) == 0
@@ -124,10 +133,11 @@ class TestSampleTableProcessor:
 
         Use reference to empty table.
         """
+        run_config = self.run_config.copy()
         processor = SampleProcessor(
             f"table:{REF_FILE_EMPTY}",
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         assert len(processor.samples) == 0
@@ -137,10 +147,11 @@ class TestSampleTableProcessor:
 
         Use reference to empty table.
         """
+        run_config = self.run_config.copy()
         processor = SampleProcessor(
             f"table:{REF_FILE_EMPTY}",
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         monkeypatch.setattr(
             SampleProcessor,
@@ -150,156 +161,17 @@ class TestSampleTableProcessor:
         processor.set_samples()
         assert len(processor.samples) == 0
 
-    def test_fetch_remote_libraries(self):
-        """Test method ``.fetch_remote_libraries()``.
-
-        Use reference to remote library.
-        """
-        processor = SampleProcessor(
-            f"{REF_ID}",
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(
-                identifier="test",
-                zarp_directory=Path(__file__).parents[1].absolute()
-                / "files"
-                / "zarp",
-            ),
-        )
-        processor.set_samples()
-        processor.fetch_remote_libraries()
-
-    def test_fetch_remote_libraries_no_zarp_dir(self):
-        """Test method ``.fetch_remote_libraries()``.
-
-        No ZARP directory set.
-        """
-        processor = SampleProcessor(
-            f"{REF_ID}",
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(identifier="test"),
-        )
-        processor.set_samples()
-        with pytest.raises(ValueError):
-            processor.fetch_remote_libraries()
-
-    def test_fetch_remote_libraries_no_workflow(self):
-        """Test method ``.fetch_remote_libraries()``.
-
-        Workflow is unavailable.
-        """
-        processor = SampleProcessor(
-            f"{REF_ID}",
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(
-                identifier="test",
-                zarp_directory=Path(__file__).parents[1].absolute()
-                / "files"
-                / "zarp",
-            ),
-        )
-        processor.set_samples()
-        with pytest.raises(FileNotFoundError):
-            processor.fetch_remote_libraries(workflow_path_suffix="n/a")
-
-    def test_update_sample_paths(self, tmpdir):
-        """Test method ``.update_sample_paths()``.
-
-        Table has all columns ``sample``, ``fq1``, and ``fq2``.
-        """
-        refs = [
-            f"sample@{REF_ID}",
-            f"table:{REF_TABLE}",
-        ]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.update_sample_paths(sample_table=REF_SRA_TABLE)
-
-    def test_update_sample_paths_table_2_cols(self, tmpdir):
-        """Test method ``.update_sample_paths()``.
-
-        Table has two columns ``sample``, and ``fq1``.
-        """
-        refs = [
-            f"sample@{REF_ID}",
-            f"table:{REF_TABLE}",
-        ]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.update_sample_paths(sample_table=REF_SRA_TABLE_2COLS)
-
-    def test_update_sample_paths_table_empty(self, tmpdir):
-        """Test method ``.update_sample_paths()``.
-
-        Table has one column ``sample`` and no data.
-        """
-        refs = [
-            f"sample@{REF_ID}",
-            f"table:{REF_TABLE}",
-        ]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.update_sample_paths(sample_table=REF_SRA_TABLE_EMPTY)
-
-    def test_update_sample_paths_table_no_files(self, tmpdir):
-        """Test method ``.update_sample_paths()``.
-
-        Table has one record that has no FASTQ files.
-        """
-        refs = [
-            f"sample@{REF_ID}",
-            f"table:{REF_TABLE}",
-        ]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.update_sample_paths(sample_table=REF_SRA_TABLE_NO_FILES)
-
-    def test_update_sample_paths_table_has_extra_data(self, tmpdir):
-        """Test method ``.update_sample_paths()``.
-
-        Table has all columns ``sample``, ``fq1``, and ``fq2``, as well as
-        additional data for which no sample information is available.
-        """
-        refs = [
-            f"sample@{REF_ID}",
-        ]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.update_sample_paths(sample_table=REF_SRA_TABLE)
-
     def test__process_sample_table(self):
         """Test method ``._process_write_sample_table()``.
 
         Use sample table with entries accounting for all conditions.
         """
+        run_config = self.run_config.copy()
         ref_str = f"table:{REF_TABLE}"
         processor = SampleProcessor(
             ref_str,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         ref = processor._resolve_sample_reference(ref=ref_str)
         assert ref.table_path is not None
@@ -310,11 +182,12 @@ class TestSampleTableProcessor:
 
         Sample table contains faulty reference.
         """
+        run_config = self.run_config.copy()
         ref_str = f"table:{REF_TABLE_FAULTY}"
         processor = SampleProcessor(
             ref_str,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         ref = processor._resolve_sample_reference(ref=ref_str)
         assert ref.table_path is not None
@@ -325,11 +198,12 @@ class TestSampleTableProcessor:
 
         Use reference for single-ended local library.
         """
+        run_config = self.run_config.copy()
         ref = str(REF_FILE_EMPTY)
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -343,12 +217,13 @@ class TestSampleTableProcessor:
 
         Use reference for single-ended local library and update configuration.
         """
+        run_config = self.run_config.copy()
         ref = str(REF_FILE_EMPTY)
         update = ConfigSample(source="test")
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -363,11 +238,12 @@ class TestSampleTableProcessor:
 
         Use reference for paired-ended local library.
         """
+        run_config = self.run_config.copy()
         ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -381,12 +257,13 @@ class TestSampleTableProcessor:
 
         Use reference for paired-ended local library and update configuration.
         """
+        run_config = self.run_config.copy()
         ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
         update = ConfigSample(source="test")
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -401,11 +278,12 @@ class TestSampleTableProcessor:
 
         Use reference for remote library.
         """
+        run_config = self.run_config.copy()
         ref = REF_ID
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -419,12 +297,13 @@ class TestSampleTableProcessor:
 
         Use reference for remote library and update configuration.
         """
+        run_config = self.run_config.copy()
         ref = REF_ID
         update = ConfigSample(source="test")
         processor = SampleProcessor(
             ref,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         assert len(processor.samples) == 0
         deref = processor._resolve_sample_reference(ref=ref)
@@ -439,6 +318,7 @@ class TestSampleTableProcessor:
 
         Use references for remote libraries.
         """
+        run_config = self.run_config.copy()
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -451,7 +331,7 @@ class TestSampleTableProcessor:
         processor = SampleProcessor(
             *refs,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         processor.samples_remote = []
@@ -464,25 +344,12 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
+        run_config = self.run_config.copy()
         refs = [f"{REF_ID}"]
         processor = SampleProcessor(
             *refs,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.write_sample_table(samples=processor.samples)
-
-    def test_write_sample_table_outpath_set(self, tmpdir):
-        """Test method ``.write_sample_table()``.
-
-        Output path is set explicitly.
-        """
-        refs = [f"{REF_ID}"]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         processor.write_sample_table(
@@ -495,31 +362,17 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
+        run_config = self.run_config.copy()
         refs = [f"{REF_ID}"]
         processor = SampleProcessor(
             *refs,
             sample_config=ConfigSample(),
-            run_config=ConfigRun(),
-        )
-        processor.set_samples()
-        processor.run_config.working_directory = tmpdir
-        processor.write_remote_sample_table(samples=processor.samples)
-
-    def test_write_remote_sample_table_outpath_set(self, tmpdir):
-        """Test method ``.write_sample_table()``.
-
-        Output path is set explicitly.
-        """
-        refs = [f"{REF_ID}"]
-        processor = SampleProcessor(
-            *refs,
-            sample_config=ConfigSample(),
-            run_config=ConfigRun(),
+            run_config=run_config,
         )
         processor.set_samples()
         processor.write_remote_sample_table(
             samples=processor.samples,
-            outpath=tmpdir / "samples.tsv",
+            outpath=tmpdir / "samples_remote.tsv",
         )
 
     @pytest.mark.parametrize(
@@ -585,7 +438,7 @@ class TestSampleTableProcessor:
         """
         deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
-        assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
+        assert deref.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
         assert deref.name is None
         assert deref.lib_paths is None
         assert deref.identifier == ref.upper()
@@ -656,7 +509,7 @@ class TestSampleTableProcessor:
         """
         deref = SampleProcessor._resolve_sample_reference(ref=ref)
         assert isinstance(deref, SampleReference)
-        assert deref.type == SampleReferenceTypes.REMOTE_LIB.name
+        assert deref.type == SampleReferenceTypes.REMOTE_LIB_SRA.name
         assert deref.name == "sample"
         assert deref.lib_paths is None
         assert deref.identifier == ref.upper()[7:]

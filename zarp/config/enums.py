@@ -39,7 +39,6 @@ class LogLevels(Enum):
     Attributes:
         DEBUG: Logging level for debug messages.
         INFO: Logging level for info messages.
-        WARN: Logging level for warning messages.
         WARNING: Logging level for warning messages.
         ERROR: Logging level for error messages.
         CRITICAL: Logging level for critical error messages.
@@ -47,7 +46,6 @@ class LogLevels(Enum):
 
     DEBUG = logging.DEBUG
     INFO = logging.INFO
-    WARN = logging.WARNING
     WARNING = logging.WARNING
     ERROR = logging.ERROR
     CRITICAL = logging.CRITICAL
@@ -114,14 +112,14 @@ class SampleReferenceTypes(Enum):
     Attributes:
         LOCAL_LIB_SINGLE: Local single-ended sequencing library.
         LOCAL_LIB_PAIRED: Local paired-ended sequencing library.
-        REMOTE_LIB: Sequencing library available at read archive.
+        REMOTE_LIB_SRA: Sequencing library available at read archive.
         TABLE: ZARP sample table.
         INVALID: Reference type invalid.
     """
 
     LOCAL_LIB_SINGLE = "LOCAL_LIB_SINGLE"
     LOCAL_LIB_PAIRED = "LOCAL_LIB_PAIRED"
-    REMOTE_LIB = "REMOTE_LIB"
+    REMOTE_LIB_SRA = "REMOTE_LIB_SRA"
     TABLE = "TABLE"
     INVALID = "INVALID"
 
