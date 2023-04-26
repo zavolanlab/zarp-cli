@@ -46,7 +46,7 @@ class TestSampleFetcherSRA:
         assert len(sra.records.index) == 2
 
     def test_process(self, tmpdir, monkeypatch):
-        """Test `append()` function."""
+        """Test `.process()` method."""
         config = self.config.copy()
         df = self.data.copy()
         outdir = Path(tmpdir)
@@ -56,7 +56,7 @@ class TestSampleFetcherSRA:
         sra = SRA(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
-            """Patch `run()` function."""
+            """Patch `run()` method."""
             run_dir = Path(tmpdir) / "runs" / config.run.identifier
             src = Path(__file__).parents[2] / "files" / "sra_table.tsv"
             dst_in = run_dir / "samples_local.tsv"
@@ -69,8 +69,21 @@ class TestSampleFetcherSRA:
         assert len(df_out.index) == 4
         assert df_out.loc[0, "identifier"] == "SRR1234567"
 
+    def test_process_empty(self, tmpdir, caplog):
+        """Test `.process()` method with no records."""
+        config = self.config.copy()
+        outdir = Path(tmpdir)
+        workflow = create_snakefile(dir=outdir, name="Snakefile")
+        df = pd.DataFrame(data={"identifier": ["no_sra"], "type": ["INVALID"]})
+        sra = SRA(config=config, records=df)
+        assert len(sra.records.index) == 0
+        with caplog.at_level(logging.DEBUG):
+            df_out = sra.process(loc=outdir, workflow=workflow)
+        assert len(df_out.index) == 0
+        assert "No remote libraries to fetch" in caplog.text
+
     def test__select_records(self):
-        """Test `_select_records()` function."""
+        """Test `._select_records()` method."""
         config = self.config.copy()
         df = self.data.copy()
         df_set = self.data.copy()
@@ -83,7 +96,7 @@ class TestSampleFetcherSRA:
         assert len(sra.records.index) == 2
 
     def test__configure_run(self, tmpdir):
-        """Test `_configure_run()` function."""
+        """Test `._configure_run()` method."""
         config = self.config.copy()
         df = self.data.copy()
         run_dir = Path(tmpdir) / "runs" / config.run.identifier
@@ -102,7 +115,7 @@ class TestSampleFetcherSRA:
         assert Path(sample_table).exists()
 
     def test__prepare_sample_table(self, tmpdir):
-        """Test `_prepare_sample_table()` function."""
+        """Test `._prepare_sample_table()` method."""
         config = self.config.copy()
         df = self.data.copy()
         sample_table = Path(tmpdir) / "samples_remote.tsv"
@@ -113,7 +126,7 @@ class TestSampleFetcherSRA:
         assert (Path(tmpdir) / "samples_remote.tsv").exists()
 
     def test__process_sample_table(self, tmpdir, caplog):
-        """Test `_process_sample_table()` function."""
+        """Test `._process_sample_table()` method."""
         config = self.config.copy()
         df = self.data.copy()
         sample_table = Path(tmpdir) / "samples_remote.tsv"

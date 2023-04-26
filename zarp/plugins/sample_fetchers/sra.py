@@ -6,7 +6,7 @@ from typing import Tuple
 
 import pandas as pd
 
-from zarp.abstract_classes.sample_processors import SampleFetcher
+from zarp.abstract_classes.sample_processor import SampleProcessor
 from zarp.config.enums import SampleReferenceTypes
 from zarp.config.models import ConfigFileSRA
 from zarp.config.mappings import (
@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class SampleFetcherSRA(
-    SampleFetcher
+    SampleProcessor
 ):  # pylint: disable=too-few-public-methods
     """Fetch remote samples from SRA.
 
@@ -48,8 +48,12 @@ class SampleFetcherSRA(
             workflow: Path to Snakemake workflow for fetching samples from SRA.
                 Defaults to ``Snakefile`` in current working directory.
 
-        Returns: Dataframe with local path information.
+        Returns: Dataframe with local path information for sequencing
+            libraries.
         """
+        if self.records.empty:
+            LOGGER.debug("No remote libraries to fetch from SRA.")
+            return self.records
         LOGGER.info("Fetching remote libraries from SRA...")
         conf_file: Path
         conf_content: ConfigFileSRA

@@ -90,6 +90,44 @@ class TestSampleRecordProcessor:
             }
         )
         srp.append(df)
+        df_short = pd.DataFrame(
+            data={
+                "name": ["sample1"],
+                "paths_1": ["path1_new"],
+                "not_available": ["na2"],
+            }
+        )
+        df_new = pd.DataFrame(
+            data={
+                "name": ["sample1", "sample2"],
+                "paths_1": ["path1_new", "path2"],
+                "not_available": ["na2", "na2"],
+            }
+        )
+        with pytest.raises(ValueError):
+            srp.update(df_short)
+        srp.update(df_new, overwrite=False)
+        assert len(srp.records.index) == 2
+        assert "name" in srp.records.columns
+        assert "paths_1" in srp.records.columns
+        assert "not_available" not in srp.records.columns
+        assert srp.records["paths_1"].to_list()[0] == "path1"
+        # assert srp.records["paths_1"].to_list()[1] == "path2"
+        srp.update(df_new, overwrite=True)
+        # assert srp.records["paths_1"].to_list()[0] == "path1_new"
+        # assert srp.records["paths_1"].to_list()[1] == "path2"
+
+    def test_update_by_column(self):
+        """Test `update()` function; merge by specific column."""
+        srp = SRP()
+        df = pd.DataFrame(
+            data={
+                "name": ["sample1", "sample2"],
+                "paths_1": ["path1", np.nan],
+                "not_available": [np.nan, np.nan],
+            }
+        )
+        srp.append(df)
         df_new = pd.DataFrame(
             data={
                 "name": ["sample1", "sample2"],
