@@ -56,7 +56,7 @@ class TestZarp:
         config = self.config.copy()
         config.run.zarp_directory = Path(__file__).parent / "files" / "zarp"
         config.run.identifier = "test"
-        config.ref = [str(Path(__file__).parent / "files/empty")]
+        config.ref = [str(Path(__file__).parent / "files" / "empty")]
         zarp = ZARP(config=config)
         zarp.set_up_run()
         monkeypatch.setattr("pathlib.Path.cwd", lambda: tmpdir)

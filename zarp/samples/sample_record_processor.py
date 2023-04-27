@@ -70,7 +70,7 @@ class SampleRecordProcessor:
     def update(
         self,
         df: pd.DataFrame,
-        by: str,
+        by: Optional[str] = None,
         overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -78,24 +78,35 @@ class SampleRecordProcessor:
 
         Args:
             df: Pandas ``DataFrame`` object.
-            by: Column to use as index for update. If ``None``, a hash of the
-                records will be used.
+            by: Column to use as index for update. If ``None`` (default),
+                compares database records by position.
             **kwargs: Keyword arguments to pass to ``_sanitize_df()``.
 
         Raises:
-            KeyError: If ``by`` column is not found in dataframe.
+            KeyError: Column indicated by ``by`` not found in records or
+                dataframe.
+            ValueError: Records and dataframe have different lengths/rows.
         """
         LOGGER.debug("Updating sample records...")
-        if not (by in self.records.columns and by in df.columns):
-            raise KeyError(
-                f"Column '{by}' not found in dataframe. Cannot update records."
-            )
-        df = self._sanitize_df(df=df, **kwargs)
-        self.records.set_index(keys=by, drop=False, inplace=True)
-        df.set_index(keys=by, drop=False, inplace=True)
-        self.records.update(df, overwrite=overwrite, **kwargs)
+        df_new: pd.DataFrame = df.copy()
+        df_new = self._sanitize_df(df=df_new, **kwargs)
+        if by is None:
+            if len(self.records.index) != len(df_new.index):
+                raise ValueError(
+                    "Records and dataframe have different lengths/rows. Cannot"
+                    " update records."
+                )
+        else:
+            if not (by in self.records.columns and by in df_new.columns):
+                raise KeyError(
+                    f"Column '{by}' not found in records or dataframe. Cannot"
+                    " update records."
+                )
+            self.records.set_index(keys=by, drop=False, inplace=True)
+            df_new.set_index(keys=by, drop=False, inplace=True)
+        self.records.update(df_new, overwrite=overwrite, **kwargs)
         self.records = self._sanitize_df(df=self.records, **kwargs)
-        LOGGER.debug(f"Sample records updated: {len(df.index)}")
+        LOGGER.debug(f"Sample records updated: {len(df_new.index)}")
 
     def view(
         self,
