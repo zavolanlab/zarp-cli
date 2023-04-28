@@ -35,7 +35,17 @@ class SampleProcessorDefaults(
         LOGGER.info("Setting defaults...")
         LOGGER.warning("Plugin not implemented!")
         LOGGER.info("Defaults set: DESCRIBE WHAT WAS SET")
-        return self.records
 
-    def _select_records(self) -> None:
-        """Select records to process."""
+        sample_index = self.records.index
+
+        defaults = self.config.dict()
+        default_data = {}
+        for key, val in defaults:
+            default_data[key] = [val for _ in range(len(sample_index))]
+        defaults_df: pd.DataFrame(default_data)
+        default_df.index = sample_index
+
+        common_cols = default_df.columns.intersection(self.records.columns)
+        self.records = default_df.drop(common_cols, axis=1).join(self.records, how="right")
+        
+        return self.records
