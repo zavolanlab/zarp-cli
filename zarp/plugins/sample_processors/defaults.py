@@ -37,14 +37,15 @@ class SampleProcessorDefaults(
 
         defaults = self.config.dict()
         default_data = {}
+        sample_index = self.records.index
         for key, val in defaults:
             default_data[key] = [val for _ in range(len(sample_index))]
         default_df = pd.DataFrame(default_data)
 
         srp = SRP(self.records)
-        srp.update(df=default_df, anchor=config.run.working_directory,
+        srp.update(df=default_df, anchor=self.config.run.working_directory,
                    path_columns=['annotations', 'reference_sequences'])
-        
+
         LOGGER.info("Defaults set")
 
         return self.records

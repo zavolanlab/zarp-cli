@@ -15,15 +15,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 class TestSampleProcessorDefaults:
-    """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults``
-    class.
-    """
+    """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults``."""
 
-    config = Config(run=ConfigRun(zarp_directory=Path(__file__).parent \
-                                  / "files" / "zarp"),
+    config = Config(run=ConfigRun(
+        zarp_directory=Path(__file__).parent / "files" / "zarp"),
                     sample=ConfigSample(),
                     user=ConfigUser(),
-    )                                                                                 
+    )
     data = pd.DataFrame(
         data={
             "identifier": ["sample1", "sample2"],
@@ -50,7 +48,8 @@ class TestSampleProcessorDefaults:
         srp.append(df)
         srd = SRD()
         records = srd.process(srp)
-        assert(records["sample1"]["fragment_length_distribution_mean"] == set_val)
+        assert records["sample1"]["fragment_length_distribution_mean"]
+               == set_val
 
     def test_process_update(self) -> pd.DataFrame:
         """Test adding defaults."""
@@ -60,6 +59,6 @@ class TestSampleProcessorDefaults:
         srp.append(df)
         srd = SRD()
         records = srd.process(srp)
-        assert(records["sample1"]["fragment_length_distribution_mean"] \
-               == Config.sample.fragment_length_distribution_mean)
-        
+        assert records["sample1"]["fragment_length_distribution_mean"]
+               == Config.sample.fragment_length_distribution_mean
+
