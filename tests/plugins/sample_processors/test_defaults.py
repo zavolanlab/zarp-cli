@@ -8,23 +8,28 @@ import pandas as pd
 
 from zarp.config.models import Config, ConfigRun, ConfigSample, ConfigUser
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
-from zarp.plugins.sample_processors.defaults import SampleProcessorDefaults as SRD
+from zarp.plugins.sample_processors.defaults \
+    import SampleProcessorDefaults as SRD
 
 LOGGER = logging.getLogger(__name__)
 
-class TestSampleProcessorDefaults:
-    """ Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults`` class."""
 
-    config = Config(run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+class TestSampleProcessorDefaults:
+    """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults``
+    class.
+    """
+
+    config = Config(run=ConfigRun(zarp_directory=Path(__file__).parent \
+                                  / "files" / "zarp"),
                     sample=ConfigSample(),
-        user=ConfigUser(),
+                    user=ConfigUser(),
     )                                                                                 
-    data = pd.DataFrame(                                                              
-        data={                                                                        
+    data = pd.DataFrame(
+        data={
             "identifier": ["sample1", "sample2"],
             "type": ["LOCAL_LIB_SINGLE", "LOCAL_LIB_SINGLE"],
             "orientation": ["SF", "SF"],
-        }                                                                             
+        }
     )
 
     def test_no_initial_sample_table(self):
@@ -51,8 +56,8 @@ class TestSampleProcessorDefaults:
         """Test adding defaults."""
         config = self.config.copy()
         df = self.data.copy()
-        srp = SRP()                                                                   
-        srp.append(df)                                                                
+        srp = SRP()
+        srp.append(df)
         srd = SRD()
         records = srd.process(srp)
         assert(records["sample1"]["fragment_length_distribution_mean"] \
