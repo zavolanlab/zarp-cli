@@ -63,6 +63,12 @@ class ZARP:
         srp.append_from_obj(samples=sample_processor.samples)
         srp.view()
 
+        # fill defaults
+        processor_defaults = SampleProcessorDefaults(
+            config=self.config,
+            records=srp.records,
+        )
+
         # fetch remote samples from SRA
         fetcher_sra = SampleFetcherSRA(
             config=self.config,
@@ -104,11 +110,6 @@ class ZARP:
         srp.update(df=df)
         srp.view()
 
-        # fill defaults
-        processor_defaults = SampleProcessorDefaults(
-            config=self.config,
-            records=srp.records,
-        )
         df = processor_defaults.process()
         srp.update(df=df)
         srp.view()

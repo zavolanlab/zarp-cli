@@ -5,6 +5,7 @@ import logging
 import pandas as pd
 
 from zarp.abstract_classes.sample_processor import SampleProcessor
+from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,19 +34,20 @@ class SampleProcessorDefaults(
         #     LOGGER.debug("No defaults to set.")
         #     return self.records
         LOGGER.info("Setting defaults...")
-        LOGGER.warning("Plugin not implemented!")
-        LOGGER.info("Defaults set: DESCRIBE WHAT WAS SET")
-
-        sample_index = self.records.index
 
         defaults = self.config.dict()
         default_data = {}
         for key, val in defaults:
             default_data[key] = [val for _ in range(len(sample_index))]
-        defaults_df: pd.DataFrame(default_data)
-        default_df.index = sample_index
+        default_df = pd.DataFrame(default_data)
 
-        common_cols = default_df.columns.intersection(self.records.columns)
-        self.records = default_df.drop(common_cols, axis=1).join(self.records, how="right")
+        srp = SRP(self.records)
+        srp.update(df=default_df, anchor=config.run.working_directory,
+                   path_columns=['annotations', 'reference_sequences'])
         
+        LOGGER.info("Defaults set")
+
         return self.records
+
+    def _select_records(self) -> None:
+        """Select records to process."""
