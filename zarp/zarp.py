@@ -10,6 +10,7 @@ from zarp.plugins.sample_fetchers.sra import SampleFetcherSRA
 from zarp.plugins.sample_fetchers.genomepy import SampleFetcherGenomePy
 from zarp.plugins.sample_processors.htsinfer import SampleProcessorHTSinfer
 from zarp.plugins.sample_processors.defaults import SampleProcessorDefaults
+from zarp.plugins.sample_processors.dummy_data import SampleProcessorDummyData
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 
 LOGGER = logging.getLogger(__name__)
@@ -68,6 +69,9 @@ class ZARP:
             config=self.config,
             records=srp.records,
         )
+        df = processor_defaults.process()
+        srp.update(df=df)
+        srp.view()
 
         # fetch remote samples from SRA
         fetcher_sra = SampleFetcherSRA(
@@ -110,6 +114,11 @@ class ZARP:
         srp.update(df=df)
         srp.view()
 
-        df = processor_defaults.process()
+        # fill defaults
+        processor_dummy_data = SampleProcessorDummyData(
+            config=self.config,
+            records=srp.records,
+        )
+        df = processor_dummy_data.process()
         srp.update(df=df)
         srp.view()
