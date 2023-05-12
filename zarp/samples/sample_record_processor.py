@@ -96,6 +96,8 @@ class SampleRecordProcessor:
                     "Records and dataframe have different lengths/rows. Cannot"
                     " update records."
                 )
+            self.records.reset_index(drop=True, inplace=True)
+            df_new.reset_index(drop=True, inplace=True)
         else:
             if not (by in self.records.columns and by in df_new.columns):
                 raise KeyError(
@@ -104,7 +106,7 @@ class SampleRecordProcessor:
                 )
             self.records.set_index(keys=by, drop=False, inplace=True)
             df_new.set_index(keys=by, drop=False, inplace=True)
-        self.records.update(df_new, overwrite=overwrite, **kwargs)
+        self.records.update(df_new, overwrite=overwrite)
         self.records = self._sanitize_df(df=self.records, **kwargs)
         LOGGER.debug(f"Sample records updated: {len(df_new.index)}")
 
