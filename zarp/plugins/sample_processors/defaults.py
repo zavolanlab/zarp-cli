@@ -42,25 +42,13 @@ class SampleProcessorDefaults(
         for key, val in defaults.items():
             default_data[key] = [val for _ in range(len(sample_index))]
         default_df = pd.DataFrame(default_data)
-        print(default_df)
 
         srp = SRP()
-        print("Empty records")
-        print(srp.records.to_string())
         srp.append(self.records)
-        print("Appended")
-        print(srp.records.to_string())
         srp.update(
             df=default_df,
             anchor=self.config.run.working_directory,
             path_columns=["annotations", "reference_sequences"],
-        )
-        print("Updated")
-        print(srp.records.to_string())
-        print(
-            srp.records["fragment_length_distribution_mean"].to_string(
-                index=False
-            )
         )
 
         LOGGER.info("Defaults set")
