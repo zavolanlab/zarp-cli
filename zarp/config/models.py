@@ -103,11 +103,11 @@ class InitRun(CustomBaseModel):
         OutputFileGroups.LOGS,
         OutputFileGroups.RESULTS,
     ]
-    cores: int = 1
-    dependency_embedding: DependencyEmbeddingStrategies = (
-        DependencyEmbeddingStrategies.CONDA
-    )
-    execution_mode: ExecModes = ExecModes.RUN
+    cores: Optional[int] = 1
+    dependency_embedding: Optional[
+        DependencyEmbeddingStrategies
+    ] = DependencyEmbeddingStrategies.CONDA
+    execution_mode: Optional[ExecModes] = ExecModes.RUN
     htsinfer_config: Optional[str] = None
     resources_version: Optional[int] = None
     rule_config: Optional[Path] = None
@@ -251,7 +251,7 @@ class ConfigSample(InitSample):
     reference_sequences: Optional[Path] = None
     source: Optional[Union[int, str]] = None
     star_sjdb_overhang: Optional[int] = None
-    salmon_kmer_size: int = 31
+    salmon_kmer_size: Optional[int] = 31
 
 
 class Config(CustomBaseModel):

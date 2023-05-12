@@ -354,7 +354,7 @@ class ArgParser:
         argument_group.add_argument(
             "--salmon-kmer-size",
             type=int,
-            default=31,
+            default=None,
             metavar="INT",
             help=(
                 "size of k-mers for building the Salmon index; the default"
@@ -389,7 +389,7 @@ class ArgParser:
         )
         argument_group.add_argument(
             "--cores",
-            default=1,
+            default=None,
             type=int,
             metavar="INT",
             help=(
@@ -401,7 +401,7 @@ class ArgParser:
         argument_group.add_argument(
             "--dependency-embedding",
             choices=[item.value for item in DependencyEmbeddingStrategies],
-            default=DependencyEmbeddingStrategies.CONDA.value,
+            default=None,
             type=str,
             help=(
                 "strategy for embedding dependencies for the execution of"
@@ -418,7 +418,7 @@ class ArgParser:
         argument_group.add_argument(
             "--execution-mode",
             choices=[item.value for item in ExecModes],
-            default=ExecModes.RUN.value,
+            default=None,
             type=str,
             help=(
                 "run identifier; if not provided a random string will be"
