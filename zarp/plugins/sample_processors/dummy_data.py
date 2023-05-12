@@ -1,7 +1,7 @@
-"""Set missing metadata defaults."""
+"""Fill in missing metadata with dummy data."""
 
 import logging
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import pandas as pd
 
@@ -11,10 +11,10 @@ from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 LOGGER = logging.getLogger(__name__)
 
 
-class SampleProcessorDefaults(
+class SampleProcessorDummyData(
     SampleProcessor
 ):  # pylint: disable=too-few-public-methods
-    """Set available defaults for missing sample metadata.
+    """Set dummy data for missing sample metadata, as required by ZARP.
 
     Args:
         records: Pandas ``DataFrame`` object.
@@ -25,22 +25,37 @@ class SampleProcessorDefaults(
         config: ``Config`` object.
     """
 
-    def process(self) -> pd.DataFrame:
-        """Set available defaults for missing sample metadata.
+    columns = [
+        "name",
+        "paths_2",
+        "adapter_3p_1",
+        "adapter_3p_2",
+        "adapter_5p_1",
+        "adapter_5p_2",
+        "adapter_poly_3p_1",
+        "adapter_poly_3p_2",
+        "adapter_poly_5p_1",
+        "adapter_poly_5p_2",
+    ]
+    dummy_data = "X" * 15
 
-        Returns: Dataframe with set defaults.
+    def process(self) -> pd.DataFrame:
+        """Set dummy data for missing sample metadata.
+
+        Returns: Dataframe with dummy data set.
         """
         if self.records.empty:
-            LOGGER.debug("No defaults to set.")
+            LOGGER.debug("No dummy data to set.")
             return self.records
 
-        LOGGER.info("Setting defaults...")
+        LOGGER.info("Setting dummy data...")
 
-        defaults: Dict[str, Any] = self.config.sample.dict()
-        default_data: Dict[str, List[Any]] = {}
+        default_data: Dict[str, List[str]] = {}
         sample_index: pd.Index = self.records.index
-        for key, val in defaults.items():
-            default_data[key] = [val for _ in range(len(sample_index))]
+        for key in self.columns:
+            default_data[key] = [
+                self.dummy_data for _ in range(len(sample_index))
+            ]
         default_df: pd.DataFrame = pd.DataFrame(default_data)
 
         srp: SRP = SRP()
@@ -51,7 +66,7 @@ class SampleProcessorDefaults(
             path_columns=["annotations", "reference_sequences"],
         )
 
-        LOGGER.info("Defaults set.")
+        LOGGER.info("Dummy data set.")
 
         return srp.records
 
