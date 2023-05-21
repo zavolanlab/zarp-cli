@@ -367,3 +367,22 @@ class ConfigFileSRA(ConfigFileContent):
     outdir: str
     samples: str
     samples_out: str
+
+
+class ConfigFileHTSinfer(ConfigFileContent):
+    """HTSinfer workflow configuration file content.
+
+    Args:
+        samples: Path to sample table.
+        outdir: Path to output directory.
+        samples_out: Path to output sample table.
+
+    Attributes:
+        samples: Path to sample table.
+        outdir: Path to output directory.
+        samples_out: Path to output sample table.
+    """
+
+    samples: str
+    outdir: str
+    samples_out: str
