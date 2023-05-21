@@ -53,8 +53,7 @@ jobs:
 
       - name: run unit tests
         run: |
-          coverage run --source zarp -m pytest
-          coverage xml
+          coverage run --source zarp -m pytest && coverage xml
 
       - name: submit coverage report
         uses: codecov/codecov-action@v2
