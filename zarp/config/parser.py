@@ -45,8 +45,8 @@ class ConfigParser:
         self.config_file: Path = Path(config_file)
         self.config: Config = Config(
             run=ConfigRun(
-                zarp_directory=Path(__file__).parents[3] / "zarp",
-                genome_assemblies_map=Path(__file__).parents[3]
+                zarp_directory=Path(__file__).parents[2] / "zarp",
+                genome_assemblies_map=Path(__file__).parents[2]
                 / "data"
                 / "genome_assemblies_map.csv",
             ),
