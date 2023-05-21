@@ -54,16 +54,7 @@ class SnakemakeExecutor:
         if self.run_config.execution_mode == "DRY_RUN":
             cmd_ls.append("--dry-run")
         if self.run_config.dependency_embedding == "CONDA":
-            if snakefile.name == "htsinfer.smk":
-                cmd_ls.append("--use-singularity")
-                # Conda is currently not supported for the HTSinfer
-                # workflow
-                LOGGER.warning(
-                    "Conda not supported for HTSinfer workflow."
-                    " Using Singularity instead."
-                )
-            else:
-                cmd_ls.append("--use-conda")
+            cmd_ls.append("--use-conda")
         elif self.run_config.dependency_embedding == "SINGULARITY":
             if snakefile.name == "sra_download.smk":
                 cmd_ls.append("--use-conda")
