@@ -7,4 +7,4 @@ pydantic>=1.9.2
 Pygments>=2.8.0
 rich>=12.5.1
 snakemake>=7.19.1
-singularity>=3.5.2
+singularity>=3.0.0
