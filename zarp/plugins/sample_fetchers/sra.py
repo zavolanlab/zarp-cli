@@ -65,9 +65,13 @@ class SampleFetcherSRA(
         )
         cmd = executor.compile_command(snakefile=workflow)
         executor.run(cmd=cmd)
-        df: pd.DataFrame = self._process_sample_table(
-            sample_table=Path(conf_content.samples_out)
-        )
+        df: pd.DataFrame
+        if self.config.run.execution_mode == "DRY_RUN":
+            df = self.records
+        else:
+            df = self._process_sample_table(
+                sample_table=Path(conf_content.samples_out)
+            )
         LOGGER.info(f"Fetched: '{', '.join(df['identifier'].values)}'")
         return df
 

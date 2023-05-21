@@ -7,9 +7,7 @@ import numpy as np
 import pandas as pd
 
 from zarp.config.models import Sample
-from zarp.config.mappings import (
-    columns_model,
-)
+from zarp.config.mappings import columns_model
 from zarp.utils import resolve_paths
 
 LOGGER = logging.getLogger(__name__)

@@ -19,7 +19,10 @@ from tests.utils import create_input_file, create_snakefile, create_config_file
 
 default_run_config = ConfigRun(
     identifier="test_run",
-    zarp_directory=Path.cwd(),
+    zarp_directory=Path(__file__).parents[1] / "files" / "zarp",
+    genome_assemblies_map=Path(__file__).parents[1]
+    / "files"
+    / "genome_assemblies.csv",
 )
 default_cwd = Path.cwd()
 

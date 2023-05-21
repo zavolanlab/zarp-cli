@@ -41,6 +41,7 @@ class ArgParser:
             "dependency_embedding",
             "description",
             "execution_mode",
+            "genome_assemblies_map",
             "htsinfer_config",
             "identifier",
             "resources_version",
@@ -424,6 +425,13 @@ class ArgParser:
                 "run identifier; if not provided a random string will be"
                 " generated"
             ),
+        )
+        argument_group.add_argument(
+            "--genome-assemblies-map",
+            default=None,
+            type=lambda p: Path(p).absolute(),
+            metavar="PATH",
+            help="Path to genome assemblies mapping file",
         )
         argument_group.add_argument(
             "--htsinfer-config",
