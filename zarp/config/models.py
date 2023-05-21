@@ -121,7 +121,7 @@ class InitRun(CustomBaseModel):
         OutputFileGroups.RESULTS,
     ]
 
-    # pylint: no-self-argument
+    # pylint: disable=no-self-argument
     @validator("genome_assemblies_map")
     def get_genome_assemblies_map(
         cls,
