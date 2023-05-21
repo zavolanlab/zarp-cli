@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -102,7 +102,7 @@ class SampleProcessorGenomePy(
             force = False
         genomes_dir.mkdir(parents=True, exist_ok=True)
 
-        assemblies: pd.ArrayLike = self.records["assembly"].dropna().unique()
+        assemblies: List = list(self.records["assembly"].dropna().unique())
         LOGGER.debug(f"Assemblies to fetch: {assemblies}")
         for assembly in assemblies:
             LOGGER.debug(f"Fetching assembly: {assembly}")
