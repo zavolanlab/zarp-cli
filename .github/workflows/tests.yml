@@ -102,6 +102,7 @@ jobs:
       - name: integration test - normal mode
         run: |
           mkdir -p $HOME/.zarp
+          export PATH=$PATH:$PWD/bin
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
           ZARP_REPO_PATH=$HOME/.zarp/workflows
           git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
