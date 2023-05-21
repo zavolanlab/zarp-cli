@@ -44,7 +44,15 @@ def list_get(_list: Sequence[Any], index: int, default: Any = None) -> Any:
 
 
 def remove_none(obj: Any) -> Dict:
-    """Remove ``None`` values from a (nested) dictionary."""
+    """Remove ``None`` values from a (nested) dictionary.
+
+    Args:
+        obj: Dictionary object to remove ``None`` values from.
+
+    Returns:
+        Object with ``None`` values removed if ``obj`` is a dictionary, else
+            ``obj`` is returned unmodified.
+    """
     if isinstance(obj, dict):
         return dict(
             (key, remove_none(val))

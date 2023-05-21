@@ -75,7 +75,14 @@ class SampleProcessorGenomePy(
     def fetch_resources(
         self, genomes_dir_root: Path
     ) -> Dict[str, Tuple[Path, Path]]:
-        """Fetch assemblies."""
+        """Fetch assemblies.
+
+        Args:
+            genomes_dir_root: Path to fetch assemblies to.
+
+        Returns:
+            Dictionary with genome resource paths.
+        """
         # Workaround for
         # https://github.com/vanheeringen-lab/genomepy/issues/238
         # pylint: disable=import-outside-toplevel
