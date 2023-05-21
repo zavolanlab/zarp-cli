@@ -121,7 +121,7 @@ class InitRun(CustomBaseModel):
         OutputFileGroups.RESULTS,
     ]
 
-    # pylint: disable=no-self-use,no-self-argument
+    # pylint: no-self-argument
     @validator("genome_assemblies_map")
     def get_genome_assemblies_map(
         cls,
@@ -204,7 +204,7 @@ class ConfigRun(InitRun):
     identifier: str = ""
     zarp_directory: DirectoryPath
 
-    # pylint: disable=no-self-use,no-self-argument
+    # pylint: disable=no-self-argument
     @validator("identifier")
     def get_identifier(
         cls,
