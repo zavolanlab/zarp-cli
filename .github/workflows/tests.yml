@@ -99,6 +99,11 @@ jobs:
           channels: conda-forge
           auto-activate-base: false
 
+      - name: set up Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.3
+
       - name: integration test - normal mode
         run: |
           mkdir -p $HOME/.zarp
