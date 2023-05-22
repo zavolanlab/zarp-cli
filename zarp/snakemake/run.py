@@ -47,6 +47,7 @@ class SnakemakeExecutor:
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
         cmd_ls.extend(["--cores", str(self.run_config.cores)])
+        cmd_ls.extend(["--singularity-args", f"--bind {str(self.exec_dir)}/../../.zarp,$TMPDIR"])
         cmd_ls.extend(["--directory", str(self.exec_dir)])
         if self.config_file is not None:
             cmd_ls.extend(["--configfile", str(self.config_file)])
