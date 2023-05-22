@@ -3,12 +3,16 @@
 from pathlib import Path
 import string
 
+import numpy as np
 import pandas as pd
+import pytest
 
 from zarp.utils import (
     generate_id,
     list_get,
+    remove_none,
     resolve_paths,
+    sanitize_strings,
 )
 
 
@@ -43,6 +47,22 @@ class TestListGet:
     def test_with_explicit_default(self):
         """Call with providing default."""
         assert list_get([1, 2, 3], 4, "default") == "default"
+
+
+class TestRemoveNone:
+    """Tests for function ``:func:zarp.utils.remove_none``."""
+
+    def test_with_dict(self):
+        """Call with dictionary."""
+        assert remove_none({"a": 1, "b": None, "c": {"d": None}}) == {
+            "a": 1,
+            "c": {},
+        }
+
+    def test_with_no_dict(self):
+        """Call with list."""
+        obj = [1, 2, None]
+        assert remove_none(obj) is obj
 
 
 class TestResolvePaths:
@@ -118,3 +138,27 @@ class TestResolvePaths:
             path_columns=("path",),
         )
         assert df["path"].tolist() == [1, 2]
+
+
+class TestSanitizeStrings:
+    """Tests for function ``:func:zarp.utils.sanitize_strings``."""
+
+    def test_with_strings(self):
+        """Call with string."""
+        assert sanitize_strings("a") == "a"
+        assert sanitize_strings("A B C") == "a_b_c"
+
+    def test_with_numerical(self):
+        """Call with numerical values."""
+        assert sanitize_strings(1) == "1"
+        assert sanitize_strings(1.0) == "1.0"
+        assert sanitize_strings(np.nan) == "nan"
+
+    def test_with_illegal_values(self):
+        """Call with illegal values."""
+        with pytest.raises(TypeError):
+            assert sanitize_strings(None)  # type: ignore
+        with pytest.raises(TypeError):
+            assert sanitize_strings([1, 2, 3])  # type: ignore
+        with pytest.raises(TypeError):
+            assert sanitize_strings({"a": 1})  # type: ignore

@@ -28,7 +28,7 @@ class SampleProcessor(ABC):  # pylint: disable=too-few-public-methods
         records: pd.DataFrame = pd.DataFrame(columns=columns_model),
     ) -> None:
         """Class constructor method."""
-        self.records: pd.DataFrame = records
+        self.records: pd.DataFrame = records.copy()
         self.config: Config = config
         self._select_records()
 

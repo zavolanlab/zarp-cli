@@ -9,7 +9,7 @@ import pandas as pd
 from zarp.config.models import Config, ConfigRun, ConfigSample, ConfigUser
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 from zarp.plugins.sample_processors.defaults import (
-    SampleProcessorDefaults as SRD,
+    SampleProcessorDefaults as SPD,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -19,7 +19,12 @@ class TestSampleProcessorDefaults:
     """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults``."""
 
     config = Config(
-        run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+        run=ConfigRun(
+            zarp_directory=Path(__file__).parents[2] / "files" / "zarp",
+            genome_assemblies_map=Path(__file__).parents[2]
+            / "files"
+            / "genome_assemblies.csv",
+        ),
         sample=ConfigSample(fragment_length_distribution_mean=1000),
         user=ConfigUser(),
     )
@@ -37,7 +42,7 @@ class TestSampleProcessorDefaults:
         df = self.data.copy()
         srp = SRP()
         srp.append(df)
-        srd = SRD(config=config, records=srp.records)
+        srd = SPD(config=config, records=srp.records)
         assert hasattr(srd, "records")
         assert len(srd.records.index) == 2
         assert np.isnan(srd.records["salmon_kmer_size"].iloc[0])
@@ -48,7 +53,7 @@ class TestSampleProcessorDefaults:
         df = self.data.copy()
         srp = SRP()
         srp.append(df)
-        srd = SRD(config=config, records=srp.records)
+        srd = SPD(config=config, records=srp.records)
         df_out = srd.process()
         assert len(df_out.index) == 2
         assert not np.isnan(df_out["salmon_kmer_size"].iloc[0])
@@ -58,7 +63,7 @@ class TestSampleProcessorDefaults:
         """Test `.process()` method with no records."""
         config = self.config.copy()
         srp = SRP()
-        srd = SRD(config=config, records=srp.records)
+        srd = SPD(config=config, records=srp.records)
         assert len(srd.records.index) == 0
         with caplog.at_level(logging.DEBUG):
             df_out = srd.process()

@@ -2,6 +2,8 @@
 
 from pathlib import Path
 from typing import (
+    Any,
+    Dict,
     List,
     Optional,
     Tuple,
@@ -14,6 +16,7 @@ from pydantic import (  # pylint: disable=no-name-in-module
     EmailStr,
     FilePath,
     HttpUrl,
+    validator,
 )
 
 from zarp.config.enums import (
@@ -77,8 +80,9 @@ class InitRun(CustomBaseModel):
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
         htsinfer_config: Configuration options for parameter inference.
+        genome_assemblies_map: Genome assemblies mapping file.
         resources_version: Version of Ensembl genome resources to use when
-            resources are not provided
+            resources are not provided.
         rule_config: ZARP rule configuration.
         snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
@@ -90,6 +94,7 @@ class InitRun(CustomBaseModel):
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
         htsinfer_config: Configuration options for parameter inference.
+        genome_assemblies_map: Genome assemblies mapping file.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
         rule_config: ZARP rule configuration.
@@ -98,22 +103,41 @@ class InitRun(CustomBaseModel):
         zarp_directory: Root directory of the ZARP repository.
     """
 
+    working_directory: Path = Path.home() / ".zarp"
+    zarp_directory: Optional[DirectoryPath] = None
+    execution_mode: Optional[ExecModes] = ExecModes.RUN
+    cores: Optional[int] = 1
+    dependency_embedding: Optional[
+        DependencyEmbeddingStrategies
+    ] = DependencyEmbeddingStrategies.CONDA
+    htsinfer_config: Optional[str] = None
+    genome_assemblies_map: Optional[FilePath] = None
+    resources_version: Optional[int] = None
+    snakemake_config: Optional[Path] = None
+    rule_config: Optional[Path] = None
     cleanup_strategy: Optional[List[OutputFileGroups]] = [
         OutputFileGroups.CONFIG,
         OutputFileGroups.LOGS,
         OutputFileGroups.RESULTS,
     ]
-    cores: Optional[int] = 1
-    dependency_embedding: Optional[
-        DependencyEmbeddingStrategies
-    ] = DependencyEmbeddingStrategies.CONDA
-    execution_mode: Optional[ExecModes] = ExecModes.RUN
-    htsinfer_config: Optional[str] = None
-    resources_version: Optional[int] = None
-    rule_config: Optional[Path] = None
-    snakemake_config: Optional[Path] = None
-    working_directory: Optional[Path] = Path.cwd()
-    zarp_directory: Optional[DirectoryPath] = None
+
+    # pylint: disable=no-self-argument
+    @validator("genome_assemblies_map")
+    def get_genome_assemblies_map(
+        cls,
+        genome_assemblies_map: Path,
+        values: Dict[str, Any],
+    ) -> Path:
+        """Get default genome assemblies mapping file."""
+        if (
+            not isinstance(genome_assemblies_map, Path)
+            and "working_directory" in values
+            and values["working_directory"] is not None
+        ):
+            return (
+                values["working_directory"] / "data" / "genome_assemblies.csv"
+            )
+        return genome_assemblies_map
 
 
 class InitSample(CustomBaseModel):
@@ -164,17 +188,32 @@ class ConfigRun(InitRun):
 
     Args:
         description: Run description.
+        genome_assemblies_map: Genome assemblies mapping file.
         identifier: Unique identifier for a run.
+        zarp_directory: Root directory of the ZARP repository.
 
     Attributes:
         description: Run description.
+        genome_assemblies_map: Genome assemblies mapping file.
         identifier: Unique identifier for a run.
+        zarp_directory: Root directory of the ZARP repository.
     """
 
     description: Optional[str] = None
-    identifier: str = generate_id()
-    working_directory: Path = Path.cwd()
-    zarp_directory: Path
+    genome_assemblies_map: Path
+    identifier: str = ""
+    zarp_directory: DirectoryPath
+
+    # pylint: disable=no-self-argument
+    @validator("identifier")
+    def get_identifier(
+        cls,
+        identifier: str,
+    ) -> str:
+        """Get default identifier."""
+        if identifier == "":
+            return generate_id()
+        return identifier
 
 
 class ConfigSample(InitSample):
@@ -245,8 +284,6 @@ class ConfigSample(InitSample):
     adapter_poly_3p: Optional[Tuple[Optional[str], Optional[str]]] = None
     adapter_poly_5p: Optional[Tuple[Optional[str], Optional[str]]] = None
     annotations: Optional[Path] = None
-    fragment_length_distribution_mean: float = 300
-    fragment_length_distribution_sd: float = 100
     read_orientation: Optional[ReadOrientation] = None
     reference_sequences: Optional[Path] = None
     source: Optional[Union[int, str]] = None

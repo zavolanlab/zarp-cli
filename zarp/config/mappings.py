@@ -1,6 +1,9 @@
 """Mappings and lists for ZARP and ZARP-cli models and tables."""
 
-map_zarp_to_model = {
+from pathlib import Path
+from typing import Dict, List
+
+map_zarp_to_model: Dict = {
     "sample": "name",
     "organism": "source",
     "gtf": "annotations",
@@ -23,35 +26,41 @@ map_zarp_to_model = {
     "seqmode": "sequencing_mode",
 }
 
-map_model_to_zarp = {v: k for k, v in map_zarp_to_model.items()}
+map_model_to_zarp: Dict = {v: k for k, v in map_zarp_to_model.items()}
 
-map_model_to_sra_in = {
+map_model_to_sra_in: Dict = {
     "identifier": "sample",
 }
 
-map_sra_out_to_model = {
+map_sra_out_to_model: Dict = {
     "sample": "identifier",
     "fq1": "paths_1",
     "fq2": "paths_2",
 }
 
-columns_sra_in = list(map_model_to_sra_in.values())
+columns_sra_in: List = list(map_model_to_sra_in.values())
 
-columns_sra_out = columns_sra_in + [
+columns_sra_out: List = columns_sra_in + [
     "fq1",
     "fq2",
 ]
 
-columns_zarp_path = [
+columns_zarp_path: List = [
     "fq1",
     "fq2",
     "gtf",
     "genome",
 ]
 
-columns_zarp = list(map_zarp_to_model.keys())
+columns_zarp: List = list(map_zarp_to_model.keys())
 
-columns_model = list(map_zarp_to_model.values()) + [
+columns_model: List = list(map_zarp_to_model.values()) + [
+    "assembly",
     "identifier",
+    "source_sanitized",
     "type",
 ]
+
+genome_assemblies_map: Path = (
+    Path(__file__).parents[2] / "data" / "genome_assemblies.csv"
+)

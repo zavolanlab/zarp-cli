@@ -43,10 +43,14 @@ class TestInitializer:
         config_file: Path = Path(tmpdir / "config_file")
         test_config: InitConfig = InitConfig()
         test_config.run.execution_mode = ExecModes.DRY_RUN
+        test_config.run.genome_assemblies_map = (
+            Path(__file__).parents[1] / "files" / "genome_assemblies.csv"
+        )
         initializer.write_yaml(
             contents=test_config,
             path=config_file,
         )
+        print(config_file)
         initializer.set_from_file(config_file=config_file)
         assert exec_mode_before_update == ExecModes.RUN.value
         assert initializer.config.run.execution_mode == ExecModes.DRY_RUN.value

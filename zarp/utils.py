@@ -5,7 +5,9 @@ from random import choice
 import string
 from typing import (
     Any,
+    Dict,
     Sequence,
+    Union,
 )
 
 import pandas as pd
@@ -41,6 +43,25 @@ def list_get(_list: Sequence[Any], index: int, default: Any = None) -> Any:
         return default
 
 
+def remove_none(obj: Any) -> Dict:
+    """Remove ``None`` values from a (nested) dictionary.
+
+    Args:
+        obj: Dictionary object to remove ``None`` values from.
+
+    Returns:
+        Object with ``None`` values removed if ``obj`` is a dictionary, else
+            ``obj`` is returned unmodified.
+    """
+    if isinstance(obj, dict):
+        return dict(
+            (key, remove_none(val))
+            for key, val in obj.items()
+            if key is not None and val is not None
+        )
+    return obj
+
+
 def resolve_paths(
     df: pd.DataFrame,
     anchor: Path = Path.cwd(),
@@ -67,3 +88,25 @@ def resolve_paths(
             else x
         )
     return df
+
+
+def sanitize_strings(value: Union[float, int, str]) -> str:
+    """Sanitize strings.
+
+    Convert numeric values to strings, replace spaces with underscores, and
+    convert to lowercase.
+
+    Args:
+        value: Value to sanitize.
+
+    Returns:
+        Sanitized string.
+
+    Raises:
+        TypeError: If ``value`` is not a string, float, or integer.
+    """
+    if isinstance(value, str):
+        return value.replace(" ", "_").lower()
+    if isinstance(value, (float, int)):
+        return str(value)
+    raise TypeError(f"Invalid type: {type(value)}")

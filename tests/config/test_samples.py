@@ -31,7 +31,10 @@ class TestSampleTableProcessor:
     """Test ``:cls:zarp.config.samples.SampleProcessor`` class."""
 
     run_config = ConfigRun(
-        zarp_directory=Path(__file__).parent / "files" / "zarp"
+        zarp_directory=Path(__file__).parents[1] / "files" / "zarp",
+        genome_assemblies_map=Path(__file__).parents[1]
+        / "files"
+        / "genome_assemblies.csv",
     )
 
     def test_constructor_without_refs(self):

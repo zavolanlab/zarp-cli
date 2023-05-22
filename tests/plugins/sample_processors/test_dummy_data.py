@@ -9,17 +9,22 @@ import pandas as pd
 from zarp.config.models import Config, ConfigRun, ConfigSample, ConfigUser
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 from zarp.plugins.sample_processors.dummy_data import (
-    SampleProcessorDummyData as SRDD,
+    SampleProcessorDummyData as SPDD,
 )
 
 LOGGER = logging.getLogger(__name__)
 
 
 class TestSampleProcessorDefaults:
-    """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDefaults``."""
+    """Test ``cls:zarp.plugins.sample_processors.SampleProcessorDummyData``."""
 
     config = Config(
-        run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+        run=ConfigRun(
+            zarp_directory=Path(__file__).parents[2] / "files" / "zarp",
+            genome_assemblies_map=Path(__file__).parents[2]
+            / "files"
+            / "genome_assemblies.csv",
+        ),
         sample=ConfigSample(fragment_length_distribution_mean=1000),
         user=ConfigUser(),
     )
@@ -37,7 +42,7 @@ class TestSampleProcessorDefaults:
         df = self.data.copy()
         srp = SRP()
         srp.append(df)
-        srdd = SRDD(config=config, records=srp.records)
+        srdd = SPDD(config=config, records=srp.records)
         assert hasattr(srdd, "records")
         assert len(srdd.records.index) == 2
 
@@ -47,7 +52,7 @@ class TestSampleProcessorDefaults:
         df = self.data.copy()
         srp = SRP()
         srp.append(df)
-        srdd = SRDD(config=config, records=srp.records)
+        srdd = SPDD(config=config, records=srp.records)
         df_out = srdd.process()
         assert len(df_out.index) == 2
         assert np.isnan(srdd.records["paths_2"].iloc[0])
@@ -57,7 +62,7 @@ class TestSampleProcessorDefaults:
         """Test `.process()` method with no records."""
         config = self.config.copy()
         srp = SRP()
-        srdd = SRDD(config=config, records=srp.records)
+        srdd = SPDD(config=config, records=srp.records)
         assert len(srdd.records.index) == 0
         with caplog.at_level(logging.DEBUG):
             df_out = srdd.process()
