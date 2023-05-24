@@ -42,7 +42,6 @@ class ArgParser:
             "description",
             "execution_mode",
             "genome_assemblies_map",
-            "htsinfer_config",
             "identifier",
             "resources_version",
             "rule_config",
@@ -432,16 +431,6 @@ class ArgParser:
             type=lambda p: Path(p).absolute(),
             metavar="PATH",
             help="Path to genome assemblies mapping file",
-        )
-        argument_group.add_argument(
-            "--htsinfer-config",
-            default=None,
-            type=str,
-            metavar="STR",
-            help=(
-                "command-line options for metadata inference; will be"
-                " interpolated into the HTSinfer call"
-            ),
         )
         argument_group.add_argument(
             "--identifier",
