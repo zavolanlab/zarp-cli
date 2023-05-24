@@ -46,7 +46,6 @@ class SampleProcessorHTSinfer(
 
         Returns: Dataframe with inferred sample metadata.
         """
-        # TODO: Uncomment when records selector and tests are implemented.
         if self.records.empty:
             LOGGER.debug("No metadata to infer.")
             return self.records
