@@ -21,7 +21,12 @@ class TestSampleProcessorHTSinfer:
     """Test ``:cls:zarp.plugins.sample_processors.htsinfer`` class."""
 
     config = Config(
-        run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+        run=ConfigRun(
+            zarp_directory=Path(__file__).parents[2] / "files" / "zarp",
+            genome_assemblies_map=Path(__file__).parents[2]
+            / "files"
+            / "genome_assemblies.csv",
+        ),
         sample=ConfigSample(),
         user=ConfigUser(),
     )
