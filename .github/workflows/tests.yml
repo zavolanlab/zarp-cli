@@ -110,7 +110,7 @@ jobs:
           cp tests/files/config_valid.yaml ~/.zarp/user.yaml
           ZARP_REPO_PATH=$HOME/.zarp/workflows
           git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
-          coverage run --source zarp \
+          coverage zarp \
             my_other_sample@tests/files/empty \
             tests/files/empty,tests/files/empty \
             SRR1525892 \
