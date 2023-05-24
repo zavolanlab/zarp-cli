@@ -6,7 +6,13 @@ import shutil
 
 import pandas as pd
 
-from zarp.config.models import Config, ConfigRun, ConfigSample, ConfigUser
+from zarp.config.models import (
+    Config,
+    ConfigRun,
+    ConfigSample,
+    ConfigUser,
+    ExecModes,
+)
 from zarp.plugins.sample_processors.htsinfer import \
     SampleProcessorHTSinfer as HTS
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
@@ -83,6 +89,30 @@ class TestSampleProcessorHTSinfer:
             df_out = hts.process(loc=outdir, workflow=workflow)
         assert len(df_out.index) == 0
         assert "No metadata to infer." in caplog.text
+
+    def test_process_dry_run(self, tmpdir, monkeypatch):
+        """Test `.process()` method with dry run."""
+        config = self.config.copy()
+        config.run.execution_mode = ExecModes.DRY_RUN
+        df = self.data.copy()
+        outdir = Path(tmpdir)
+        workflow = create_snakefile(dir=outdir, name="Snakefile")
+        srp = SRP()
+        srp.append(df)
+        hts = HTS(config=config, records=srp.records)
+
+        def patched_run(self, cmd) -> None:
+            """Patch `run()` method."""
+            run_dir = Path(tmpdir)
+            src = Path(__file__).parents[2] / "files" / "sample_table.tsv"
+            dst_in = run_dir / "samples_result.tsv"
+            dst_out = run_dir / "samples_htsinfer.tsv"
+            shutil.copyfile(src, dst_in)
+            shutil.copyfile(src, dst_out)
+
+        monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
+        df_out = hts.process(loc=outdir, workflow=workflow)
+        assert len(df_out.index) == 2
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""
