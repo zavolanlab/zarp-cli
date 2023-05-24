@@ -7,7 +7,6 @@ run:
   dependency_embedding: CONDA
   execution_mode: RUN
   genome_assemblies_map: ./data/genome_assemblies.csv
-  htsinfer_config: null
   resources_version: null
   snakemake_config: null
   working_directory: /some/path

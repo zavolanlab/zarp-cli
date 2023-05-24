@@ -57,7 +57,10 @@ class SampleProcessorHTSinfer(
             exec_dir=loc,
         )
         cmd = executor.compile_command(snakefile=workflow)
-        executor.run(cmd=cmd)
+        if self.config.run.execution_mode == "DRY_RUN":
+            self.records = self.records
+        else:
+            executor.run(cmd=cmd)
 
         return self.records
 

@@ -79,7 +79,6 @@ class InitRun(CustomBaseModel):
         cores: Cores to be used by the workflow engine.
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
-        htsinfer_config: Configuration options for parameter inference.
         genome_assemblies_map: Genome assemblies mapping file.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
@@ -93,7 +92,6 @@ class InitRun(CustomBaseModel):
         cores: Cores to be used by the workflow engine.
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
-        htsinfer_config: Configuration options for parameter inference.
         genome_assemblies_map: Genome assemblies mapping file.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
@@ -110,7 +108,6 @@ class InitRun(CustomBaseModel):
     dependency_embedding: Optional[
         DependencyEmbeddingStrategies
     ] = DependencyEmbeddingStrategies.CONDA
-    htsinfer_config: Optional[str] = None
     genome_assemblies_map: Optional[FilePath] = None
     resources_version: Optional[int] = None
     snakemake_config: Optional[Path] = None
