@@ -12,7 +12,12 @@ class TestZarp:
     """Test ``:cls:zarp.zarp.ZARP` class."""
 
     config = Config(
-        run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+        run=ConfigRun(
+            zarp_directory=Path(__file__).parent / "files" / "zarp",
+            genome_assemblies_map=Path(__file__).parent
+            / "files"
+            / "genome_assemblies.csv",
+        ),
         sample=ConfigSample(),
         user=ConfigUser(),
     )
@@ -38,6 +43,21 @@ class TestZarp:
         assert hasattr(zarp, "config")
         assert isinstance(zarp.config, Config)
         assert zarp.config.run.working_directory == tmpdir
+
+    def test_set_up_run_genome_assemblies_map_file_not_exists(self, tmpdir):
+        """Test setting up run environment.
+
+        Genome assemblies map file does not exist at specified location.
+        """
+        config = self.config.copy()
+        config.run.working_directory = tmpdir
+        config.run.genome_assemblies_map = tmpdir / "genome_assemblies.csv"
+        zarp = ZARP(config=config)
+        zarp.set_up_run()
+        assert hasattr(zarp, "config")
+        assert isinstance(zarp.config, Config)
+        assert zarp.config.run.working_directory == tmpdir
+        assert zarp.config.run.genome_assemblies_map.is_file()
 
     def test_set_up_run_env_identifier_set(self, tmpdir):
         """Test setting up run environment when run identifier is set."""

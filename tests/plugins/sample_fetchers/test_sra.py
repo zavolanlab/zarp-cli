@@ -6,7 +6,13 @@ import shutil
 
 import pandas as pd
 
-from zarp.config.models import Config, ConfigRun, ConfigSample, ConfigUser
+from zarp.config.models import (
+    Config,
+    ConfigRun,
+    ConfigSample,
+    ConfigUser,
+    ExecModes,
+)
 from zarp.plugins.sample_fetchers.sra import SampleFetcherSRA as SRA
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 from zarp.snakemake.run import SnakemakeExecutor
@@ -20,7 +26,12 @@ class TestSampleFetcherSRA:
     """Test ``:cls:zarp.plugins.sample_fetchers.SampleFetcherSRA`` class."""
 
     config = Config(
-        run=ConfigRun(zarp_directory=Path(__file__).parent / "files" / "zarp"),
+        run=ConfigRun(
+            zarp_directory=Path(__file__).parents[2] / "files" / "zarp",
+            genome_assemblies_map=Path(__file__).parents[2]
+            / "files"
+            / "genome_assemblies.csv",
+        ),
         sample=ConfigSample(),
         user=ConfigUser(),
     )
@@ -81,6 +92,30 @@ class TestSampleFetcherSRA:
             df_out = sra.process(loc=outdir, workflow=workflow)
         assert len(df_out.index) == 0
         assert "No remote libraries to fetch" in caplog.text
+
+    def test_process_dry_run(self, tmpdir, monkeypatch):
+        """Test `.process()` method with dry run."""
+        config = self.config.copy()
+        config.run.execution_mode = ExecModes.DRY_RUN
+        df = self.data.copy()
+        outdir = Path(tmpdir)
+        workflow = create_snakefile(dir=outdir, name="Snakefile")
+        srp = SRP()
+        srp.append(df)
+        sra = SRA(config=config, records=srp.records)
+
+        def patched_run(self, cmd) -> None:
+            """Patch `run()` method."""
+            run_dir = Path(tmpdir) / "runs" / config.run.identifier
+            src = Path(__file__).parents[2] / "files" / "sra_table.tsv"
+            dst_in = run_dir / "samples_local.tsv"
+            dst_out = run_dir / "samples_remote.tsv"
+            shutil.copyfile(src, dst_in)
+            shutil.copyfile(src, dst_out)
+
+        monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
+        df_out = sra.process(loc=outdir, workflow=workflow)
+        assert len(df_out.index) == 2
 
     def test__select_records(self):
         """Test `._select_records()` method."""

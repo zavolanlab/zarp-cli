@@ -20,8 +20,8 @@ from zarp.config.models import (
     ConfigRun,
     ConfigSample,
     ConfigUser,
-    InitConfig,
 )
+from zarp.utils import remove_none
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +45,10 @@ class ConfigParser:
         self.config_file: Path = Path(config_file)
         self.config: Config = Config(
             run=ConfigRun(
-                zarp_directory=Path(__file__).parent / "files" / "zarp"
+                zarp_directory=Path(__file__).parents[2] / "zarp",
+                genome_assemblies_map=Path(__file__).parents[2]
+                / "data"
+                / "genome_assemblies_map.csv",
             ),
             sample=ConfigSample(),
             user=ConfigUser(),
@@ -84,11 +87,11 @@ class ConfigParser:
                 are invalid.
         """
         try:
-            override = InitConfig(**config_mapping).dict(exclude_none=True)
+            override = remove_none(config_mapping)
             config = Addict(self.config.dict())
             config.update(override)
             self.config = Config(**config)
-        except (TypeError, ValidationError) as exc:
+        except (TypeError, ValidationError, ValueError) as exc:
             raise ValueError(
                 "configuration could not be updated; configuration before "
                 f"updating: {self.config}; mapping to update the "

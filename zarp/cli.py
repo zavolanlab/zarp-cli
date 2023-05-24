@@ -81,8 +81,17 @@ def main() -> None:  # pylint: disable=R0915
         LOGGER.info("Starting ZARP-cli in mode: normal")
         LOGGER.info("Setting configuration...")
         config_parser = ConfigParser(config_file=args.config_file)
+        LOGGER.debug(f"Default configuration: {config_parser.config}")
         config_parser.set_from_file()
+        LOGGER.debug(
+            "Configuration after setting from config file:"
+            f" {config_parser.config}"
+        )
         config_parser.update_from_mapping(config_mapping=args.grouped)
+        LOGGER.debug(
+            "Configuration after updating from CLI arguments:"
+            f" {config_parser.config}"
+        )
         config_parser.config.ref = args.sample_references
         LOGGER.info(f"Configuration set: {config_parser.config}")
 

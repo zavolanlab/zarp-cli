@@ -54,7 +54,7 @@ class TestMain:
                 "--working-directory",
                 str(tmpdir),
                 "--zarp-directory",
-                str(Path(__file__).parent / "files" / "zarp"),
+                str(TEST_FILE_DIR / "zarp"),
             ],
         )
         with pytest.raises(SystemExit) as exc:
