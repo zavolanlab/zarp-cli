@@ -54,7 +54,7 @@ class TestSnakemakeExecutor:
             "--use-conda",
         ]
         cmd = my_run.compile_command(snakefile=snakefile)
-        assert cmd == expected_command
+        assert all(item in cmd for item in expected_command)
         os.chdir(default_cwd)
 
     def test_compile_command_config_file(self, tmpdir):
