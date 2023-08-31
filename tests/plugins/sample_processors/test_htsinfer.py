@@ -13,8 +13,9 @@ from zarp.config.models import (
     ConfigUser,
     ExecModes,
 )
-from zarp.plugins.sample_processors.htsinfer import \
-    SampleProcessorHTSinfer as HTS
+from zarp.plugins.sample_processors.htsinfer import (
+    SampleProcessorHTSinfer as HTS,
+)
 from zarp.samples.sample_record_processor import SampleRecordProcessor as SRP
 from zarp.snakemake.run import SnakemakeExecutor
 
@@ -46,8 +47,8 @@ class TestSampleProcessorHTSinfer:
 
     def test_init(self):
         """Test constructor."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         hts = HTS(config=config, records=srp.records)
@@ -56,8 +57,8 @@ class TestSampleProcessorHTSinfer:
 
     def test_process(self, tmpdir, monkeypatch):
         """Test `.process()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
@@ -79,7 +80,7 @@ class TestSampleProcessorHTSinfer:
 
     def test_process_empty(self, tmpdir, caplog):
         """Test `.process()` method with no records."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         df = pd.DataFrame(data={"sample": [], "fq1": [], "fq2": []})
@@ -92,9 +93,9 @@ class TestSampleProcessorHTSinfer:
 
     def test_process_dry_run(self, tmpdir, monkeypatch):
         """Test `.process()` method with dry run."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         config.run.execution_mode = ExecModes.DRY_RUN
-        df = self.data.copy()
+        df = self.data.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
@@ -116,10 +117,11 @@ class TestSampleProcessorHTSinfer:
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
-        run_dir = Path(tmpdir)
-        out_dir = Path(tmpdir)
+        config = self.config.copy(deep=True)
+        config.run.identifier = "ABCDE"
+        df = self.data.copy(deep=True)
+        run_dir = Path(tmpdir) / "runs" / config.run.identifier
+        out_dir = Path(tmpdir) / "results"
         sample_table = Path(run_dir) / "samples_htsinfer.tsv"
         srp = SRP()
         srp.append(df)
@@ -131,8 +133,8 @@ class TestSampleProcessorHTSinfer:
 
     def test__prepare_sample_table(self, tmpdir):
         """Test `._prepare_sample_table()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_htsinfer.tsv"
         srp = SRP()
         srp.append(df)

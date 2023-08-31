@@ -38,8 +38,8 @@ class TestSampleProcessorDefaults:
 
     def test_init(self):
         """Test constructor."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         srd = SPD(config=config, records=srp.records)
@@ -49,8 +49,8 @@ class TestSampleProcessorDefaults:
 
     def test_process(self):
         """Test `.process()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         srd = SPD(config=config, records=srp.records)
@@ -61,7 +61,7 @@ class TestSampleProcessorDefaults:
 
     def test_process_empty(self, caplog):
         """Test `.process()` method with no records."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         srp = SRP()
         srd = SPD(config=config, records=srp.records)
         assert len(srd.records.index) == 0

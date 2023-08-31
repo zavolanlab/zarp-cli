@@ -201,7 +201,7 @@ class TestSampleRecordProcessor:
             }
         )
         srp.append(df)
-        df_same = df.copy()
+        df_same = df.copy(deep=True)
         df_same = srp._sanitize_df(df=df_same)
         with caplog.at_level(logging.WARNING):
             df_trunc = srp._remove_duplicates(df=df_same)

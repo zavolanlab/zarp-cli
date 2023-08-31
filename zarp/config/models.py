@@ -2,8 +2,6 @@
 
 from pathlib import Path
 from typing import (
-    Any,
-    Dict,
     List,
     Optional,
     Tuple,
@@ -22,7 +20,6 @@ from pydantic import (  # pylint: disable=no-name-in-module
 from zarp.config.enums import (
     DependencyEmbeddingStrategies,
     ExecModes,
-    OutputFileGroups,
     ReadOrientation,
     SampleReferenceTypes,
 )
@@ -46,28 +43,25 @@ class InitUser(CustomBaseModel):
     """User-specific parameters for initialization.
 
     Args:
-        affiliations: Affiliations of the person running the analysis.
         author: Name of the person running the analysis.
-        emails: Email addresses of the person running the analysis.
+        email: Email address of the person running the analysis.
         logo: Path or URL pointing to image file to be used as a logo
             in the run report.
-        urls: One or more URLs with additional information about the author or
-            their affiliation.
+        url: A URL with additional information about the author or their
+            affiliation.
 
     Attributes:
-        affiliations: Affiliations of the person running the analysis.
         author: Name of the person running the analysis.
-        emails: Email addresses of the person running the analysis.
+        email: Email address of the person running the analysis.
         logo: Path or URL pointing to image file to be used as a logo
             in the run report.
-        urls: One or more URLs with additional information about the author or
-            their affiliation.
+        url: A URL with additional information about the author or their
+            affiliation.
     """
 
     author: Optional[str] = None
-    emails: Optional[List[EmailStr]] = None
-    affiliations: Optional[List[str]] = None
-    urls: Optional[List[HttpUrl]] = None
+    email: Optional[EmailStr] = None
+    url: Optional[HttpUrl] = None
     logo: Optional[Union[HttpUrl, FilePath]] = None
 
 
@@ -75,7 +69,6 @@ class InitRun(CustomBaseModel):
     """Run-specific parameters for initialization.
 
     Args:
-        cleanup_strategy: Types of output files to keep.
         cores: Cores to be used by the workflow engine.
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
@@ -83,12 +76,10 @@ class InitRun(CustomBaseModel):
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
         rule_config: ZARP rule configuration.
-        snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
         zarp_directory: Root directory of the ZARP repository.
 
     Attributes:
-        cleanup_strategy: Types of output files to keep.
         cores: Cores to be used by the workflow engine.
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
@@ -96,45 +87,22 @@ class InitRun(CustomBaseModel):
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
         rule_config: ZARP rule configuration.
-        snakemake_config: Configuration options for execution environment.
         working_directory: Root directory for all runs.
         zarp_directory: Root directory of the ZARP repository.
     """
 
     working_directory: Path = Path.home() / ".zarp"
-    zarp_directory: Optional[DirectoryPath] = None
+    zarp_directory: Optional[Path] = Path(__file__).parents[3] / "zarp"
     execution_mode: Optional[ExecModes] = ExecModes.RUN
     cores: Optional[int] = 1
     dependency_embedding: Optional[
         DependencyEmbeddingStrategies
     ] = DependencyEmbeddingStrategies.CONDA
-    genome_assemblies_map: Optional[FilePath] = None
+    genome_assemblies_map: Optional[FilePath] = (
+        Path(__file__).parents[2] / "data" / "genome_assemblies.csv"
+    )
     resources_version: Optional[int] = None
-    snakemake_config: Optional[Path] = None
     rule_config: Optional[Path] = None
-    cleanup_strategy: Optional[List[OutputFileGroups]] = [
-        OutputFileGroups.CONFIG,
-        OutputFileGroups.LOGS,
-        OutputFileGroups.RESULTS,
-    ]
-
-    # pylint: disable=no-self-argument
-    @validator("genome_assemblies_map")
-    def get_genome_assemblies_map(
-        cls,
-        genome_assemblies_map: Path,
-        values: Dict[str, Any],
-    ) -> Path:
-        """Get default genome assemblies mapping file."""
-        if (
-            not isinstance(genome_assemblies_map, Path)
-            and "working_directory" in values
-            and values["working_directory"] is not None
-        ):
-            return (
-                values["working_directory"] / "data" / "genome_assemblies.csv"
-            )
-        return genome_assemblies_map
 
 
 class InitSample(CustomBaseModel):
@@ -420,3 +388,56 @@ class ConfigFileHTSinfer(ConfigFileContent):
     samples: str
     outdir: str
     samples_out: str
+
+
+class ConfigFileZARP(ConfigFileContent):
+    """ZARP workflow configuration file content.
+
+    Args:
+        samples: Path to sample table.
+        output_dir: Path to output directory.
+        log_dir: Path to log directory.
+        cluster_log_dir: Path to cluster log directory.
+        kallisto_indexes: Path to kallisto indexes.
+        salmon_indexes: Path to Salmon indexes.
+        star_indexes: Path to STAR indexes.
+        alfa_indexes: Path to ALFA indexes.
+        rule_config: Path to ZARP rule configuration.
+        report_description: Run report description.
+        report_logo: Path or URL pointing to image file to be used as a logo
+            for the run report.
+        report_url: URL to link to from the run report.
+        author_name: Name of the person running the analysis.
+        author_email: Email address of the person running the analysis.
+
+    Attributes:
+        samples: Path to sample table.
+        output_dir: Path to output directory.
+        log_dir: Path to log directory.
+        cluster_log_dir: Path to cluster log directory.
+        kallisto_indexes: Path to kallisto indexes.
+        salmon_indexes: Path to Salmon indexes.
+        star_indexes: Path to STAR indexes.
+        alfa_indexes: Path to ALFA indexes.
+        report_description: Run report description.
+        report_logo: Path or URL pointing to image file to be used as a logo
+            for the run report.
+        report_url: URL to link to from the run report.
+        author_name: Name of the person running the analysis.
+        author_email: Email address of the person running the analysis.
+    """
+
+    samples: str
+    output_dir: str
+    log_dir: str
+    cluster_log_dir: str
+    kallisto_indexes: str
+    salmon_indexes: str
+    star_indexes: str
+    alfa_indexes: str
+    rule_config: Optional[str]
+    report_description: Optional[str]
+    report_logo: Optional[str]
+    report_url: Optional[str]
+    author_name: Optional[str]
+    author_email: Optional[str]

@@ -31,11 +31,13 @@ class ConfigFileProcessor:
         """
         self.content = content
 
-    def write(self, path) -> None:
+    def write(self, path, exclude_none=False) -> None:
         """Write Snakemake configuration file in YAML format.
 
         Args:
             path: Path to run configuration file.
+            exclude_none: Do not write fields that are set to ``None``.
         """
+        LOGGER.debug(f"Writing configuration file to '{path}'...")
         with open(path, "w", encoding="utf-8") as _file:
-            yaml.dump(self.content.dict(), _file)
+            yaml.dump(self.content.dict(exclude_none=exclude_none), _file)

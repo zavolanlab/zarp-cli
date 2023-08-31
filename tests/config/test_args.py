@@ -8,7 +8,6 @@ from zarp.config.args import ArgParser
 from zarp.config.enums import (
     DependencyEmbeddingStrategies,
     ExecModes,
-    OutputFileGroups,
 )
 
 VALID_SAMPLE_REF = "SRR1234567"
@@ -97,96 +96,6 @@ class TestArgParser:
     def test_process_arguments_required_args_missing(self):
         """Test method ``.process_arguments()`` with no arguments."""
         args = []
-        parser = ArgParser(args=args)
-        parser.set_parser()
-        parser.set_arguments()
-        parser.parse_arguments()
-        with pytest.raises(SystemExit) as exc:
-            parser.process_arguments()
-        assert exc.value.code == 1
-
-    @pytest.mark.parametrize(
-        "test_input", ["CONFIG", "LOGS", "RESULTS", "TEMPORARY"]
-    )
-    def test_process_arguments_cleanup_strategy_individual(self, test_input):
-        """Test method ``.process_arguments()``.
-
-        Use different individual arguments for option `--cleanup-strategy`.
-        """
-        args = [VALID_SAMPLE_REF, "--cleanup-strategy", test_input]
-        parser = ArgParser(args=args)
-        parser.set_parser()
-        parser.set_arguments()
-        parser.parse_arguments()
-        parser.process_arguments()
-        assert parser.args_parsed.cleanup_strategy == [
-            OutputFileGroups[test_input]
-        ]
-
-    def test_process_arguments_cleanup_strategy_all(self):
-        """Test method ``.process_arguments()``.
-
-        Use argument `ALL` for option `--cleanup-strategy`.
-        """
-        args = [VALID_SAMPLE_REF, "--cleanup-strategy", "ALL"]
-        parser = ArgParser(args=args)
-        parser.set_parser()
-        parser.set_arguments()
-        parser.parse_arguments()
-        parser.process_arguments()
-        assert parser.args_parsed.cleanup_strategy == [
-            item for item in OutputFileGroups
-        ]
-
-    def test_process_arguments_cleanup_strategy_none(self):
-        """Test method ``.process_arguments()``.
-
-        Use argument `NONE` for option `--cleanup-strategy`.
-        """
-        args = [VALID_SAMPLE_REF, "--cleanup-strategy", "NONE"]
-        parser = ArgParser(args=args)
-        parser.set_parser()
-        parser.set_arguments()
-        parser.parse_arguments()
-        parser.process_arguments()
-        assert parser.args_parsed.cleanup_strategy == []
-
-    def test_process_arguments_cleanup_strategy_combo(self):
-        """Test method ``.process_arguments()``.
-
-        Use a combination of different arguments for option
-        '--cleanup-strategy'.
-        """
-        args = [
-            VALID_SAMPLE_REF,
-            "--cleanup-strategy",
-            "CONFIG",
-            "--cleanup-strategy",
-            "LOGS",
-            "--cleanup-strategy",
-            "RESULTS",
-            "--cleanup-strategy",
-            "TEMPORARY",
-        ]
-        parser = ArgParser(args=args)
-        parser.set_parser()
-        parser.set_arguments()
-        parser.parse_arguments()
-        parser.process_arguments()
-
-    def test_process_arguments_cleanup_strategy_combo_invalid(self):
-        """Test method ``.process_arguments()``.
-
-        Use an invalid combination of different arguments for option
-        '--cleanup-strategy'.
-        """
-        args = [
-            VALID_SAMPLE_REF,
-            "--cleanup-strategy",
-            "CONFIG",
-            "--cleanup-strategy",
-            "ALL",
-        ]
         parser = ArgParser(args=args)
         parser.set_parser()
         parser.set_arguments()

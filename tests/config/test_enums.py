@@ -5,7 +5,6 @@ from zarp.config.enums import (  # noqa: F401
     ExecModes,
     LogLevels,
     FieldNameMappingDirection,
-    OutputFileGroups,
     ReadOrientation,
     SampleReferenceTypes,
     SnakemakeRunState,

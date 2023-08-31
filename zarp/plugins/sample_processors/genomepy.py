@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 from zarp.abstract_classes.sample_processor import SampleProcessor
+from zarp.config.enums import ExecModes
 from zarp.utils import sanitize_strings
 
 LOGGER = logging.getLogger(__name__)
@@ -58,15 +59,42 @@ class SampleProcessorGenomePy(
             self.config.run.genome_assemblies_map,
             sep=";",
             header=None,
-            names=["organism", "assembly"],
+            names=["organism", "aliases", "assembly"],
         )
-        source_assembly_map: Dict = dict(zip(df.organism, df.assembly))
+
+        # sanitize user input
         self.records["source_sanitized"] = self.records["source"].map(
             sanitize_strings
         )
+
+        # set assemblies
+        identifier_assembly_map: Dict = {}
+        for _, row in df.iterrows():
+            organisms = (
+                [row["organism"]] + row["aliases"].split(",")
+                if row["aliases"]
+                else [row["organism"]]
+            )
+            for organism in organisms:
+                identifier_assembly_map[organism.strip()] = row["assembly"]
         self.records["assembly"] = self.records["source_sanitized"].map(
-            source_assembly_map
+            identifier_assembly_map
         )
+
+        # set sanitized long source name
+        alias_long_name_map: Dict = {}
+        for _, row in df.iterrows():
+            organisms = (
+                [row["organism"]] + row["aliases"].split(",")
+                if row["aliases"]
+                else [row["organism"]]
+            )
+            for organism in organisms:
+                alias_long_name_map[organism.strip()] = row["organism"]
+        self.records["source"] = self.records["source_sanitized"].map(
+            alias_long_name_map
+        )
+
         LOGGER.debug(
             "Assemblies set:"
             f" {self.records[['name', 'source', 'assembly']].to_string()}..."
@@ -88,7 +116,7 @@ class SampleProcessorGenomePy(
         # pylint: disable=import-outside-toplevel
         import genomepy  # type: ignore
 
-        LOGGER.info("Fetching assemblies...")
+        LOGGER.debug("Fetching assemblies...")
 
         force: bool = True
         genomes_dir: Path = genomes_dir_root / "latest"
@@ -105,16 +133,17 @@ class SampleProcessorGenomePy(
         assemblies: List = list(self.records["assembly"].dropna().unique())
         LOGGER.debug(f"Assemblies to fetch: {assemblies}")
         for assembly in assemblies:
-            LOGGER.debug(f"Fetching assembly: {assembly}")
-            resources[assembly] = genomepy.install_genome(
-                name=assembly,
-                provider=self.PROVIDER,
-                genomes_dir=str(genomes_dir),
-                annotation=True,
-                force=force,
-                threads=self.config.run.cores,
-                version=self.config.run.resources_version,  # type: ignore
-            )
+            LOGGER.info(f"Fetching assembly: {assembly}")
+            if self.config.run.execution_mode != ExecModes.DRY_RUN.value:
+                resources[assembly] = genomepy.install_genome(
+                    name=assembly,
+                    provider=self.PROVIDER,
+                    genomes_dir=str(genomes_dir),
+                    annotation=True,
+                    force=force,
+                    threads=self.config.run.cores,
+                    version=self.config.run.resources_version,  # type: ignore
+                )
 
         for name, assembly in resources.items():
             if not Path(assembly.genome_file).is_file():

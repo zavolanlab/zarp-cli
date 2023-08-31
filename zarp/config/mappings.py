@@ -1,6 +1,5 @@
 """Mappings and lists for ZARP and ZARP-cli models and tables."""
 
-from pathlib import Path
 from typing import Dict, List
 
 map_zarp_to_model: Dict = {
@@ -60,7 +59,3 @@ columns_model: List = list(map_zarp_to_model.values()) + [
     "source_sanitized",
     "type",
 ]
-
-genome_assemblies_map: Path = (
-    Path(__file__).parents[2] / "data" / "genome_assemblies.csv"
-)

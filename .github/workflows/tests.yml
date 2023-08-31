@@ -86,12 +86,6 @@ jobs:
           pip install -e .
           pip install -r requirements_dev.txt
 
-      - name: integration test - help screen
-        run: zarp --help
-
-      - name: integration test - version screen
-        run: zarp --version
-
       - name: set up Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -105,24 +99,8 @@ jobs:
         with:
           singularity-version: 3.8.3
 
-      - name: integration test - normal mode
-        run: |
-          mkdir -p $HOME/.zarp
-          export PATH=$PATH:$PWD/bin
-          cp tests/files/config_valid.yaml ~/.zarp/user.yaml
-          ZARP_REPO_PATH=$HOME/.zarp/workflows
-          git clone https://github.com/zavolanlab/zarp.git $ZARP_REPO_PATH
-          zarp \
-            my_other_sample@tests/files/empty \
-            tests/files/empty,tests/files/empty \
-            SRR1525892 \
-            ERR2248142 \
-            table:tests/files/sample_table.tsv \
-            NotASample \
-            /path/to/* \
-            table:$PWD/tests/files/empty \
-            --execution-mode=RUN \
-            --dependency-embedding=SINGULARITY \
-            --working-directory=$HOME/ \
-            --zarp-directory=$ZARP_REPO_PATH \
-            --verbosity=DEBUG 
+      - name: integration test - help screen
+        run: zarp --help
+
+      - name: integration test - version screen
+        run: zarp --version

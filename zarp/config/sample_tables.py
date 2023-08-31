@@ -164,6 +164,7 @@ class SampleTableProcessor:
                 rec_cp.get("fq1_polya_5p", None),
                 rec_cp.get("fq2_polya_5p", None),
             )
+            rec_cp["sequencing_mode"] = rec_cp.get("seqmode", None)
             entries_to_remove = [
                 "fq1",
                 "fq2",
