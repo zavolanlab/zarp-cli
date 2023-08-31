@@ -63,7 +63,7 @@ def write(
             renaming.
     """
     LOGGER.debug(f"Writing sample table to '{path}'...")
-    df = df.copy()
+    df = df.copy(deep=True)
     if mapping is not None:
         df = df.rename(columns=mapping)
     if columns is not None:

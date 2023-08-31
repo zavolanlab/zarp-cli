@@ -61,7 +61,7 @@ class TestSnakemakeExecutor:
         """Execute a run with a config file."""
         snakefile = create_snakefile(dir=Path(tmpdir), name="sra_download.smk")
         config_file = create_config_file(dir=Path(tmpdir))
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.dependency_embedding = (
             DependencyEmbeddingStrategies.SINGULARITY
         )
@@ -83,7 +83,7 @@ class TestSnakemakeExecutor:
     def test_compile_command_dep_embedding(self, dependency_embedding, tmpdir):
         """Execute a run with different dependency embedding strategies."""
         snakefile = create_snakefile(dir=Path(tmpdir))
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.dependency_embedding = dependency_embedding
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=snakefile)
@@ -93,7 +93,7 @@ class TestSnakemakeExecutor:
     def test_compile_command_dep_embedding_sra_exception(self, tmpdir):
         """Execute a run with different dependency embedding strategies."""
         snakefile = create_snakefile(dir=Path(tmpdir), name="sra_download.smk")
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.dependency_embedding = (
             DependencyEmbeddingStrategies.SINGULARITY
         )
@@ -107,7 +107,7 @@ class TestSnakemakeExecutor:
     def test_compile_command_exec_modes(self, exec_mode, tmpdir):
         """Execute a run with different execution modes."""
         snakefile = create_snakefile(dir=Path(tmpdir))
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.execution_mode = exec_mode
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=snakefile)
@@ -120,7 +120,7 @@ class TestSnakemakeExecutor:
         """Execute a valid run."""
         os.chdir(tmpdir)
         snakefile = create_snakefile(dir=Path(tmpdir))
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.working_directory = tmpdir
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         create_input_file(dir=my_run.exec_dir)
@@ -133,7 +133,7 @@ class TestSnakemakeExecutor:
         """Execute a valid dry run."""
         os.chdir(tmpdir)
         snakefile = create_snakefile(dir=Path(tmpdir))
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.working_directory = tmpdir
         run_config.execution_mode = ExecModes.DRY_RUN
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
@@ -146,7 +146,7 @@ class TestSnakemakeExecutor:
     def test_run_invalid(self, tmpdir):
         """Execute a valid dry run."""
         os.chdir(tmpdir)
-        run_config = default_run_config.copy()
+        run_config = default_run_config.copy(deep=True)
         run_config.working_directory = tmpdir
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=Path("not_a_snakefile"))

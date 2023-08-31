@@ -43,8 +43,8 @@ class TestSampleProcessorGenomePy:
 
     def test_init(self):
         """Test constructor."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         spg = SPG(config=config, records=srp.records)
@@ -53,8 +53,8 @@ class TestSampleProcessorGenomePy:
 
     def test_process(self, monkeypatch, tmpdir):
         """Test `.process()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         spg = SPG(config=config, records=srp.records)
@@ -113,7 +113,7 @@ class TestSampleProcessorGenomePy:
 
     def test_process_empty(self, caplog):
         """Test `.process()` method with no records."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         srp = SRP()
         srdd = SPG(config=config, records=srp.records)
         assert len(srdd.records.index) == 0
@@ -124,8 +124,8 @@ class TestSampleProcessorGenomePy:
 
     def test_set_assemblies(self):
         """Test `.set_assemblies()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         spg = SPG(config=config, records=srp.records)
@@ -136,9 +136,9 @@ class TestSampleProcessorGenomePy:
 
     def test_fetch_resources(self, monkeypatch, tmpdir):
         """Test `.fetch_resources()` method."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         config.run.resources_version = 50
-        df = self.data.copy()
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         spg = SPG(config=config, records=srp.records)
@@ -186,8 +186,8 @@ class TestSampleProcessorGenomePy:
 
     def test_set_resource_paths(self):
         """Test `.set_resource_paths()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         spg = SPG(config=config, records=srp.records)

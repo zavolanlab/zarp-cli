@@ -79,7 +79,7 @@ def resolve_paths(
     Returns:
         Pandas ``DataFrame`` object.
     """
-    df = df.copy()
+    df = df.copy(deep=True)
     cols = set(path_columns) & set(df.columns)
     for col in cols:
         df[col] = df[col].apply(

@@ -14,7 +14,6 @@ from zarp.config.enums import (
     DependencyEmbeddingStrategies,
     ExecModes,
     LogLevels,
-    OutputFileGroups,
 )
 from zarp.version import __version__
 
@@ -36,7 +35,6 @@ class ArgParser:
             "source",
         ],
         "run": [
-            "cleanup_strategy",
             "cores",
             "dependency_embedding",
             "description",
@@ -45,16 +43,14 @@ class ArgParser:
             "identifier",
             "resources_version",
             "rule_config",
-            "snakemake_config",
             "working_directory",
             "zarp_directory",
         ],
         "user": [
-            "affiliations",
             "author",
-            "emails",
+            "email",
             "logo",
-            "urls",
+            "url",
         ],
     }
     DESCRIPTION = f"{sys.modules[__name__].__doc__}\n\n"
@@ -375,19 +371,6 @@ class ArgParser:
             argument_group: Argument group object.
         """
         argument_group.add_argument(
-            "--cleanup-strategy",
-            choices=[item.value for item in OutputFileGroups]
-            + ["NONE", "ALL"],
-            default=None,
-            type=str,
-            action="append",
-            help=(
-                "class of files to keep after the workflow run; when not"
-                " choosing 'NONE' or 'ALL', parameter can be specified"
-                " multiple times to provide more than one class of files"
-            ),
-        )
-        argument_group.add_argument(
             "--cores",
             default=None,
             type=int,
@@ -463,16 +446,6 @@ class ArgParser:
             ),
         )
         argument_group.add_argument(
-            "--snakemake-config",
-            default=None,
-            type=str,
-            metavar="STR",
-            help=(
-                "command-line options for Snakemake; will be interpolated into"
-                " the Snakemake calls"
-            ),
-        )
-        argument_group.add_argument(
             "--working-directory",
             default=None,
             type=lambda p: Path(p).absolute(),
@@ -497,17 +470,6 @@ class ArgParser:
             argument_group: Argument group object.
         """
         argument_group.add_argument(
-            "--affiliations",
-            action="append",
-            default=None,
-            type=str,
-            metavar="STR",
-            help=(
-                "your affiliation; parameter can be specified multiple times"
-                " to provide more than one affiliation"
-            ),
-        )
-        argument_group.add_argument(
             "--author",
             default=None,
             type=str,
@@ -515,15 +477,11 @@ class ArgParser:
             help="your name",
         )
         argument_group.add_argument(
-            "--emails",
-            action="append",
+            "--email",
             default=None,
             type=str,
             metavar="STR",
-            help=(
-                "your email address; parameter can be specified multiple times"
-                " to provide more than one email address"
-            ),
+            help="your email address",
         )
         argument_group.add_argument(
             "--logo",
@@ -533,15 +491,14 @@ class ArgParser:
             help="path or URL pointing to your organization's logo",
         )
         argument_group.add_argument(
-            "--urls",
+            "--url",
             action="append",
             default=None,
             type=str,
             metavar="STR",
             help=(
-                "one or more relevant URLs, pointing to, e.g., your personal"
-                " or organization's websites; parameter can be specified"
-                " multiple times to provide more than one affiliation"
+                "a relevant URL pointing to, e.g., your personal or"
+                " organization's websites"
             ),
         )
 
@@ -562,42 +519,6 @@ class ArgParser:
                 "required if not in initialization mode: REF, --sample-table"
             )
             sys.exit(1)
-
-        # set special cases for keeping files
-        if self.args_parsed.cleanup_strategy is not None:
-            for singleton in ["NONE", "ALL"]:
-                if (
-                    singleton in self.args_parsed.cleanup_strategy
-                    and len(self.args_parsed.cleanup_strategy) != 1
-                ):
-                    self.parser.print_usage(file=sys.stderr)
-                    sys.stderr.write(
-                        "zarp: error: argument --cleanup-strategy: invalid "
-                        "choices: multiple arguments not allowed if "
-                        f"'{singleton}' included\n"
-                    )
-                    sys.exit(1)
-            if "NONE" in self.args_parsed.cleanup_strategy:
-                setattr(self.args_parsed, "cleanup_strategy", [])
-            elif "ALL" in self.args_parsed.cleanup_strategy:
-                setattr(
-                    self.args_parsed,
-                    "cleanup_strategy",
-                    [
-                        "CONFIG",
-                        "LOGS",
-                        "RESULTS",
-                        "TEMPORARY",
-                    ],
-                )
-            setattr(
-                self.args_parsed,
-                "cleanup_strategy",
-                [
-                    OutputFileGroups[item]
-                    for item in self.args_parsed.cleanup_strategy
-                ],
-            )
 
         # set enum choices to values
         if self.args_parsed.execution_mode is not None:

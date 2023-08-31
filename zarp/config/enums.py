@@ -65,22 +65,6 @@ class FieldNameMappingDirection(Enum):
     TO_TABLE_COL_NAMES = "TO_TABLE_COL_NAMES"
 
 
-class OutputFileGroups(Enum):
-    """Output file types.
-
-    Attributes:
-        CONFIG: Configuration files.
-        LOGS: Log files.
-        RESULTS: Result files.
-        TEMPORARY: Temporary files.
-    """
-
-    CONFIG = "CONFIG"
-    LOGS = "LOGS"
-    RESULTS = "RESULTS"
-    TEMPORARY = "TEMPORARY"
-
-
 class ReadOrientation(Enum):
     """Read orientation types.
 

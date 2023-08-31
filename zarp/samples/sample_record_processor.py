@@ -86,7 +86,7 @@ class SampleRecordProcessor:
             ValueError: Records and dataframe have different lengths/rows.
         """
         LOGGER.debug("Updating sample records...")
-        df_new: pd.DataFrame = df.copy()
+        df_new: pd.DataFrame = df.copy(deep=True)
         df_new = self._sanitize_df(df=df_new, **kwargs)
         if by is None:
             if len(self.records.index) != len(df_new.index):

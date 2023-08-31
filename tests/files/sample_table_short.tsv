@@ -1,0 +1,3 @@
+sample	seqmode	fq1	index_size	kmer	fq1_3p	fq1_5p	organism	gtf	genome	sd	mean	libtype	fq1_polya_3p	fq1_polya_5p	fq2	fq2_3p	fq2_5p	fq2_polya_3p	fq2_polya_5p
+paired	pe	empty	199	31	ACGTACGT		4932					ISF			empty				
+single	se	empty				XXXXXXXX				250	25	SF	AAAAAAAA	XXXXXXXX		XXXXXXXX	XXXXXXXX	XXXXXXXX	XXXXXXXX

@@ -42,7 +42,7 @@ class TestSampleTableProcessor:
 
         Do not provide sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         attributes = ["references", "sample_config", "run_config", "samples"]
         processor = SampleProcessor(
             sample_config=ConfigSample(),
@@ -64,7 +64,7 @@ class TestSampleTableProcessor:
 
         Use various sample_references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -86,7 +86,7 @@ class TestSampleTableProcessor:
 
         Do not provide sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         processor = SampleProcessor(
             sample_config=ConfigSample(),
             run_config=run_config,
@@ -99,7 +99,7 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -122,7 +122,7 @@ class TestSampleTableProcessor:
 
         Use invalid sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         processor = SampleProcessor(
             f"{REF_INVALID}",
             sample_config=ConfigSample(),
@@ -136,7 +136,7 @@ class TestSampleTableProcessor:
 
         Use reference to empty table.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         processor = SampleProcessor(
             f"table:{REF_FILE_EMPTY}",
             sample_config=ConfigSample(),
@@ -150,7 +150,7 @@ class TestSampleTableProcessor:
 
         Use reference to empty table.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         processor = SampleProcessor(
             f"table:{REF_FILE_EMPTY}",
             sample_config=ConfigSample(),
@@ -169,7 +169,7 @@ class TestSampleTableProcessor:
 
         Use sample table with entries accounting for all conditions.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref_str = f"table:{REF_TABLE}"
         processor = SampleProcessor(
             ref_str,
@@ -185,7 +185,7 @@ class TestSampleTableProcessor:
 
         Sample table contains faulty reference.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref_str = f"table:{REF_TABLE_FAULTY}"
         processor = SampleProcessor(
             ref_str,
@@ -201,7 +201,7 @@ class TestSampleTableProcessor:
 
         Use reference for single-ended local library.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = str(REF_FILE_EMPTY)
         processor = SampleProcessor(
             ref,
@@ -220,7 +220,7 @@ class TestSampleTableProcessor:
 
         Use reference for single-ended local library and update configuration.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = str(REF_FILE_EMPTY)
         update = ConfigSample(source="test")
         processor = SampleProcessor(
@@ -241,7 +241,7 @@ class TestSampleTableProcessor:
 
         Use reference for paired-ended local library.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
         processor = SampleProcessor(
             ref,
@@ -260,7 +260,7 @@ class TestSampleTableProcessor:
 
         Use reference for paired-ended local library and update configuration.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = f"{REF_FILE_EMPTY},{REF_FILE_EMPTY}"
         update = ConfigSample(source="test")
         processor = SampleProcessor(
@@ -281,7 +281,7 @@ class TestSampleTableProcessor:
 
         Use reference for remote library.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = REF_ID
         processor = SampleProcessor(
             ref,
@@ -300,7 +300,7 @@ class TestSampleTableProcessor:
 
         Use reference for remote library and update configuration.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         ref = REF_ID
         update = ConfigSample(source="test")
         processor = SampleProcessor(
@@ -321,7 +321,7 @@ class TestSampleTableProcessor:
 
         Use references for remote libraries.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         refs = [
             f"{REF_ID}",
             f"sample@{REF_ID}",
@@ -347,7 +347,7 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         refs = [f"{REF_ID}"]
         processor = SampleProcessor(
             *refs,
@@ -365,7 +365,7 @@ class TestSampleTableProcessor:
 
         Use various sample references.
         """
-        run_config = self.run_config.copy()
+        run_config = self.run_config.copy(deep=True)
         refs = [f"{REF_ID}"]
         processor = SampleProcessor(
             *refs,

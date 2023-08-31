@@ -48,8 +48,8 @@ class TestSampleFetcherSRA:
 
     def test_init(self):
         """Test constructor."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         sra = SRA(config=config, records=srp.records)
@@ -58,8 +58,8 @@ class TestSampleFetcherSRA:
 
     def test_process(self, tmpdir, monkeypatch):
         """Test `.process()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
@@ -82,7 +82,7 @@ class TestSampleFetcherSRA:
 
     def test_process_empty(self, tmpdir, caplog):
         """Test `.process()` method with no records."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         df = pd.DataFrame(data={"identifier": ["no_sra"], "type": ["INVALID"]})
@@ -95,9 +95,9 @@ class TestSampleFetcherSRA:
 
     def test_process_dry_run(self, tmpdir, monkeypatch):
         """Test `.process()` method with dry run."""
-        config = self.config.copy()
+        config = self.config.copy(deep=True)
         config.run.execution_mode = ExecModes.DRY_RUN
-        df = self.data.copy()
+        df = self.data.copy(deep=True)
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
@@ -119,9 +119,9 @@ class TestSampleFetcherSRA:
 
     def test__select_records(self):
         """Test `._select_records()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
-        df_set = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
+        df_set = self.data.copy(deep=True)
         srp = SRP()
         srp.append(df)
         sra = SRA(config=config, records=srp.records)
@@ -132,10 +132,11 @@ class TestSampleFetcherSRA:
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        config.run.identifier = "ABCDE"
+        df = self.data.copy(deep=True)
         run_dir = Path(tmpdir) / "runs" / config.run.identifier
-        out_dir = Path(tmpdir) / "sra"
+        out_dir = Path(tmpdir) / "results"
         cluster_log_dir = Path(tmpdir) / "logs" / "cluster"
         config_file = Path(run_dir) / "config.yaml"
         sample_table = Path(run_dir) / "samples_remote.tsv"
@@ -151,8 +152,8 @@ class TestSampleFetcherSRA:
 
     def test__prepare_sample_table(self, tmpdir):
         """Test `._prepare_sample_table()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_remote.tsv"
         srp = SRP()
         srp.append(df)
@@ -162,8 +163,8 @@ class TestSampleFetcherSRA:
 
     def test__process_sample_table(self, tmpdir, caplog):
         """Test `._process_sample_table()` method."""
-        config = self.config.copy()
-        df = self.data.copy()
+        config = self.config.copy(deep=True)
+        df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_remote.tsv"
         srp = SRP()
         srp.append(df)

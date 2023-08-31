@@ -64,6 +64,7 @@ class SampleFetcherSRA(
             exec_dir=loc,
         )
         cmd = executor.compile_command(snakefile=workflow)
+        LOGGER.debug(f"Command: {cmd}")
         executor.run(cmd=cmd)
         df: pd.DataFrame
         if self.config.run.execution_mode == "DRY_RUN":
@@ -98,21 +99,21 @@ class SampleFetcherSRA(
         root_dir.mkdir(parents=True, exist_ok=True)
         run_dir: Path = root_dir / "runs" / self.config.run.identifier
         run_dir.mkdir(parents=True, exist_ok=True)
-        outdir: Path = root_dir / "sra"
+        outdir: Path = root_dir / "results"
         outdir.mkdir(parents=True, exist_ok=True)
+        log_dir = root_dir / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
         cluster_log_dir = root_dir / "logs" / "cluster"
         cluster_log_dir.mkdir(parents=True, exist_ok=True)
 
         config_file: Path = run_dir / "config.yaml"
-
         content: ConfigFileSRA = ConfigFileSRA(
             samples=str(run_dir / "samples_remote.tsv"),
             outdir=str(outdir),
             samples_out=str(run_dir / "samples_local.tsv"),
-            log_dir=str(root_dir / "logs"),
+            log_dir=str(log_dir),
             cluster_log_dir=str(cluster_log_dir),
         )
-
         config_file_writer = ConfigFileProcessor()
         config_file_writer.set_content(content=content)
         config_file_writer.write(path=config_file)

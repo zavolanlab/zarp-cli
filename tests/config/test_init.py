@@ -19,7 +19,6 @@ from tests.utils import (
     RaiseError,
 )
 from zarp.config.enums import (
-    OutputFileGroups,
     ExecModes,
 )
 from zarp.config.init import Initializer
@@ -150,34 +149,6 @@ class TestInitializer:
         initializer.set_from_user_input()
         assert initializer.config.run.working_directory == Path.home()
 
-    def test_set_from_user_input_array(self, tmpdir, monkeypatch):
-        """Test method `.set_from_user_input()` with array input."""
-
-        class InitUser(BaseModel):
-            affiliations: List[str] = ["affiliation"]
-
-        class InitConfig(BaseModel):
-            user: InitUser = InitUser()
-
-        mocker: MultiMocker = MultiMocker(
-            [
-                "affiliation_1",
-                "affiliation_2",
-                "affiliation_2",
-                "",
-            ]
-        )
-        schema: Dict = jsonref.loads(InitConfig().schema_json())
-        initializer: Initializer = Initializer()
-        monkeypatch.setattr("jsonref.loads", lambda *args: schema)
-        monkeypatch.setattr("builtins.input", mocker)
-        setattr(initializer, "config", InitConfig())
-        initializer.set_from_user_input()
-        config = initializer.config.user
-        assert "affiliation_1" in config.affiliations  # type: ignore
-        assert "affiliation_2" in config.affiliations  # type: ignore
-        assert len(config.affiliations) == 2  # type: ignore
-
     def test_set_from_user_input_integer(self, monkeypatch):
         """Test method `.set_from_user_input()` with integer input."""
 
@@ -302,10 +273,10 @@ class TestInitializer:
     def test_get_param_type_basic_format(self):
         """Test method `._get_param_type()` with formatted string."""
         group: str = "user"
-        param: str = "emails"
+        param: str = "email"
         schema: Dict = jsonref.loads(InitConfig.schema_json())["properties"][
             group
-        ]["allOf"][0]["properties"][param]["items"]
+        ]["allOf"][0]["properties"][param]
         ret = Initializer._get_param_type(schema=schema)
         assert ret[0] == "email"
         assert ret[1] is None
@@ -322,42 +293,6 @@ class TestInitializer:
         assert ret[0] == "enum"
         assert ret[1] == ExecModes
         assert ret[2] is None
-
-    def test_get_param_type_array(self):
-        """Test method `._get_param_type()` with array."""
-        group: str = "user"
-        param: str = "affiliations"
-        schema: Dict = jsonref.loads(InitConfig.schema_json())["properties"][
-            group
-        ]["allOf"][0]["properties"][param]
-        ret = Initializer._get_param_type(schema=schema)
-        assert ret[0] == "array"
-        assert ret[1] is None
-        assert ret[2] == "string"
-
-    def test_get_param_type_array_format(self):
-        """Test method `._get_param_type()` with array of formatted strings."""
-        group: str = "user"
-        param: str = "emails"
-        schema: Dict = jsonref.loads(InitConfig.schema_json())["properties"][
-            group
-        ]["allOf"][0]["properties"][param]
-        ret = Initializer._get_param_type(schema=schema)
-        assert ret[0] == "array"
-        assert ret[1] is None
-        assert ret[2] == "email"
-
-    def test_get_param_type_array_enum(self):
-        """Test method `._get_param_type()` with array of enums."""
-        group: str = "run"
-        param: str = "cleanup_strategy"
-        schema: Dict = jsonref.loads(InitConfig.schema_json())["properties"][
-            group
-        ]["allOf"][0]["properties"][param]
-        ret = Initializer._get_param_type(schema=schema)
-        assert ret[0] == "array"
-        assert ret[1] == OutputFileGroups
-        assert ret[2] == "enum"
 
     def test_format_default_int(self):
         """Test method `._format_default()` with basic type."""

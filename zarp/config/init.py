@@ -245,18 +245,6 @@ having entered a value. Make sure to enter only _one_ value per query.
                 _class = getattr(enums, ref_props["title"])
         except KeyError:
             pass
-        # array item types
-        if _type == "array":
-            try:
-                _type_item = schema["items"]["format"]
-            except KeyError:
-                try:
-                    _type_item = schema["items"]["type"]
-                except KeyError:
-                    pass
-            if "enum" in list(schema["items"]):
-                _type_item = "enum"
-                _class = getattr(enums, schema["items"]["title"])
         return (_type, _class, _type_item)
 
     @staticmethod
@@ -303,6 +291,4 @@ having entered a value. Make sure to enter only _one_ value per query.
         if len(choices) != 0:
             choices_clean = f" {{{','.join(choices)}}}"
         default_clean: str = str(default)
-        if isinstance(default, list):
-            default_clean = ",".join(default)
         return f"{param_clean} [{default_clean}]{choices_clean}{asterisk}: "
