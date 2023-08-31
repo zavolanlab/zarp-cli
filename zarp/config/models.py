@@ -169,7 +169,7 @@ class ConfigRun(InitRun):
     identifier: str = ""
     zarp_directory: DirectoryPath
 
-    # pylint: disable=no-self-argument,no-self-use
+    # pylint: disable=no-self-argument
     @validator("identifier")
     def get_identifier(
         cls,
