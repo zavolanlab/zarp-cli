@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import pandas as pd
 
@@ -51,10 +51,14 @@ class SampleProcessorHTSinfer(
             return self.records
         LOGGER.info("Inferring missing metadata...")
         conf_file, _ = self._configure_run(root_dir=loc)
+        bind_paths: List[Path] = list(
+            self.records.paths_1.append(self.records.paths_2).dropna().unique()
+        )
         executor: SnakemakeExecutor = SnakemakeExecutor(
             run_config=self.config.run,
             config_file=conf_file,
             exec_dir=loc,
+            bind_paths=bind_paths,
         )
         cmd = executor.compile_command(snakefile=workflow)
         LOGGER.debug(f"Command: {cmd}")

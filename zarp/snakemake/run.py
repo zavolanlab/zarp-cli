@@ -18,11 +18,13 @@ class SnakemakeExecutor:
         run_config: Run-specific parameters.
         exec_dir: Directory in which the run is executed.
         config_file: Path to Snakemake configuration file.
+        bind_paths: Paths to bind to Singularity container.
 
     Attributes:
         run_config: Run-specific parameters.
         exec_dir: Directory in which the run is executed.
         config_file: Path to Snakemake configuration file.
+        bind_paths: Paths to bind to Singularity container.
         run_state: State of the run.
     """
 
@@ -31,11 +33,13 @@ class SnakemakeExecutor:
         run_config: ConfigRun,
         exec_dir: Path = Path.cwd(),
         config_file: Optional[Path] = None,
+        bind_paths: Optional[List[Path]] = None,
     ) -> None:
         """Class constructor."""
         self.run_config: ConfigRun = run_config
         self.exec_dir: Path = exec_dir
         self.config_file: Optional[Path] = config_file
+        self.bind_paths: Optional[List[Path]] = bind_paths
         self.run_state: SnakemakeRunState = SnakemakeRunState.UNKNOWN
 
     def compile_command(self, snakefile: Path) -> List[str]:
@@ -44,11 +48,18 @@ class SnakemakeExecutor:
         Args:
             snakefile: Path to Snakemake descriptor file.
         """
+        bind_paths: List[str] = [
+            str(self.exec_dir),
+            str(self.run_config.working_directory),
+            str(self.run_config.zarp_directory),
+        ]
+        if self.bind_paths is not None:
+            bind_paths.extend([str(path) for path in self.bind_paths])
+        bind_paths_arg: str = ",".join(bind_paths)
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
         cmd_ls.extend(["--cores", str(self.run_config.cores)])
-        cmd_ls.extend(["--singularity-args", " ".join(["--bind", ",".join(
-            [str(self.exec_dir), str(self.run_config.zarp_directory)])])])
+        cmd_ls.extend(["--singularity-args", f"--bind {bind_paths_arg}"])
         cmd_ls.extend(["--directory", str(self.exec_dir)])
         if self.config_file is not None:
             cmd_ls.extend(["--configfile", str(self.config_file)])
