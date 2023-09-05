@@ -24,9 +24,6 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
 
-      - name: update environment with root packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
-  
       - name: update environment with dev packages
         run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
@@ -53,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+        python-version: [ '3.9', '3.10' ]
 
     name: unit-testing-Python-${{ matrix.python-version }}
 
@@ -74,9 +71,6 @@ jobs:
 
       - name: update environment with root packages
         run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
-  
-      - name: update environment with dev packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
       - name: display environment info
         run: |
@@ -88,7 +82,7 @@ jobs:
           coverage run --source zarp -m pytest && coverage xml
 
       - name: submit coverage report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
@@ -104,14 +98,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+        python-version: [ '3.9', '3.10' ]
 
     name: integration-testing-Python-${{ matrix.python-version }}
 
     steps:
 
       - name: check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: set up Conda/Mamba
         uses: conda-incubator/setup-miniconda@v2
@@ -125,7 +119,7 @@ jobs:
 
       - name: update environment with root packages
         run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
-  
+
       - name: update environment with dev packages
         run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
