@@ -1,7 +1,6 @@
 """ZARP CLI package definition."""
 
 from pathlib import Path
-from typing import List
 
 from setuptools import (setup, find_packages)
 
