@@ -14,11 +14,6 @@ FILE_NAME: Path = ROOT_DIR / "README.md"
 with open(FILE_NAME, encoding="utf-8") as _f:
     LONG_DESCRIPTION: str = _f.read()
 
-# Read requirements from file
-FILE_NAME = ROOT_DIR / 'requirements.txt'
-with open(FILE_NAME, encoding="utf-8") as _f:
-    INSTALL_REQUIRES: List = _f.read().splitlines()
-
 setup(
     name="zarp",
     version=__version__,  # noqa: F821
@@ -64,7 +59,6 @@ setup(
     },
     packages=find_packages(),
     include_package_data=True,
-    install_requires=INSTALL_REQUIRES,
     setup_requires=[
         "setuptools_git == 1.2",
     ],
