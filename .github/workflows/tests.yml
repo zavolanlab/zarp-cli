@@ -72,6 +72,9 @@ jobs:
       - name: update environment with root packages
         run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
 
+      - name: update environment with dev packages
+        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
+
       - name: display environment info
         run: |
           conda info -a
