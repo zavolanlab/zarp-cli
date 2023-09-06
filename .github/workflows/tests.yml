@@ -9,8 +9,8 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    steps:
 
+    steps:
       - name: check out repository
         uses: actions/checkout@v3
 
@@ -46,16 +46,13 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-
     strategy:
       fail-fast: false
       matrix:
         python-version: [ '3.9', '3.10' ]
-
     name: unit-testing-Python-${{ matrix.python-version }}
 
     steps:
-
       - name: check out repository
         uses: actions/checkout@v3
 
@@ -97,16 +94,13 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-
     strategy:
       fail-fast: false
       matrix:
         python-version: [ '3.9', '3.10' ]
-
     name: integration-testing-Python-${{ matrix.python-version }}
 
     steps:
-
       - name: check out repository
         uses: actions/checkout@v3
 
