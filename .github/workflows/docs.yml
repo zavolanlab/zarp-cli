@@ -2,21 +2,41 @@ name: docs
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 jobs:
+
   docs:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - name: check out repository
         uses: actions/checkout@v3
 
-      - name: set up Python
-        uses: actions/setup-python@v4
+      - name: set up Conda/Mamba
+        uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: "3.10"
+          mamba-version: "*"
+          auto-update-conda: true
+          activate-environment: zarp-cli
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: update environment with root packages
+        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
+
+      - name: update environment with dev packages
+        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
+
+      - name: display environment info
+        run: |
+          conda info -a
+          conda list
 
       - name: cache build artifacts
         uses: actions/cache@v3
@@ -27,15 +47,13 @@ jobs:
       - name: install doc requirements
         run: pip install -r docs/requirements.txt
 
-      - name: install app & requirements
-        run: pip install -e .
-
       - name: create markdown documents
         run: |
           lazydocs \
+              --no-watermark \
               --output-path="./docs/docstring" \
               --overview-file="README.md" \
-              --src-base-url="https://github.com/zavolanlab/zarp-cli/blob/main/" \
+              --src-base-url="https://github.com/zavolanlab/zarp-cli/blob/dev/" \
               --validate \
               zarp
 

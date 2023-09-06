@@ -10,7 +10,7 @@
 
 ## Synopsis
 
-- Have a bunch of RNA-Seq samples and you wanna know what's in them? **_ZARP
+- You have a bunch of RNA-Seq samples and wanna know what's in them? **_ZARP
 'em!_**  
 - You have an extensive SRA query with hundreds of runs and you don't know
 where to start? **Easy - _ZARP 'em!_**
@@ -21,8 +21,6 @@ ZARP-cli uses the HTSinfer package to infer missing metadata and then runs the
 [ZARP RNA-Seq analysis pipeline][zarp] on your samples. Impress your colleagues
 with your sudden productivity boost. Or better yet, use the time saved to go on
 that camping trip with Barry. Just make sure to guard your secret! :wink:
-
-Kindly brought to you by the [Zavolab][zavolab].
 
 ## Basic usage
 
@@ -45,61 +43,26 @@ zarp \
     SRR0123456789 my_other_sample@SRR0123456789  # ZARP everything at once!
 ```
 
-## Installation
+## Quick installation
 
-### Requirements
+Quick installation requires the following:
 
-Installation requires the following:
+- Linux with root permissions
+- [`conda >= 22.11.1`][conda]
+- [`mamba >=1.3.0`][mamba]
 
-- Linux (tested with Ubuntu 20.04)
-- [Conda][conda] (tested with `conda 22.11.1`)
-- [Mamba][mamba] (tested with `mamba 1.3.0`)
-- Possibly: [Singularity][singularity] (tested with `singularity 3.8.6`; see
-  [comment below](#4-install-optional-dependencies))
-
-> Other versions are not guaranteed to work as expected.
-
-### 1. Clone ZARP
-
-Clone the ZARP workflow repository:
+Execute the following commands:
 
 ```sh
 git clone git@github.com:zavolanlab/zarp
-# or: git clone https://github.com/zavolanlab/zarp.git
-```
-
-### 2. Clone ZARP-cli
-
-Clone this repository and traverse into the app directory:
-
-```sh
 git clone git@github.com:zavolanlab/zarp-cli.git
-# or: git clone https://github.com/zavolanlab/zarp-cli.git
 cd zarp-cli
-```
-
-### 3. Install the app
-
-Install the app with Mamba:
-
-```sh
 mamba env create -f environment.yml
-```
-
-### 4. Install optional dependencies
-
-If you do not already have Singularity installed and have root privileges on
-your machine, you can install Singularity via Mamba:
-
-```sh
 mamba env update -f environment.root.yml
+conda activate zarp-cli
 ```
 
-Optionally, install required packages for testing and development:
-
-```sh
-mamba env update -f environment.dev.yml
-```
+That's it - you can now use _ZARP-cli_!
 
 ### 5. Activate Conda environment
 
@@ -115,9 +78,16 @@ section [Documentation](#documentation) below).
 ## Documentation
 
 We have designed _ZARP-cli_ to be easy to use. However, there are still a lot
-of ways in which execution can be tweaked. For the full documentation of
-features visit:  
+of ways in which execution can be tweaked. For the full documentation visit:  
 <https://zavolanlab.github.io/zarp-cli>
+
+## Versioning
+
+The project adopts the [Semantic Versioning][semver] specification for
+versioning. Currently the service is still in beta stage, so the API may change
+and even break without further notice. However, we are planning to release a
+`1.0.0` release as soon as we feel that the software is reasonably stable and 
+"feature complete" for all of the major use cases we wish to cover.
 
 ## Contributing
 
@@ -131,9 +101,9 @@ interactions with the community.
 
 For questions or suggestions regarding the code, please use the
 [issue tracker][issue-tracker]. For any other inquiries, please contact us
-by email: <zavolab-biozentrum@unibas.ch>
+by [email][contact].
 
-&copy; 2021 [Zavolab, Biozentrum, University of Basel][contact]
+&copy; 2021 [Zavolab, Biozentrum, University of Basel][zavolab]
 
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [contact]: <zavolab-biozentrum@unibas.ch>
@@ -149,6 +119,6 @@ by email: <zavolab-biozentrum@unibas.ch>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
 [mamba]: <https://github.com/mamba-org/mamba>
-[singularity]: <https://sylabs.io/singularity/>
+[semver]: <https://semver.org/>
 [zarp]: <https://github.com/zavolanlab/zarp>
 [zavolab]: <https://www.biozentrum.unibas.ch/research/researchgroups/overview/unit/zavolan/research-group-mihaela-zavolan/>
