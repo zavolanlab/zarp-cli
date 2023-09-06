@@ -1,7 +1,6 @@
 """ZARP CLI package definition."""
 
 from pathlib import Path
-from typing import List
 
 from setuptools import (setup, find_packages)
 
@@ -13,11 +12,6 @@ exec(open(ROOT_DIR / "zarp" / "version.py", encoding="utf-8").read())
 FILE_NAME: Path = ROOT_DIR / "README.md"
 with open(FILE_NAME, encoding="utf-8") as _f:
     LONG_DESCRIPTION: str = _f.read()
-
-# Read requirements from file
-FILE_NAME = ROOT_DIR / 'requirements.txt'
-with open(FILE_NAME, encoding="utf-8") as _f:
-    INSTALL_REQUIRES: List = _f.read().splitlines()
 
 setup(
     name="zarp",
@@ -38,8 +32,6 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -64,7 +56,6 @@ setup(
     },
     packages=find_packages(),
     include_package_data=True,
-    install_requires=INSTALL_REQUIRES,
     setup_requires=[
         "setuptools_git == 1.2",
     ],
