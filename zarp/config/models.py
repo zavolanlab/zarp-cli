@@ -375,16 +375,22 @@ class ConfigFileHTSinfer(ConfigFileContent):
     """HTSinfer workflow configuration file content.
 
     Args:
+        cluster_log_dir: Path to cluster log directory.
+        log_dir: Path to log directory.
         samples: Path to sample table.
         outdir: Path to output directory.
         samples_out: Path to output sample table.
 
     Attributes:
+        cluster_log_dir: Path to cluster log directory.
+        log_dir: Path to log directory.
         samples: Path to sample table.
         outdir: Path to output directory.
         samples_out: Path to output sample table.
     """
 
+    cluster_log_dir: str
+    log_dir: str
     samples: str
     outdir: str
     samples_out: str

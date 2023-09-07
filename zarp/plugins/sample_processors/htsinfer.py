@@ -84,12 +84,18 @@ class SampleProcessorHTSinfer(
         run_dir.mkdir(parents=True, exist_ok=True)
         outdir: Path = root_dir / "results"
         outdir.mkdir(parents=True, exist_ok=True)
+        log_dir = root_dir / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        cluster_log_dir = root_dir / "logs" / "cluster"
+        cluster_log_dir.mkdir(parents=True, exist_ok=True)
 
         config_file: Path = run_dir / "config.yaml"
         content: ConfigFileHTSinfer = ConfigFileHTSinfer(
             samples=str(run_dir / "samples_htsinfer.tsv"),
             outdir=str(outdir),
             samples_out=str(run_dir / "samples_result.tsv"),
+            log_dir=str(log_dir),
+            cluster_log_dir=str(cluster_log_dir),
         )
         config_file_writer = ConfigFileProcessor()
         config_file_writer.set_content(content=content)
