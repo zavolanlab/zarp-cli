@@ -1,5 +1,0 @@
-name: zarp-cli
-channels:
-  - conda-forge
-dependencies:
-  - singularity >=3.5

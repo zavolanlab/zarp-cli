@@ -57,23 +57,18 @@ Execute the following commands:
 git clone git@github.com:zavolanlab/zarp
 git clone git@github.com:zavolanlab/zarp-cli.git
 cd zarp-cli
-mamba env create -f environment.yml
-mamba env update -f environment.root.yml
+mamba env create -f install/environment.root.yml
 conda activate zarp-cli
 ```
+
+> If you do not have root privileges on your machine, replace the `mamba env
+> create` call with the following one:
+>
+> ```sh
+> mamba env create -f install/environment.yml
+> ```
 
 That's it - you can now use _ZARP-cli_!
-
-### 5. Activate Conda environment
-
-To activate the environment, run:
-
-```sh
-conda activate zarp-cli
-```
-
-You should now be good to go to proceed with initiliaztion and testing (see
-section [Documentation](#documentation) below).
 
 ## Documentation
 
@@ -86,7 +81,7 @@ of ways in which execution can be tweaked. For the full documentation visit:
 The project adopts the [Semantic Versioning][semver] specification for
 versioning. Currently the service is still in beta stage, so the API may change
 and even break without further notice. However, we are planning to release a
-`1.0.0` release as soon as we feel that the software is reasonably stable and 
+`1.0.0` release as soon as we feel that the software is reasonably stable and
 "feature complete" for all of the major use cases we wish to cover.
 
 ## Contributing

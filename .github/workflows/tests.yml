@@ -21,11 +21,8 @@ jobs:
           mamba-version: "*"
           auto-update-conda: true
           activate-environment: zarp-cli
-          environment-file: environment.yml
+          environment-file: install/environment.dev.yml
           auto-activate-base: false
-
-      - name: update environment with dev packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
       - name: display environment info
         run: |
@@ -63,14 +60,8 @@ jobs:
           mamba-version: "*"
           auto-update-conda: true
           activate-environment: zarp-cli
-          environment-file: environment.yml
+          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
-
-      - name: update environment with root packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
-
-      - name: update environment with dev packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
       - name: display environment info
         run: |
@@ -111,14 +102,8 @@ jobs:
           mamba-version: "*"
           auto-update-conda: true
           activate-environment: zarp-cli
-          environment-file: environment.yml
+          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
-
-      - name: update environment with root packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.root.yml
-
-      - name: update environment with dev packages
-        run: mamba env update -p $CONDA_PREFIX -f environment.dev.yml
 
       - name: display environment info
         run: |
