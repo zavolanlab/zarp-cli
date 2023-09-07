@@ -9,8 +9,10 @@ Installation requires the following:
 - Linux (tested with Ubuntu 20.04; macOS has not been tested yet)
 - [Conda][conda] (tested with `conda 22.11.1`)
 - [Mamba][mamba] (tested with `mamba 1.3.0`)
-- Possibly: [Singularity][singularity] (tested with `singularity 3.8.6`; see
-  [comment below](#4-install-optional-dependencies))
+- [Singularity][singularity] (tested with `singularity 3.8.6`; not required
+  if you have root permissions on the machine you would like to install
+  _ZARP-cli_ on; in that case choose one of the `.root.` environment file
+  flavors [below](#3-install-app-dependencies))
 
 > Other versions, especially older ones, are not guaranteed to work.
 
@@ -37,29 +39,25 @@ cd zarp-cli
 
 ### 3. Install app & dependencies
 
-Next, install the app and its dependencies with Mamba:
+In the next step, you need to install the app with its dependencies. For that
+purpose, there exist four different environment files. Use this decision matrix
+to pick the most suitable one for you:
+
+| I have root privileges on the machine | I want to run pre-packaged tests | Environment file to use &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; |
+|:---:|:---:| --- |
+| | | `install/environment.yml` |
+| :check_mark: | | `install/environment.root.yml` |
+| | :check_mark: | `install/environment.dev.yml` |
+| :check_mark: | :check_mark: | `install/environment.dev.root.yml` |
+
+To set up the environment execute the call below, but do not forget to replace
+the placeholder `ENVIRONMENT` with the appropriate file from the table above:
 
 ```sh
-mamba env create -f environment.yml
+mamba env create -f ENVIRONMENT
 ```
 
-### 4. Install optional dependencies
-
-If you do not already have Singularity installed and have root privileges on
-your machine, you can **install Singularity via Mamba**:
-
-```sh
-mamba env update -f environment.root.yml
-```
-
-If you would like to **contribute to _ZARP-cli_ development or run the packaged
-tests**, you also want to further update your environment:
-
-```sh
-mamba env update -f environment.dev.yml
-```
-
-### 5. Activate environment
+### 4. Activate environment
 
 Finally, activate the Conda environment with:
 
