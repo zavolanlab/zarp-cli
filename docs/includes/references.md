@@ -11,6 +11,7 @@
 [salmon]: <https://github.com/COMBINE-lab/salmon>
 [singularity]: <https://sylabs.io/singularity/>
 [snakemake]: <https://github.com/snakemake/snakemake>
+[snakemake-profiles]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>
 [sra]: <https://www.ncbi.nlm.nih.gov/sra>
 [sra-toolkit]: <https://github.com/ncbi/sra-tools>
 [zarp]: <https://github.com/zavolanlab/zarp>

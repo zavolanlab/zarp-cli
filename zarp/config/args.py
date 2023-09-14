@@ -41,6 +41,7 @@ class ArgParser:
             "execution_mode",
             "genome_assemblies_map",
             "identifier",
+            "profile",
             "resources_version",
             "rule_config",
             "working_directory",
@@ -423,6 +424,16 @@ class ArgParser:
             help=(
                 "run identifier; if not provided a random string will be"
                 " generated"
+            ),
+        )
+        argument_group.add_argument(
+            "--profile",
+            default=None,
+            type=lambda p: Path(p).absolute(),
+            metavar="PATH",
+            help=(
+                "Snakemake profile for ZARP workflow; refer to ZARP"
+                " documentation for details"
             ),
         )
         argument_group.add_argument(

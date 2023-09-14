@@ -73,6 +73,19 @@ class TestSnakemakeExecutor:
         cmd = my_run.compile_command(snakefile=snakefile)
         assert "--configfile" in cmd
 
+    def test_compile_command_profile(self, tmpdir):
+        os.chdir(tmpdir)
+        snakefile = create_snakefile(dir=Path(tmpdir))
+        run_config = default_run_config.copy(deep=True)
+        run_config.profile = Path("/path/to/profile")
+        my_run = SnakemakeExecutor(
+            run_config=run_config,
+            exec_dir=tmpdir,
+        )
+        cmd = my_run.compile_command(snakefile=snakefile)
+        assert "--profile" in cmd
+        os.chdir(default_cwd)
+
     @pytest.mark.parametrize(
         "dependency_embedding",
         [
