@@ -74,6 +74,7 @@ class TestSnakemakeExecutor:
         assert "--configfile" in cmd
 
     def test_compile_command_profile(self, tmpdir):
+        """Execute a run with a Snakemake profile."""
         os.chdir(tmpdir)
         snakefile = create_snakefile(dir=Path(tmpdir))
         run_config = default_run_config.copy(deep=True)
