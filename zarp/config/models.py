@@ -73,6 +73,7 @@ class InitRun(CustomBaseModel):
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
         genome_assemblies_map: Genome assemblies mapping file.
+        profile: Snakemake profile for ZARP workflow.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
         rule_config: ZARP rule configuration.
@@ -84,6 +85,7 @@ class InitRun(CustomBaseModel):
         dependency_embedding: Dependency embedding strategy to use.
         execution_mode: Execution mode to use.
         genome_assemblies_map: Genome assemblies mapping file.
+        profile: Snakemake profile for ZARP workflow.
         resources_version: Version of Ensembl genome resources to use when
             resources are not provided.
         rule_config: ZARP rule configuration.
@@ -103,6 +105,7 @@ class InitRun(CustomBaseModel):
     )
     resources_version: Optional[int] = None
     rule_config: Optional[Path] = None
+    profile: Optional[Path] = None
 
 
 class InitSample(CustomBaseModel):
