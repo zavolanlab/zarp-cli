@@ -64,7 +64,7 @@ class SampleProcessorHTSinfer(
         LOGGER.debug(f"Command: {cmd}")
         executor.run(cmd=cmd)
         records_new = stp.read(
-            path=content.samples_out,
+            path=Path(content.samples_out),
             mapping=map_zarp_to_model,
         )
         return records_new
