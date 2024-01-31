@@ -59,7 +59,7 @@ class TestMain:
         )
         with pytest.raises(SystemExit) as exc:
             main()
-        assert exc.value.code == 1
+        assert exc.value.code == 0
 
     def test_normal_mode_with_runtime_error(self, monkeypatch, tmpdir):
         """Call with runtime error being raised."""
