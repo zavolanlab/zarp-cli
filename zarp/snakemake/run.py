@@ -1,9 +1,10 @@
 """Module for executing Snakemake workflows."""
 
 import logging
+import os
 from pathlib import Path
 import subprocess
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from zarp.config.enums import SnakemakeRunState
 from zarp.config.models import ConfigRun
@@ -48,14 +49,19 @@ class SnakemakeExecutor:
         Args:
             snakefile: Path to Snakemake descriptor file.
         """
-        bind_paths: List[str] = [
-            str(self.exec_dir),
-            str(self.run_config.working_directory),
-            str(self.run_config.zarp_directory),
+        bind_paths: List[Optional[Union[Path, str]]] = [
+            self.exec_dir,
+            self.run_config.working_directory,
+            self.run_config.zarp_directory,
+            os.environ.get("TMP"),
+            os.environ.get("TMPDIR"),
+        ]
+        bind_paths_str: List[str] = [
+            str(item) for item in bind_paths if item is not None
         ]
         if self.bind_paths is not None:
-            bind_paths.extend([str(path) for path in self.bind_paths])
-        bind_paths_arg: str = ",".join(bind_paths)
+            bind_paths_str.extend([str(path) for path in self.bind_paths])
+        bind_paths_arg: str = ",".join(bind_paths_str)
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
         cmd_ls.extend(["--cores", str(self.run_config.cores)])
