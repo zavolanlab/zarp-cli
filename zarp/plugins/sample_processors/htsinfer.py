@@ -7,7 +7,7 @@ from typing import List, Tuple
 import pandas as pd
 
 from zarp.abstract_classes.sample_processor import SampleProcessor
-from zarp.config.mappings import map_model_to_zarp
+from zarp.config.mappings import map_model_to_zarp, map_zarp_to_model
 from zarp.config.models import ConfigFileHTSinfer
 from zarp.samples import sample_table_processor as stp
 from zarp.snakemake.config_file_processor import ConfigFileProcessor
@@ -50,7 +50,7 @@ class SampleProcessorHTSinfer(
             LOGGER.debug("No metadata to infer.")
             return self.records
         LOGGER.info("Inferring missing metadata...")
-        conf_file, _ = self._configure_run(root_dir=loc)
+        conf_file, content = self._configure_run(root_dir=loc)
         bind_paths: List[Path] = list(
             self.records.paths_1.append(self.records.paths_2).dropna().unique()
         )
@@ -63,7 +63,11 @@ class SampleProcessorHTSinfer(
         cmd = executor.compile_command(snakefile=workflow)
         LOGGER.debug(f"Command: {cmd}")
         executor.run(cmd=cmd)
-        return self.records
+        records_new = stp.read(
+            path=Path(content.samples_out),
+            mapping=map_zarp_to_model,
+        )
+        return records_new
 
     def _configure_run(
         self,

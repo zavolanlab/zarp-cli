@@ -1,4 +1,4 @@
-"""Dummy version of Snakefile for inferring sample metadata with HTSinfer."""
+"""Dummy version of Snakefile for ZARP workflow."""
 
 
 localrules:
@@ -8,14 +8,14 @@ localrules:
 
 rule all:
     input:
-        config["samples_out"],
+        "zarp_dummy_output",
 
 
 rule dummy:
     input:
         config["samples"],
     output:
-        config["samples_out"],
+        "zarp_dummy_output",
     shell:
         'cat {input} > {output}'
 
