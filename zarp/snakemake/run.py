@@ -1,7 +1,7 @@
 """Module for executing Snakemake workflows."""
 
-import os
 import logging
+import os
 from pathlib import Path
 import subprocess
 from typing import List, Optional, Union
