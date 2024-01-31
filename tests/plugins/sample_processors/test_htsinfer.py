@@ -67,16 +67,17 @@ class TestSampleProcessorHTSinfer:
 
         def patched_run(self, cmd) -> None:
             """Patch `run()` method."""
-            run_dir = Path(tmpdir)
+            run_dir = Path(tmpdir) / "runs" / config.run.identifier
             src = Path(__file__).parents[2] / "files" / "sample_table.tsv"
-            dst_in = run_dir / "samples_result.tsv"
-            dst_out = run_dir / "samples_htsinfer.tsv"
+            dst_in = run_dir / "samples_htsinfer.tsv"
+            dst_out = run_dir / "samples_result.tsv"
+            print(dst_out)
             shutil.copyfile(src, dst_in)
             shutil.copyfile(src, dst_out)
 
         monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
         df_out = hts.process(loc=outdir, workflow=workflow)
-        assert len(df_out.index) == 2
+        assert len(df_out.index) == 5
 
     def test_process_empty(self, tmpdir, caplog):
         """Test `.process()` method with no records."""
@@ -104,16 +105,16 @@ class TestSampleProcessorHTSinfer:
 
         def patched_run(self, cmd) -> None:
             """Patch `run()` method."""
-            run_dir = Path(tmpdir)
+            run_dir = Path(tmpdir) / "runs" / config.run.identifier
             src = Path(__file__).parents[2] / "files" / "sample_table.tsv"
-            dst_in = run_dir / "samples_result.tsv"
-            dst_out = run_dir / "samples_htsinfer.tsv"
+            dst_in = run_dir / "samples_htsinfer.tsv"
+            dst_out = run_dir / "samples_result.tsv"
             shutil.copyfile(src, dst_in)
             shutil.copyfile(src, dst_out)
 
         monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
         df_out = hts.process(loc=outdir, workflow=workflow)
-        assert len(df_out.index) == 2
+        assert len(df_out.index) == 5
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""
