@@ -71,7 +71,6 @@ class TestSampleProcessorHTSinfer:
             src = Path(__file__).parents[2] / "files" / "sample_table.tsv"
             dst_in = run_dir / "samples_htsinfer.tsv"
             dst_out = run_dir / "samples_result.tsv"
-            print(dst_out)
             shutil.copyfile(src, dst_in)
             shutil.copyfile(src, dst_out)
 
