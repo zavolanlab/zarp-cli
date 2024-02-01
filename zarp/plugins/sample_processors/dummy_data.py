@@ -6,6 +6,7 @@ from typing import Dict, List
 import pandas as pd
 
 from zarp.abstract_classes.sample_processor import SampleProcessor
+from zarp.config.constants import DUMMY_DATA
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,7 +37,6 @@ class SampleProcessorDummyData(
         "adapter_poly_5p_1",
         "adapter_poly_5p_2",
     ]
-    dummy_data = "X" * 15
 
     def process(self) -> pd.DataFrame:
         """Set dummy data for missing sample metadata.
@@ -50,7 +50,7 @@ class SampleProcessorDummyData(
         sample_index: pd.Index = self.records.index
         for key in self.columns:
             default_data[key] = [
-                self.dummy_data for _ in range(len(sample_index))
+                DUMMY_DATA for _ in range(len(sample_index))
             ]
         default_df: pd.DataFrame = pd.DataFrame(default_data)
         return default_df
