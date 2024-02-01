@@ -17,7 +17,7 @@ where to start? **Easy - _ZARP 'em!_**
 - Barry left you some samples to analyze and then went on vacation, again? **No
 problem, _ZARP 'em!_**  
 
-ZARP-cli uses the HTSinfer package to infer missing metadata and then runs the
+ZARP-cli uses the [HTSinfer][htsinfer] package to infer missing metadata and then runs the
 [ZARP RNA-Seq analysis pipeline][zarp] on your samples. Impress your colleagues
 with your sudden productivity boost. Or better yet, use the time saved to go on
 that camping trip with Barry. Just make sure to guard your secret! :wink:
@@ -112,6 +112,7 @@ by [email][contact].
 [badge-url-docs]: <https://zavolanlab.github.io/zarp-cli>
 [badge-url-github-tag]: <https://github.com/zavolanlab/zarp-cli/releases>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
+[htsinfer]: <https://github.com/zavolanlab/htsinfer>
 [issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
 [mamba]: <https://github.com/mamba-org/mamba>
 [semver]: <https://semver.org/>
