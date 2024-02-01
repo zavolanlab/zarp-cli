@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 from typing import List, Optional, Union
 
+from zarp.config.constants import DUMMY_DATA
 from zarp.config.enums import SnakemakeRunState
 from zarp.config.models import ConfigRun
 
@@ -56,11 +57,14 @@ class SnakemakeExecutor:
             os.environ.get("TMP"),
             os.environ.get("TMPDIR"),
         ]
-        bind_paths_str: List[str] = [
-            str(item) for item in bind_paths if item is not None
-        ]
+        bind_paths_str: List[str] = list(
+            set(str(item) for item in bind_paths if item is not None)
+        )
         if self.bind_paths is not None:
             bind_paths_str.extend([str(path) for path in self.bind_paths])
+        bind_paths_str = [
+            item for item in bind_paths_str if item != DUMMY_DATA
+        ]
         bind_paths_arg: str = ",".join(bind_paths_str)
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
