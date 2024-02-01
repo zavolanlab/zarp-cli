@@ -51,11 +51,8 @@ class TestConfigFileProcessor:
         )
         cfp.set_content(content=content)
         assert cfp.content == content
-        print(cfp.content.dict())
         cfp.write(Path(tmpdir) / "config.yaml")
         assert (Path(tmpdir) / "config.yaml").is_file()
-        print(Path(tmpdir) / "config.yaml")
-        print(cfp.content.dict())
         with open(Path(tmpdir) / "config.yaml", "r") as _file:
             assert (
                 _file.read()

@@ -156,7 +156,6 @@ class SampleRunnerZARP(
         """Select records to process."""
         for _, row in self.records.iterrows():
             _row = row[map_model_to_zarp.keys()]  # type: ignore
-            LOGGER.warning(_row.to_dict())
             if _row.isnull().any():
                 LOGGER.warning(
                     (
