@@ -78,6 +78,8 @@ class SampleRecordProcessor:
             df: Pandas ``DataFrame`` object.
             by: Column to use as index for update. If ``None`` (default),
                 compares database records by position.
+            overwrite: Overwrite existing records. If ``False`` (default),
+                existing records will not be updated.
             **kwargs: Keyword arguments to pass to ``_sanitize_df()``.
 
         Raises:

@@ -114,7 +114,7 @@ class TestSampleProcessorHTSinfer:
 
         monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
         df_out = hts.process(loc=outdir, workflow=workflow)
-        assert len(df_out.index) == 5
+        assert len(df_out.index) == len(srp.records.index)
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""

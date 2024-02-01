@@ -285,18 +285,18 @@ class SampleProcessor:
         paths: List
         if SampleProcessor._is_unnamed_single_end(ref=ref):
             deref.type = SampleReferenceTypes.LOCAL_LIB_SINGLE
-            deref.lib_paths = (Path(ref).absolute(), None)
+            deref.lib_paths = (Path(ref).expanduser().resolve(), None)
         elif SampleProcessor._is_named_single_end(ref=ref):
             parts = ref.split("@", maxsplit=1)
             deref.type = SampleReferenceTypes.LOCAL_LIB_SINGLE
             deref.name = parts[0]
-            deref.lib_paths = (Path(parts[1]).absolute(), None)
+            deref.lib_paths = (Path(parts[1]).expanduser().resolve(), None)
         elif SampleProcessor._is_unnamed_paired_end(ref=ref):
             paths = ref.split(",")
             deref.type = SampleReferenceTypes.LOCAL_LIB_PAIRED
             deref.lib_paths = (
-                Path(paths[0]).absolute(),
-                Path(paths[1]).absolute(),
+                Path(paths[0]).expanduser().resolve(),
+                Path(paths[1]).expanduser().resolve(),
             )
         elif SampleProcessor._is_named_paired_end(ref):
             parts = ref.split("@", maxsplit=1)
@@ -304,8 +304,8 @@ class SampleProcessor:
             deref.type = SampleReferenceTypes.LOCAL_LIB_PAIRED
             deref.name = parts[0]
             deref.lib_paths = (
-                Path(paths[0]).absolute(),
-                Path(paths[1]).absolute(),
+                Path(paths[0]).expanduser().resolve(),
+                Path(paths[1]).expanduser().resolve(),
             )
         elif SampleProcessor._is_unnamed_seq_identifier(ref=ref):
             deref.type = SampleReferenceTypes.REMOTE_LIB_SRA
@@ -318,7 +318,7 @@ class SampleProcessor:
         elif SampleProcessor._is_sample_table(ref=ref):
             parts = ref.split(":", maxsplit=1)
             deref.type = SampleReferenceTypes.TABLE
-            deref.table_path = Path(parts[1]).absolute()
+            deref.table_path = Path(parts[1]).expanduser().resolve()
         return deref
 
     @staticmethod
@@ -333,7 +333,7 @@ class SampleProcessor:
         Returns:
             True if sample reference is an unnamed single-end library.
         """
-        return Path(ref).is_file()
+        return Path(ref).expanduser().is_file()
 
     @staticmethod
     def _is_named_single_end(
@@ -351,7 +351,7 @@ class SampleProcessor:
         return (
             len(parts) == 2
             and bool(search(r"^[a-zA-Z0-9\-\_\.]+$", parts[0]))
-            and Path(parts[1]).is_file()
+            and Path(parts[1]).expanduser().is_file()
         )
 
     @staticmethod
@@ -367,7 +367,9 @@ class SampleProcessor:
             True if sample reference is an unnamed paired-end library.
         """
         paths = ref.split(",")
-        return len(paths) == 2 and all(Path(path).is_file() for path in paths)
+        return len(paths) == 2 and all(
+            Path(path).expanduser().is_file() for path in paths
+        )
 
     @staticmethod
     def _is_named_paired_end(
@@ -386,7 +388,10 @@ class SampleProcessor:
             len(parts) == 2
             and bool(search(r"^[a-zA-Z0-9\-\_\.]+$", parts[0]))
             and len(parts[1].split(",")) == 2
-            and all(Path(path).is_file() for path in parts[1].split(","))
+            and all(
+                Path(path).expanduser().is_file()
+                for path in parts[1].split(",")
+            )
         )
 
     @staticmethod
@@ -438,7 +443,7 @@ class SampleProcessor:
         return (
             len(parts) == 2
             and parts[0] == "table"
-            and Path(parts[1]).is_file()
+            and Path(parts[1]).expanduser().is_file()
         )
 
     @staticmethod

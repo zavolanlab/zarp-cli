@@ -52,9 +52,8 @@ class SampleFetcherSRA(
             libraries.
         """
         if self.records.empty:
-            LOGGER.debug("No remote libraries to fetch from SRA.")
+            LOGGER.debug("No remote libraries to fetch.")
             return self.records
-        LOGGER.info("Fetching remote libraries from SRA...")
         conf_file: Path
         conf_content: ConfigFileSRA
         conf_file, conf_content = self._configure_run(root_dir=loc)

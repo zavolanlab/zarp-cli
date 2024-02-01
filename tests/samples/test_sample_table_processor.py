@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import numpy as np
+
 from zarp.samples import sample_table_processor as stp
 
 
@@ -23,7 +25,7 @@ class TestRead:
             index_col=0,
         )
         assert len(df.index) > 0
-        assert df.iloc[0, 0] == ""
+        assert df.iloc[0, 0] is np.nan
         assert "sample" not in df.columns
 
     def test_read_with_mapping(self):

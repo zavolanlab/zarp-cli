@@ -49,7 +49,6 @@ class TestInitializer:
             contents=test_config,
             path=config_file,
         )
-        print(config_file)
         initializer.set_from_file(config_file=config_file)
         assert exec_mode_before_update == ExecModes.RUN.value
         assert initializer.config.run.execution_mode == ExecModes.DRY_RUN.value

@@ -49,8 +49,7 @@ class SampleProcessorHTSinfer(
         if self.records.empty:
             LOGGER.debug("No metadata to infer.")
             return self.records
-        LOGGER.info("Inferring missing metadata...")
-        conf_file, content = self._configure_run(root_dir=loc)
+        conf_file, conf_content = self._configure_run(root_dir=loc)
         bind_paths: List[Path] = list(
             self.records.paths_1.append(self.records.paths_2).dropna().unique()
         )
@@ -63,11 +62,18 @@ class SampleProcessorHTSinfer(
         cmd = executor.compile_command(snakefile=workflow)
         LOGGER.debug(f"Command: {cmd}")
         executor.run(cmd=cmd)
-        records_new = stp.read(
-            path=Path(content.samples_out),
-            mapping=map_zarp_to_model,
-        )
-        return records_new
+        df: pd.DataFrame
+        if self.config.run.execution_mode == "DRY_RUN":
+            df = self.records
+        else:
+            df = stp.read(
+                path=Path(conf_content.samples_out),
+                mapping=map_zarp_to_model,
+            )
+        return df
+
+    def _select_records(self) -> None:
+        """Select records to process."""
 
     def _configure_run(
         self,
@@ -116,6 +122,3 @@ class SampleProcessorHTSinfer(
             path=sample_table,
             mapping=map_model_to_zarp,
         )
-
-    def _select_records(self) -> None:
-        """Select records to process."""

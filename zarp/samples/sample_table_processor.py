@@ -33,7 +33,6 @@ def read(
         path,
         comment="#",
         sep="\t",
-        keep_default_na=False,
         dtype=str,
         index_col=index_col,
         usecols=columns,  # type: ignore

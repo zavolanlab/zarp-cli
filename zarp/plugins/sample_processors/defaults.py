@@ -33,16 +33,12 @@ class SampleProcessorDefaults(
         if self.records.empty:
             LOGGER.debug("No defaults to set.")
             return self.records
-
-        LOGGER.info("Setting defaults...")
-
         defaults: Dict[str, Any] = self.config.sample.dict()
         default_data: Dict[str, List[Any]] = {}
         sample_index: pd.Index = self.records.index
         for key, val in defaults.items():
             default_data[key] = [val for _ in range(len(sample_index))]
         default_df: pd.DataFrame = pd.DataFrame(default_data)
-
         srp: SRP = SRP()
         srp.append(self.records)
         srp.update(
@@ -50,9 +46,6 @@ class SampleProcessorDefaults(
             anchor=self.config.run.working_directory,
             path_columns=["annotations", "reference_sequences"],
         )
-
-        LOGGER.info("Defaults set.")
-
         return srp.records
 
     def _select_records(self) -> None:
