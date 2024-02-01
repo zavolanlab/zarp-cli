@@ -58,7 +58,8 @@ class TestSampleRunnerZARP:
         srp.append(df)
         srz = SRZ(config=config, records=srp.records)
         assert hasattr(srz, "records")
-        assert len(srz.records.index) == 2
+        assert len(srp.records.index) == 2
+        assert len(srz.records.index) == 1
 
     def test__configure_run(self, tmpdir):
         """Test `._configure_run()` method."""
@@ -152,7 +153,9 @@ class TestSampleRunnerZARP:
 
         monkeypatch.setattr(SnakemakeExecutor, "run", patched_run)
         df_out = srz.process(loc=outdir, workflow=workflow)
-        assert len(df_out.index) == 2
+        assert len(srp.records.index) == 2
+        assert len(srz.records.index) == 1
+        assert len(df_out.index) == 1
 
     def test_process_dry_run(self, tmpdir, monkeypatch):
         """Test `.process()` method with dry run."""
@@ -165,4 +168,6 @@ class TestSampleRunnerZARP:
         srp.append(df)
         srz = SRZ(config=config, records=srp.records)
         df_out = srz.process(loc=outdir, workflow=workflow)
-        assert len(df_out.index) == 2
+        assert len(srp.records.index) == 2
+        assert len(srz.records.index) == 1
+        assert len(df_out.index) == 1

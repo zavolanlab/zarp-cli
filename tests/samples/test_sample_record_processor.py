@@ -251,9 +251,7 @@ class TestSampleRecordProcessor:
                 "three": [("path1", "path2", None), None, (None, "path2")],
             }
         )
-        print(df)
         df_new = SRP._expand_tuple_columns(df=df)
-        print(df_new)
         assert len(df_new.columns) == 6
         assert "one" in df_new.columns
         assert "two_1" in df_new.columns

@@ -47,7 +47,6 @@ class SampleRunnerZARP(
 
         Returns: Dataframe with inferred sample metadata.
         """
-        LOGGER.info("Preparing ZARP run...")
         if self.records.empty:
             LOGGER.info("No samples to run.")
             return self.records
@@ -157,6 +156,7 @@ class SampleRunnerZARP(
         """Select records to process."""
         for _, row in self.records.iterrows():
             _row = row[map_model_to_zarp.keys()]  # type: ignore
+            LOGGER.warning(_row.to_dict())
             if _row.isnull().any():
                 LOGGER.warning(
                     (

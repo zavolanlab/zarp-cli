@@ -84,15 +84,18 @@ class ZARP:
         srp.view()
 
         # fill defaults
+        LOGGER.info("Setting defaults...")
         processor_defaults = SampleProcessorDefaults(
             config=self.config,
             records=srp.records,
         )
         df = processor_defaults.process()
         srp.update(df=df)
+        LOGGER.info("Defaults set.")
         srp.view()
 
         # fetch remote samples from SRA
+        LOGGER.info("Fetching remote libraries from SRA...")
         fetcher_sra = SampleFetcherSRA(
             config=self.config,
             records=srp.records,
@@ -105,9 +108,11 @@ class ZARP:
             / "sra_download.smk",
         )
         srp.update(df=df, by="identifier")
+        LOGGER.info("Local sample paths set.")
         srp.view()
 
         # infer sample metadata with HTSinfer
+        LOGGER.info("Inferring metadata...")
         processor_htsinfer = SampleProcessorHTSinfer(
             config=self.config,
             records=srp.records,
@@ -120,9 +125,11 @@ class ZARP:
             / "htsinfer.smk",
         )
         srp.update(df=df)
+        LOGGER.info("Missing metadata set.")
         srp.view()
 
         # fetch genome resources with genomepy
+        LOGGER.info("Fetching genome resources...")
         fetcher_genomepy = SampleProcessorGenomePy(
             config=self.config,
             records=srp.records,
@@ -131,15 +138,18 @@ class ZARP:
             loc=self.config.run.working_directory / "genomes",
         )
         srp.update(df=df, overwrite=True)
+        LOGGER.info("Genome resource paths set...")
         srp.view()
 
         # fill with dummy data
+        LOGGER.info("Setting dummy data...")
         processor_dummy_data = SampleProcessorDummyData(
             config=self.config,
             records=srp.records,
         )
         df = processor_dummy_data.process()
         srp.update(df=df)
+        LOGGER.info("Dummy data set...")
         srp.view()
 
         return srp
@@ -150,6 +160,7 @@ class ZARP:
         Args:
             samples: Sample record processor instance.
         """
+        LOGGER.info("Preparing ZARP run...")
         runner_zarp = SampleRunnerZARP(
             config=self.config,
             records=samples.records,
@@ -158,3 +169,4 @@ class ZARP:
             loc=self.config.run.working_directory / "zarp",
             workflow=self.config.run.zarp_directory / "workflow" / "Snakefile",
         )
+        LOGGER.info("ZARP run completed.")

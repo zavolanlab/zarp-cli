@@ -45,7 +45,6 @@ class SampleProcessorGenomePy(
             LOGGER.debug("No genome resources to fetch.")
             return self.records
 
-        LOGGER.info("Fetching genome resources...")
         self.set_assemblies()
         resource_paths = self.fetch_resources(genomes_dir_root=loc)
         self.set_resource_paths(resource_paths)
