@@ -74,8 +74,7 @@ class SnakemakeExecutor:
         if self.config_file is not None:
             cmd_ls.extend(["--configfile", str(self.config_file)])
         if self.run_config.profile is not None:
-            if snakefile.name == "Snakefile":
-                cmd_ls.extend(["--profile", str(self.run_config.profile)])
+            cmd_ls.extend(["--profile", str(self.run_config.profile)])
         if self.run_config.execution_mode == "DRY_RUN":
             cmd_ls.append("--dry-run")
         if self.run_config.dependency_embedding == "CONDA":
