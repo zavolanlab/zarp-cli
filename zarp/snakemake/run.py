@@ -51,6 +51,7 @@ class SnakemakeExecutor:
             snakefile: Path to Snakemake descriptor file.
         """
         cmd_ls = ["snakemake"]
+        cmd_ls.append("--printshellcmds")
         cmd_ls.extend(["--snakefile", str(snakefile)])
         cmd_ls.extend(["--cores", str(self.run_config.cores)])
         cmd_ls.extend(["--directory", str(self.exec_dir)])
@@ -60,11 +61,33 @@ class SnakemakeExecutor:
             cmd_ls.extend(["--profile", str(self.run_config.profile)])
         if self.run_config.execution_mode == "DRY_RUN":
             cmd_ls.append("--dry-run")
+        bind_paths: List[Optional[Union[Path, str]]]
+        bind_paths_str: List[str]
+        bind_paths_arg: str
         if self.run_config.dependency_embedding == "CONDA":
+            # Conda is currently not supported for the HTSinfer workflow
             if snakefile.name == "htsinfer.smk":
                 cmd_ls.append("--use-singularity")
-                # Conda is currently not supported for the HTSinfer
-                # workflow
+                bind_paths = [
+                    self.exec_dir,
+                    self.run_config.working_directory,
+                    self.run_config.zarp_directory,
+                    os.environ.get("TMP"),
+                    os.environ.get("TMPDIR"),
+                ]
+                bind_paths_str = list(
+                    set(str(item) for item in bind_paths if item is not None)
+                )
+                if self.bind_paths is not None:
+                    bind_paths_str.extend(
+                        [str(path) for path in self.bind_paths]
+                    )
+                bind_paths_str = [
+                    item for item in bind_paths_str if item != DUMMY_DATA
+                ]
+                bind_paths_arg = ",".join(bind_paths_str)
+                cmd_ls.extend(
+                    ["--singularity-args", f"--bind {bind_paths_arg}"])
                 LOGGER.warning(
                     "Conda not supported for HTSinfer workflow."
                     " Using Singularity instead."
@@ -73,14 +96,14 @@ class SnakemakeExecutor:
                 cmd_ls.append("--use-conda")
         elif self.run_config.dependency_embedding == "SINGULARITY":
             cmd_ls.append("--use-singularity")
-            bind_paths: List[Optional[Union[Path, str]]] = [
+            bind_paths = [
                 self.exec_dir,
                 self.run_config.working_directory,
                 self.run_config.zarp_directory,
                 os.environ.get("TMP"),
                 os.environ.get("TMPDIR"),
             ]
-            bind_paths_str: List[str] = list(
+            bind_paths_str = list(
                 set(str(item) for item in bind_paths if item is not None)
             )
             if self.bind_paths is not None:
@@ -88,7 +111,7 @@ class SnakemakeExecutor:
             bind_paths_str = [
                 item for item in bind_paths_str if item != DUMMY_DATA
             ]
-            bind_paths_arg: str = ",".join(bind_paths_str)
+            bind_paths_arg = ",".join(bind_paths_str)
             cmd_ls.extend(["--singularity-args", f"--bind {bind_paths_arg}"])
         return cmd_ls
 
