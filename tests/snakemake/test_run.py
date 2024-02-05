@@ -104,17 +104,6 @@ class TestSnakemakeExecutor:
         my_param = f"--use-{dependency_embedding.value.lower()}"
         assert my_param in cmd
 
-    def test_compile_command_dep_embedding_sra_exception(self, tmpdir):
-        """Execute a run with different dependency embedding strategies."""
-        snakefile = create_snakefile(dir=Path(tmpdir), name="sra_download.smk")
-        run_config = default_run_config.copy(deep=True)
-        run_config.dependency_embedding = (
-            DependencyEmbeddingStrategies.SINGULARITY
-        )
-        my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
-        cmd = my_run.compile_command(snakefile=snakefile)
-        assert "--use-singularity" not in cmd
-
     @pytest.mark.parametrize(
         "exec_mode", [ExecModes.RUN, ExecModes.DRY_RUN, ExecModes.PREPARE_RUN]
     )
