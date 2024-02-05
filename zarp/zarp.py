@@ -161,6 +161,7 @@ class ZARP:
             samples: Sample record processor instance.
         """
         LOGGER.info("Preparing ZARP run...")
+        samples.view(level=logging.INFO)
         runner_zarp = SampleRunnerZARP(
             config=self.config,
             records=samples.records,
