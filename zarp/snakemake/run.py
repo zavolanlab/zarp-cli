@@ -50,26 +50,9 @@ class SnakemakeExecutor:
         Args:
             snakefile: Path to Snakemake descriptor file.
         """
-        bind_paths: List[Optional[Union[Path, str]]] = [
-            self.exec_dir,
-            self.run_config.working_directory,
-            self.run_config.zarp_directory,
-            os.environ.get("TMP"),
-            os.environ.get("TMPDIR"),
-        ]
-        bind_paths_str: List[str] = list(
-            set(str(item) for item in bind_paths if item is not None)
-        )
-        if self.bind_paths is not None:
-            bind_paths_str.extend([str(path) for path in self.bind_paths])
-        bind_paths_str = [
-            item for item in bind_paths_str if item != DUMMY_DATA
-        ]
-        bind_paths_arg: str = ",".join(bind_paths_str)
         cmd_ls = ["snakemake"]
         cmd_ls.extend(["--snakefile", str(snakefile)])
         cmd_ls.extend(["--cores", str(self.run_config.cores)])
-        cmd_ls.extend(["--singularity-args", f"--bind {bind_paths_arg}"])
         cmd_ls.extend(["--directory", str(self.exec_dir)])
         if self.config_file is not None:
             cmd_ls.extend(["--configfile", str(self.config_file)])
@@ -90,6 +73,23 @@ class SnakemakeExecutor:
                 cmd_ls.append("--use-conda")
         elif self.run_config.dependency_embedding == "SINGULARITY":
             cmd_ls.append("--use-singularity")
+            bind_paths: List[Optional[Union[Path, str]]] = [
+                self.exec_dir,
+                self.run_config.working_directory,
+                self.run_config.zarp_directory,
+                os.environ.get("TMP"),
+                os.environ.get("TMPDIR"),
+            ]
+            bind_paths_str: List[str] = list(
+                set(str(item) for item in bind_paths if item is not None)
+            )
+            if self.bind_paths is not None:
+                bind_paths_str.extend([str(path) for path in self.bind_paths])
+            bind_paths_str = [
+                item for item in bind_paths_str if item != DUMMY_DATA
+            ]
+            bind_paths_arg: str = ",".join(bind_paths_str)
+            cmd_ls.extend(["--singularity-args", f"--bind {bind_paths_arg}"])
         return cmd_ls
 
     def run(self, cmd) -> None:
