@@ -160,7 +160,7 @@ class SampleRunnerZARP(
                 LOGGER.warning(
                     (
                         f"Sample '{row.loc['name']}' is dropped due to missing"
-                        " metadata."
+                        f" metadata: {_row}"
                     ),
                 )
                 self.records.drop(index=row.name, inplace=True)
