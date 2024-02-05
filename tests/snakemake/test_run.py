@@ -69,6 +69,7 @@ class TestSnakemakeExecutor:
             run_config=run_config,
             config_file=config_file,
             exec_dir=tmpdir,
+            bind_paths=[Path("/path/to/bind")],
         )
         cmd = my_run.compile_command(snakefile=snakefile)
         assert "--configfile" in cmd
