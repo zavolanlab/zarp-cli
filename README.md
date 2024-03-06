@@ -17,10 +17,11 @@ where to start? **Easy - _ZARP 'em!_**
 - Barry left you some samples to analyze and then went on vacation, again? **No
 problem, _ZARP 'em!_**  
 
-ZARP-cli uses the [HTSinfer][htsinfer] package to infer missing metadata and then runs the
-[ZARP RNA-Seq analysis pipeline][zarp] on your samples. Impress your colleagues
-with your sudden productivity boost. Or better yet, use the time saved to go on
-that camping trip with Barry. Just make sure to guard your secret! :wink:
+ZARP-cli uses the [HTSinfer][htsinfer] package to infer missing metadata and
+then runs the [ZARP RNA-Seq analysis pipeline][zarp] on your samples. Impress
+your colleagueswith your sudden productivity boost. Or better yet, use the time
+saved to go on that camping trip with Barry. Just make sure to guard your
+secret! :wink:
 
 ## Basic usage
 
