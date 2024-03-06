@@ -405,9 +405,9 @@ class ArgParser:
             default=None,
             type=str,
             help=(
-                "Trigger a full ZARP-cli run, "
+                "whether to trigger a full ZARP-cli run, "
                 "a dry run (external tools are not run, for testing),"
-                "or prepare a ZARP run (metadata creation only)"
+                "or prepare a ZARP run (input data creation only)"
             ),
         )
         argument_group.add_argument(
