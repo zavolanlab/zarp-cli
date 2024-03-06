@@ -405,8 +405,9 @@ class ArgParser:
             default=None,
             type=str,
             help=(
-                "run identifier; if not provided a random string will be"
-                " generated"
+                "whether to trigger a full ZARP-cli run, "
+                "a dry run (external tools are not run, for testing),"
+                "or prepare a ZARP run (input data creation only)"
             ),
         )
         argument_group.add_argument(

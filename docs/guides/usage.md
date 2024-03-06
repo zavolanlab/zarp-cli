@@ -47,7 +47,7 @@ Available command-line parameters are grouped into the following sections:
 | **Run modes** | These parameters execute _ZARP-cli_ in special modes, e.g., for initialization or to display the help screen |
 | **Sample-specific** | These parameters modify globally set metadata for all samples of a run, unless overridden inside provided sample tables |
 | **Run-specific** | These parameters modify the behavior of _ZARP-cli_ or set metadata to describe runs |
-| **User-specific** | These parameters that will be included in the _ZARP_ report, if available |
+| **User-specific** | These parameters will be included in the _ZARP_ report, if available |
 
 A complete listing of all available CLI options can easily be printed to the
 screen, together with detailed descriptions, with the following command and
