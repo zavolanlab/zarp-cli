@@ -19,4 +19,6 @@
 [zarp-cli-issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
 [zarp-issue-tracker]: <https://github.com/zavolanlab/zarp/issues>
 [zarp-qa]: <https://github.com/zavolanlab/zarp/discussions>
+[zarp-supplementary]: <https://zenodo.org/records/10797372.
 [zavolab-gh]: <https://github.com/zavolanlab>
+[zenodo]: <https://zenodo.org/>
