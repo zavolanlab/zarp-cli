@@ -11,8 +11,8 @@ Installation requires the following:
 - [Mamba][mamba] (tested with `mamba 1.3.0`)
 - [Singularity][singularity] (tested with `singularity 3.8.6`; not required
   if you have root permissions on the machine you would like to install
-  _ZARP-cli_ on; in that case choose one of the `.root.` environment file
-  flavors [below](#3-install-app-dependencies))
+  _ZARP-cli_ on; in that case, choose one of the `.root.` environment file
+  flavors [below](#3-set-up-environment))
 
 > Other versions, especially older ones, are not guaranteed to work.
 
@@ -37,7 +37,7 @@ git clone git@github.com:zavolanlab/zarp-cli.git
 cd zarp-cli
 ```
 
-### 3. Install app & dependencies
+### 3. Set up environment
 
 In the next step, you need to install the app with its dependencies. For that
 purpose, there exist four different environment files. Use this decision matrix
@@ -50,7 +50,7 @@ to pick the most suitable one for you:
 | | :check_mark: | `install/environment.dev.yml` |
 | :check_mark: | :check_mark: | `install/environment.dev.root.yml` |
 
-To set up the environment execute the call below, but do not forget to replace
+To set up the environment, execute the call below, but do not forget to replace
 the placeholder `ENVIRONMENT` with the appropriate file from the table above:
 
 ```sh
@@ -66,4 +66,4 @@ conda activate zarp-cli
 ```
 
 You should now be good to go to proceed with
-[initiliaztion](./initialization.md).
+[initialization](./initialization.md).

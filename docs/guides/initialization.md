@@ -11,8 +11,8 @@ The following simple command triggers the _ZARP-cli_ initialization mode:
 zarp --init
 ```
 
-An interactive screen will guide you through the process. Read
-[on](#configuration-options) to find out more about what each of the available
+An interactive screen will guide you through the process. [Read
+on](#configuration-options) to find out more about what each of the available
 options and suggested defaults mean.
 
 ??? question "Where is the configuration stored?"
@@ -39,14 +39,14 @@ The following configuration options are available.
 | ------ | ----------- | ------- |
 | `working_directory` | Root directory for _ZARP-cli_ runs; needs to be writable | `$HOME/.zarp` |
 | `zarp_directory` | Path to the local copy of the [ZARP workflow repository][zarp] | `../zarp` relative to the location of the ZARP-cli repository |
-| `execution_mode` | Trigger a full _ZARP-cli_ run (`RUN`), a dry run (`DRY_RUN`; external tools are not actually run, only logs what _would be_ run; useful for testing) or prepare a _ZARP_ run (`PREPARE_RUN`; _ZARP-cli_ is run normally, including all external tools, up until the point of the execution of the actual _ZARP_ workflow; use to manually check metadata table before execution)  | `RUN` |
+| `execution_mode` | Trigger a full _ZARP-cli_ run (`RUN`), a dry run (`DRY_RUN`; external tools are not actually run, only logs what _would be_ run; useful for testing) or prepare a _ZARP_ run (`PREPARE_RUN`; _ZARP-cli_ is run normally, including all external tools, up until the point of the execution of the actual _ZARP_ workflow; use to manually check metadata table before _ZARP_ execution)  | `RUN` |
 | `cores` | Number of CPU cores that Snakemake is run with when executing _ZARP_ and the auxiliary workflows (fetching libraries from [SRA][sra], inferring metadata) | `1` |
-| `dependency_embedding` | Whether Snakemake should use `CONDA` or containers (`SINGULARITY`) to manage dependencies of each workflow step/rule (note that the auxiliary workflows currently have restrictions on which dependency embedding strategy can be used; if an unsupported scheme is suggested, a warning is emitted and the other one is enabled by default) | `CONDA` |
-| `genome_assemblies_map` | A headerless 3-column semicolon-separated mapping table of organism/source trivial names (e.g., `homo_sapiens`), optional comma-separated aliases such as NCBI taxon IDs and/or organism/source short names (e.g., `7227,dmelanogaster`) and a corresponding genome assembly name (e.g., `GRCm39`); a table in the required format is shipped with _ZARP_cli_ in the location provided in the default location; which can be amended with additional aliases; note that for [`genomepy`][genomepy] to be able to pull genome annotations for organisms/sources that [HTSinfer][htsinfer] inferred, NCBI taxon ID aliases are _required_  | `./data/genome_assemblies.map` relative to the location of the ZARP-cli repository |
+| `dependency_embedding` | Whether Snakemake should use `CONDA` or containers (`SINGULARITY`) to manage dependencies of each workflow step/rule | `CONDA` |
+| `genome_assemblies_map` | A headerless 3-column semicolon-separated mapping table of organism/source trivial names (e.g., `homo_sapiens`), optional comma-separated aliases such as NCBI taxon IDs and/or organism/source short names (e.g., `7227,dmelanogaster`) and a corresponding genome assembly name (e.g., `GRCm39`); a table in the required format is shipped with _ZARP_cli_ in the the default location; it can be amended with additional aliases; note that for [`genomepy`][genomepy] to be able to pull genome annotations for organisms/sources that [HTSinfer][htsinfer] inferred, NCBI taxon ID aliases are _required_  | `./data/genome_assemblies.map` relative to the location of the ZARP-cli repository |
 | `resources_version` | Whether to always download the latest available version of genome annotations for a given organism/source from Ensembl (enter `None`; default) or whether to use a specific version of the corresponding Ensembl database (e.g., `100`); note that the different Ensembl databases (e.g., for fungi, plants) use a different versioning scheme, so pinning a particular database version may lead to unexpected outcomes | `None` |
 | `rule_config` | A configuration file for the _ZARP_ workflow that sets specific parameters for each workflow step ("rule"); see [ZARP][zarp] documentation for details | `None` |
-| `profile` | Path to [Snakemake profile][snakemake-profiles] to be used for the _ZARP_ workflow. Use this to optimize _ZARP_ for your specific compute environment |
-| `fragment_length_distribution_mean` | HTSinfer currently is unable to infer the mean of the fragment length distribution of RNA-seq libraries; however, this value is required for tools [`kallisto`][kallisto] and [`salmon`][salmon] -which are executed as part of _ZARP_- when run on single-ended libraries only (for paired-ended libraries, the tools are able to infer this parameter from the data); the value provided here is used as a fallback if the value was not determined experimentally (e.g., with [Bioanalyzer][bioanalyzer] instruments) and provided via a sample table | `300` |
+| `profile` | Path to [Snakemake profile][snakemake-profiles] to be used for the _ZARP_ workflow; use this to optimize _ZARP_ for your specific compute environment |
+| `fragment_length_distribution_mean` | HTSinfer currently is unable to infer the mean of the fragment length distribution of RNA-seq libraries; however, this value is required for tools [`kallisto`][kallisto] and [`salmon`][salmon] - which are executed as part of _ZARP_ - when run on single-ended libraries only (for paired-ended libraries, the tools are able to infer this parameter from the data); the value provided here is used as a fallback if the value was not determined experimentally (e.g., with [Bioanalyzer][bioanalyzer] instruments) and provided via a sample table | `300` |
 | `fragment_length_distribution_sd` | Analogous to `fragment_length_distribution_mean` above, but this parameter is for the _standard deviation_ of the fragment length distribution | `100` |
 | `author` | Name of the person or organization executing the _ZARP-cli_ runs; will be added to the _ZARP_ report | `None` |
 | `email` | Email of the person or organization executing the _ZARP-cli_ runs; will be added to the _ZARP_ report | `None` |
@@ -98,4 +98,4 @@ dynamically**:
     - [CLI arguments](./usage.md) for individual run- and sample-specific
     parameters, if provided
     - Sample-specific parameters specified in sample tables **(highest
-    precendence!)**
+    precedence!)**
