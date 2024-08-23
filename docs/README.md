@@ -18,8 +18,8 @@ supercharges it by providing the following features:
 !!! tip "Manage _ZARP_ run data and resources in one central, configurable location"
 
 Once _ZARP-cli_ is [installed](guides/installation.md) and
-[configured](guides/initialization.md), you may be able to _ZARP_ an RNA-Seq library
-with a command like this:
+[configured](guides/initialization.md), you may be able to _ZARP_ an RNA-Seq
+library with a command like this:
 
 ```bash
 zarp SRA1234567
@@ -34,13 +34,19 @@ zarp SRA1234567
 
 ## How does it work?
 
-Briefly, when a _ZARP-cli_ run is triggered, a [_ZARP-cli_ configuration
+> _"Any sufficiently advanced technology is indistinguishable from magic."_  
+> — Arthur C. Clarke
+
+At the risk of demystifying the magic, let's take a look at how _ZARP-cli_
+works:
+
+Briefly, when the program is triggered, a [_ZARP-cli_ configuration
 object](docstring/config.models.md#Config) is constructed from parsing [default
 configuration
 settings](guides/initialization.md#modifying-configuration-settings) and
 [command-line options](guides/usage.md#command-line-options). A user-specified
 list of [sample references](guides/usage.md#sample-references) of various
-supported types is then attached to the configuration object and dereferenced
+supported types is then attached to the configuration object and de-referenced
 to construct a (potentially) sparse data frame of sample metadata. If
 necessary, this data frame of samples is then successively completed by
 applying various sample processor plugins that are built on tools such as
@@ -59,6 +65,7 @@ appended, if possible/sensible. If at the end of this process enough
 information is available to start a _ZARP_ run, the sample will be analyzed.
 
 ## How to cite
+
 
 If you use _ZARP_ in your work (with or without _ZARP-cli_), please kindly cite
 the following article:
