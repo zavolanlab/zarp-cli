@@ -70,12 +70,15 @@ information is available to start a _ZARP_ run, the sample will be analyzed.
 If you use _ZARP_ in your work (with or without _ZARP-cli_), please kindly cite
 the following article:
 
-**ZARP: An automated workflow for processing of RNA-seq data**  
+**ZARP: A user-friendly and versatile RNA-seq analysis workflow**  
 _Maria Katsantoni, Foivos Gypas, Christina J. Herrmann, Dominik Burri, Maciej
-Bak, Paula Iborra, Krish Agarwal, Meric Ataman, Anastasiya Börsch, Mihaela
-Zavolan, Alexander Kanitz_  
-bioRxiv 2021.11.18.469017  
-<https://doi.org/10.1101/2021.11.18.469017>
+Bak, Paula Iborra, Krish Agarwal, Meric Ataman, Máté Balajti, Noè Pozzan, Niels
+Schlusser, Youngbin Moon, Aleksei Mironov, Anastasiya Börsch, Mihaela Zavolan,
+Alexander Kanitz_  
+**F1000Research 2024, 13:533**  
+<https://doi.org/10.12688/f1000research.149237.1>
+
+[Download BibTeX citation :download: ](https://f1000research.com/articles/exportTo?versionId=163676&bibliographyReaderFormat=BIBTEX){ .md-button }
 
 ## Training materials
 
