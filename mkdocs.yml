@@ -53,9 +53,9 @@ extra:
     - icon: github
       link: https://github.com/zavolanlab
       name: Zavolab GitHub organization
-    - icon: twitter
-      link: https://twitter.com/ZavolanLab
-      name: Zavolab Twitter profile
+    - icon: x
+      link: https://x.com/ZavolanLab
+      name: Zavolab X profile
     - icon: forum
       link: https://github.com/zavolanlab/zarp/discussions
       name: ZARP Q&A forum
