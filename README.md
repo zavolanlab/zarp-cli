@@ -4,7 +4,9 @@
 [![Build_status][badge-build-status]][badge-url-build-status]
 [![Docs][badge-docs]][badge-url-docs]
 [![Coverage][badge-coverage]][badge-url-coverage]
-[![GitHub_tag][badge-github-tag]][badge-url-github-tag]
+[![GitHub_tag][badge-github-tag]][badge-url-github-tag]  
+[![DOI:zenodo][badge-doi-zenodo]][badge-url-doi-zenodo]
+[![DOI:f1000][badge-doi-f1000]][badge-url-doi-f1000]
 
 :pill: **_ZARP_** - RNA-Seq analysis made easy! :syringe:
 
@@ -19,8 +21,8 @@ problem, _ZARP 'em!_**
 
 ZARP-cli uses the [HTSinfer][htsinfer] package to infer missing metadata and
 then runs the [ZARP RNA-Seq analysis pipeline][zarp] on your samples. Impress
-your colleagueswith your sudden productivity boost. Or better yet, use the time
-saved to go on that camping trip with Barry. Just make sure to guard your
+your colleagues with your sudden productivity boost. Or better yet, use the
+time saved to go on that camping trip with Barry. Just make sure to guard your
 secret! :wink:
 
 ## Basic usage
@@ -74,8 +76,8 @@ That's it - you can now use _ZARP-cli_!
 ## Documentation
 
 We have designed _ZARP-cli_ to be easy to use. However, there are still a lot
-of ways in which execution can be tweaked. For the full documentation visit:  
-<https://zavolanlab.github.io/zarp-cli>
+of ways in which execution can be tweaked. For the full documentation visit
+**<https://zavolanlab.github.io/zarp-cli>**.
 
 ## Versioning
 
@@ -102,20 +104,24 @@ by [email][contact].
 &copy; 2021 [Zavolab, Biozentrum, University of Basel][zavolab]
 
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
-[contact]: <zavolab-biozentrum@unibas.ch>
+[contact]: <mailto:zavolab-biozentrum@unibas.ch>
 [badge-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/tests.yml/badge.svg>
 [badge-coverage]: <https://codecov.io/gh/zavolanlab/zarp-cli/branch/dev/graph/badge.svg?branch=dev&token=0KQZYULZ88>
 [badge-docs]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/docs.yml/badge.svg>
+[badge-doi-zenodo]: <https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.10789818-informational>
+[badge-doi-f1000]: <https://img.shields.io/badge/F1000Research-10.12688%2Ff1000research.149237.1-informational>
 [badge-github-tag]: <https://img.shields.io/github/v/tag/zavolanlab/zarp-cli?color=C39BD3>
 [badge-license]: <https://img.shields.io/badge/license-Apache%202.0-blue.svg>
 [badge-url-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/tests.yml>
 [badge-url-coverage]: <https://codecov.io/gh/zavolanlab/zarp-cli?branch=dev>
 [badge-url-docs]: <https://zavolanlab.github.io/zarp-cli>
+[badge-url-doi-zenodo]: <https://doi.org/10.5281/zenodo.10789818>
+[badge-url-doi-f1000]: <https://doi.org/10.12688/f1000research.149237.1>
 [badge-url-github-tag]: <https://github.com/zavolanlab/zarp-cli/releases>
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [htsinfer]: <https://github.com/zavolanlab/htsinfer>
 [issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
-[mamba]: <https://github.com/mamba-org/mamba>
+[mamba]: <https://mamba.readthedocs.io/en/latest/>
 [semver]: <https://semver.org/>
 [zarp]: <https://github.com/zavolanlab/zarp>
 [zavolab]: <https://www.biozentrum.unibas.ch/research/researchgroups/overview/unit/zavolan/research-group-mihaela-zavolan/>
