@@ -224,7 +224,7 @@ preferred-citation:
     - en
   license: CC-BY-4.0
   month: 5
-  notes: Article describing the ZARP workflow and the ZARP command-line interface.
+  notes: Article describing the ZARP workflow and its command-line interface ZARP-cli.
   number: 533
   publisher:
     name: F1000 Research Ltd
