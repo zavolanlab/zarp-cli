@@ -1,0 +1,344 @@
+# This CITATION.cff file was formatted with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: ZARP-cli
+message: >-
+  Please cite this software using the metadata from
+  'preferred-citation'.
+type: software
+authors:
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Kanitz
+    given-names: Alexander
+    orcid: 'https://orcid.org/0000-0002-3468-0652'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Herrmann
+    given-names: Christina J.
+    orcid: 'https://orcid.org/0000-0003-1649-3463'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Bąk
+    given-names: Maciej
+    orcid: 'https://orcid.org/0000-0003-1361-7301'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Katsantoni
+    given-names: Maria
+    orcid: 'https://orcid.org/0000-0003-1961-0223'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Burri
+    given-names: Dominik
+    orcid: 'https://orcid.org/0000-0002-8131-9309'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Balajti
+    given-names: Máté
+    orcid: 'https://orcid.org/0009-0000-3932-3964'
+  - affiliation: 'Biozentrum, University of Basel'
+    family-names: Zavolan
+    given-names: Mihaela
+    orcid: 'https://orcid.org/0000-0002-8832-2041'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.10789818
+    description: >-
+      Collection of archived snapshots of all versions of
+      ZARP-cli
+  - type: doi
+    value: 10.5281/zenodo.10789819
+    description: >-
+      Archived snapshot of version v1.0.0-rc.1 of My
+      Research Software
+repository-code: 'https://github.com/zavolanlab/zarp-cli'
+url: 'https://zavolanlab.github.io/zarp-cli/'
+abstract: >-
+  A user-friendly command-line interface for the ZARP
+  RNA-seq analysis workflow.
+keywords:
+  - bioinformatics
+  - cli
+  - command-line-interface
+  - fair
+  - high-throughput
+  - library
+  - pipeline
+  - python
+  - reproducible-research
+  - rna-seq
+  - sequencing
+  - transcriptomics
+  - workflow
+license: Apache-2.0
+commit: 4f861767029905ae543d7eb6d9772cae457e3f00
+version: v1.0.0-rc.1
+date-released: '2024-03-06'
+contact:
+  - address: Spitalstrasse 41
+    city: Basel
+    country: CH
+    email: zavolab-biozentrum@unibas.ch
+    location: 'Biozentrum, room 08.004'
+    name: 'Zavolab, Biozentrum, University of Basel'
+    post-code: 4056
+    region: Basel-Stadt
+    website: >-
+      https://www.biozentrum.unibas.ch/research/research-groups/research-groups-a-z/overview/unit/research-group-mihaela-zavolan
+  - affiliation: 'Biozentrum, University of Basel'
+    email: alexander.kanitz@alumni.ethz.ch
+    family-names: Kanitz
+    given-names: Alexander
+    orcid: 'https://orcid.org/0000-0002-3468-0652'
+preferred-citation:
+  abstract: >-
+    BACKGROUND: RNA sequencing (RNA-seq) is a widely used technique in many
+    scientific studies. Given the plethora of models and software packages that
+    have been developed for processing and analyzing RNA-seq datasets, choosing
+    the most appropriate ones is a time-consuming process that requires an
+    in-depth understanding of the data, as well as of the principles and
+    parameters of each tool. In addition, packages designed for individual tasks
+    are developed in different programming languages and have dependencies of
+    various degrees of complexity, which renders their installation and
+    execution challenging for users with limited computational expertise.
+    Workflow languages and execution engines with support for virtualization and
+    encapsulation options such as containers and Conda environments facilitate
+    these tasks considerably. The resulting computational workflows can then be
+    reliably shared with the scientific community, enhancing reusability and the
+    reproducibility of results as individual analysis steps are becoming more
+    transparent and portable. METHODS: Here we present ZARP, a general purpose
+    RNA-seq analysis workflow that builds on state-of-the-art software in the
+    field to facilitate the analysis of RNA-seq datasets. ZARP is developed in
+    the Snakemake workflow language and can run locally or in a cluster
+    environment, generating extensive reports not only of the data but also of
+    the options utilized. It is built using modern technologies with the
+    ultimate goal to reduce the hands-on time for bioinformaticians and
+    non-expert users and serve as a template for future workflow development. To
+    this end, we also provide ZARP-cli, a dedicated command-line interface that
+    may make running ZARP on an RNA-seq library of interest as easy as executing
+    a single two-word command. CONCLUSIONS: ZARP is a powerful RNA-seq analysis
+    workflow that is easy to use even for beginners, built using best software
+    development practices, available under a permissive Open Source license and
+    open to contributions by the scientific community.
+  authors:
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Katsantoni
+      given-names: Maria
+      orcid: 'https://orcid.org/0000-0003-1961-0223'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Gypas
+      given-names: Foivos
+      orcid: 'https://orcid.org/0000-0002-7233-8794'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Herrmann
+      given-names: Christina J.
+      orcid: 'https://orcid.org/0000-0003-1649-3463'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Burri
+      given-names: Dominik
+      orcid: 'https://orcid.org/0000-0002-8131-9309'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Bąk
+      given-names: Maciej
+      orcid: 'https://orcid.org/0000-0003-1361-7301'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Iborra
+      given-names: Paula
+      orcid: 'https://orcid.org/0000-0003-0504-3029'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Agarwal
+      given-names: Krish
+      orcid: 'https://orcid.org/0000-0001-6809-5024'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Ataman
+      given-names: Meriç
+      orcid: 'https://orcid.org/0000-0002-7942-9226'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Balajti
+      given-names: Máté
+      orcid: 'https://orcid.org/0009-0000-3932-3964'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Pozzan
+      given-names: Noè
+      orcid: 'https://orcid.org/0009-0007-0466-8269'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Schlusser
+      given-names: Niels
+      orcid: 'https://orcid.org/0000-0002-3534-2153'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Moon
+      given-names: Youngbin
+      orcid: 'https://orcid.org/0009-0001-5728-3959'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Mironov
+      given-names: Aleksei
+      orcid: 'https://orcid.org/0000-0003-4228-7022'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Börsch
+      given-names: Anastasiya
+      orcid: 'https://orcid.org/0000-0003-3392-5272'
+    - affiliation: 'Biozentrum, University of Basel'
+      family-names: Zavolan
+      given-names: Mihaela
+      orcid: 'https://orcid.org/0000-0002-8832-2041'
+    - affiliation: 'Biozentrum, University of Basel'
+      country: CH
+      family-names: Kanitz
+      given-names: Alexander
+      orcid: 'https://orcid.org/0000-0002-3468-0652'
+  contact:
+    - address: Spitalstrasse 41
+      city: Basel
+      country: CH
+      email: zavolab-biozentrum@unibas.ch
+      location: 'Biozentrum, room 08.004'
+      name: 'Zavolab, Biozentrum, University of Basel'
+      post-code: 4056
+      region: Basel-Stadt
+      website: >-
+        https://www.biozentrum.unibas.ch/research/research-groups/research-groups-a-z/overview/unit/research-group-mihaela-zavolan
+    - affiliation: 'Biozentrum, University of Basel'
+      email: alexander.kanitz@unibas.ch
+      family-names: Kanitz
+      given-names: Alexander
+      orcid: 'https://orcid.org/0000-0002-3468-0652'
+    - affiliation: 'Biozentrum, University of Basel'
+      email: mihaela.zavolan@unibas.ch
+      family-names: Zavolan
+      given-names: Mihaela
+      orcid: 'https://orcid.org/0000-0002-8832-2041'
+  copyright: © 2024 Katsantoni M et al.
+  date-published: '2024-05-24'
+  department: Biozentrum
+  doi: 10.12688/f1000research.149237.1
+  institution:
+    name: University of Basel
+  issn: 2046-1402
+  journal: F1000Research
+  keywords:
+    - bioinformatics
+    - computational workflow
+    - data analysis
+    - high-throughput
+    - reproducibility
+    - RNA-seq
+    - transcriptomics
+    - usability
+  languages:
+    - en
+  license: CC-BY-4.0
+  month: 5
+  notes: Article describing the ZARP workflow and its command-line interface ZARP-cli.
+  number: 533
+  publisher:
+    name: F1000 Research Ltd
+  status: preprint
+  title: 'ZARP: A user-friendly and versatile RNA-seq analysis workflow'
+  type: article
+  url: 'https://f1000research.com/articles/13-533/v1'
+  version: 1
+  volume: 13
+  year: 2024
+references:
+  - authors:
+      - name: genomepy team
+    doi: 10.5281/zenodo.1010458
+    license: MIT
+    repository-code: 'https://github.com/vanheeringen-lab/genomepy'
+    title: genomepy
+    type: software
+    url: 'https://vanheeringen-lab.github.io/genomepy/'
+  - authors:
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Kanitz
+        given-names: Alexander
+        orcid: 'https://orcid.org/0000-0002-3468-0652'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Balajti
+        given-names: Máté
+        orcid: 'https://orcid.org/0009-0000-3932-3964'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Kandari
+        given-names: Rohan
+      - affiliation: 'Institute of Computer Science, Masaryk University'
+        family-names: Jurič
+        given-names: Boris
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Herrmann
+        given-names: Christina J.
+        orcid: 'https://orcid.org/0000-0003-1649-3463'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: How
+        given-names: Hiap Chon
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Bąk
+        given-names: Maciej
+        orcid: 'https://orcid.org/0000-0003-1361-7301'
+    license: Apache-2.0
+    repository-code: 'https://github.com/zavolanlab/htsinfer'
+    title: HTSinfer
+    type: software
+  - authors:
+      - name: Snakemake team
+    license: MIT
+    repository-code: 'https://github.com/snakemake/snakemake'
+    title: Snakemake
+    type: software
+    url: 'https://snakemake.github.io/'
+  - authors:
+      - name: SRA Tools team
+    license-url: >-
+      https://github.com/ncbi/sra-tools/blob/0cf634c2fb641cd55c6bff987c95ac669273eea9/LICENSE
+    repository-code: 'https://github.com/ncbi/sra-tools'
+    title: SRA Tools
+    type: software
+  - authors:
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Katsantoni
+        given-names: Maria
+        orcid: 'https://orcid.org/0000-0003-1961-0223'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Kanitz
+        given-names: Alexander
+        orcid: 'https://orcid.org/0000-0002-3468-0652'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Herrmann
+        given-names: Christina J.
+        orcid: 'https://orcid.org/0000-0003-1649-3463'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Burri
+        given-names: Dominik
+        orcid: 'https://orcid.org/0000-0002-8131-9309'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Gypas
+        given-names: Foivos
+        orcid: 'https://orcid.org/0000-0002-7233-8794'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Bąk
+        given-names: Maciej
+        orcid: 'https://orcid.org/0000-0003-1361-7301'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Balajti
+        given-names: Máté
+        orcid: 'https://orcid.org/0009-0000-3932-3964'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Pozzan
+        given-names: Noè
+        orcid: 'https://orcid.org/0009-0007-0466-8269'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Ataman
+        given-names: Meriç
+        orcid: 'https://orcid.org/0000-0002-7942-9226'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Zavolan
+        given-names: Mihaela
+        orcid: 'https://orcid.org/0000-0002-8832-2041'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Schlusser
+        given-names: Niels
+        orcid: 'https://orcid.org/0000-0002-3534-2153'
+      - affiliation: 'Biozentrum, University of Basel'
+        family-names: Mironov
+        given-names: Aleksei
+        orcid: 'https://orcid.org/0000-0003-4228-7022'
+    license: Apache-2.0
+    repository-code: 'https://github.com/zavolanlab/htsinfer'
+    title: ZARP
+    type: software
+    url: 'https://zavolanlab.github.io/zarp/'
