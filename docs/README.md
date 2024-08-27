@@ -86,11 +86,13 @@ Coming soon...
 
 ## Info materials
 
-### Poster
+### Posters
 
-<kbd>
-[![ZARP-cli poster](./images/poster_ZARP_cli.jpg)](https://f1000research.com/posters/12-621)  
-</kbd>
+<p float="left">
+  <a href="https://f1000research.com/posters/13-968"><img alt="ZARP poster latest" src="./images/poster_ZARP_latest.jpg" width="100" /></a>
+  &nbsp; &nbsp; &nbsp;
+  <a href="https://f1000research.com/posters/12-621"><img src="./images/poster_ZARP_cli.jpg" width="100" /></a> 
+</p>
 
 ## Reach out
 
