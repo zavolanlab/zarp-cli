@@ -1,4 +1,5 @@
 [apptainer]: <https://apptainer.org/>
+[apptainer-docs]: <https://apptainer.org/documentation/>
 [bioanalyzer]: <https://www.agilent.com/en/product/automated-electrophoresis/bioanalyzer-systems>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [contact]: <mailto:zavolab-biozentrum@unibas.ch>
@@ -8,7 +9,6 @@
 [github-signup]: <https://github.com/signup>
 [htsinfer]: <https://github.com/zavolanlab/htsinfer> 
 [kallisto]: <https://github.com/pachterlab/kallisto>
-[mamba]: <https://github.com/mamba-org/mamba>
 [salmon]: <https://github.com/COMBINE-lab/salmon>
 [snakemake]: <https://github.com/snakemake/snakemake>
 [snakemake-profiles]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>
@@ -17,6 +17,7 @@
 [zarp]: <https://github.com/zavolanlab/zarp>
 [zarp-cli]: <https://github.com/zavolanlab/zarp-cli>
 [zarp-cli-issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
+[zarp-docs]: <https://zavolanlab.github.io/zarp/>
 [zarp-issue-tracker]: <https://github.com/zavolanlab/zarp/issues>
 [zarp-qa]: <https://github.com/zavolanlab/zarp/discussions>
 [zarp-supplementary]: <https://zenodo.org/records/10797372.
