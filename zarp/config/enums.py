@@ -15,7 +15,6 @@ class DependencyEmbeddingStrategies(Enum):
 
     CONDA = "CONDA"
     APPTAINER = "APPTAINER"
-    APPTAINER = "SINGULARITY"
 
 
 class ExecModes(Enum):
