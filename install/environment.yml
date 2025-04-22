@@ -1,17 +1,20 @@
 name: zarp-cli
+channels:
+  - conda-forge
+  - bioconda
 dependencies:
-  - biconda::genomepy >=0.15.0
-  - bioconda::snakemake >=8
   - addict >=2.4.0
   - bidict >=0.22.0
   - email-validator >=1.2.1
+  - genomepy >=0.15.0
   - jsonref >=0.2
   - numpy >=1.22, <1.25
-  - pandas >=1.3.5, <1.4.0
+  - pandas >=1.3.5
   - pip >=22.1
   - pydantic >=1.9.2, <2.0.0
   - pygments >=2.8.0
   - python >=3.11
   - rich >=12.5.1
+  - snakemake >=8
   - pip:
     - -e ..
