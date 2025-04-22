@@ -1,3 +1,4 @@
+[apptainer]: <https://apptainer.org/>
 [bioanalyzer]: <https://www.agilent.com/en/product/automated-electrophoresis/bioanalyzer-systems>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [contact]: <mailto:zavolab-biozentrum@unibas.ch>
@@ -9,7 +10,6 @@
 [kallisto]: <https://github.com/pachterlab/kallisto>
 [mamba]: <https://github.com/mamba-org/mamba>
 [salmon]: <https://github.com/COMBINE-lab/salmon>
-[singularity]: <https://sylabs.io/singularity/>
 [snakemake]: <https://github.com/snakemake/snakemake>
 [snakemake-profiles]: <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>
 [sra]: <https://www.ncbi.nlm.nih.gov/sra>

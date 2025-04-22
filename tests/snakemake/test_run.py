@@ -63,7 +63,7 @@ class TestSnakemakeExecutor:
         config_file = create_config_file(dir=Path(tmpdir))
         run_config = default_run_config.copy(deep=True)
         run_config.dependency_embedding = (
-            DependencyEmbeddingStrategies.SINGULARITY
+            DependencyEmbeddingStrategies.APPTAINER
         )
         my_run = SnakemakeExecutor(
             run_config=run_config,
@@ -92,7 +92,7 @@ class TestSnakemakeExecutor:
         "dependency_embedding",
         [
             DependencyEmbeddingStrategies.CONDA,
-            DependencyEmbeddingStrategies.SINGULARITY,
+            DependencyEmbeddingStrategies.APPTAINER,
         ],
     )
     def test_compile_command_dep_embedding(self, dependency_embedding, tmpdir):

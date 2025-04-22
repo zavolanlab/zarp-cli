@@ -1,4 +1,4 @@
-"""ZARP CLI package definition."""
+"""ZARP-cli package definition."""
 
 from pathlib import Path
 
@@ -32,8 +32,7 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Utilities",
     ],

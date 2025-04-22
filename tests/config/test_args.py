@@ -123,7 +123,7 @@ class TestArgParser:
 
     @pytest.mark.parametrize(
         "test_input",
-        ["CONDA", "SINGULARITY"],
+        ["CONDA", "APPTAINER"],
     )
     def test_process_arguments_dependency_embedding(self, test_input):
         """Test method ``.process_arguments()``.
