@@ -61,10 +61,10 @@ configuration settings**:
 - **Re-run `zarp --init`**  
   Suggested defaults are now taken from the current
   contents of `~/.zarp/user.yaml`, which will then be overridden with the
-  values supplied during the interactive initialization mode
+  values supplied during the interactive initialization mode.
 - **Edit configuration file in a text editor**  
   Simply edit the `~/.zarp/user.yaml` file in a text editor; however, make sure
-  that only valid values are provided, as inputs are not checked
+  that only valid values are provided, as inputs are not checked.
 
 Additionally, there are ways in which you can **modify configuration settings
 dynamically**:
@@ -74,14 +74,14 @@ dynamically**:
   CLI parameter; this could be a copy of an old/alternative `~/.zarp/user.yaml`
   file or a subset with only some of the parameters; however, the format has
   to strictly follow that of the default configuration file in order for the
-  custom configuration file contents to take effect
+  custom configuration file contents to take effect.
 - **Setting individual CLI arguments**  
   _ZARP-cli_ provides a range of run-specific [CLI parameters](./usage.md)
   that, when specified, will override the default configuration settings for a
-  given run
-- **Setting sample-specific parameters in sample tables**
+  given run.
+- **Setting sample-specific parameters in sample tables**  
   _ZARP-cli_'s ability to process sample table allows setting of most sample-
-  specific parameters via _ZARP_ sample tables
+  specific parameters via _ZARP_ sample tables.
 
 ??? Note "Configuration setting precedence"
 
