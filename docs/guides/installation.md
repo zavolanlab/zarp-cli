@@ -70,8 +70,7 @@ In the next step, you need to install the app with its dependencies. For that
 purpose, there exist two different "environment files". Use this decision
 matrix to pick the most suitable one for you:
 
-| I want to run pre-packaged tests | Environment file to use 
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; |
+| I want to run pre-packaged tests | Environment file to use &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; |
 |:---:| --- |
 | | `install/environment.yml` |
 | :check_mark: | `install/environment.dev.yml` |
