@@ -80,10 +80,6 @@ Alexander Kanitz_
 
 [Download BibTeX citation :download: ](https://f1000research.com/articles/exportTo?versionId=163676&bibliographyReaderFormat=BIBTEX){ .md-button }
 
-## Training materials
-
-Coming soon...
-
 ## Info materials
 
 ### Posters
@@ -98,20 +94,20 @@ Coming soon...
 
 There are several ways to get in touch with us:
 
-- For ZARP usage questions, please use the [_ZARP_ Q&A forum][zarp-qa]  
-  (requires [GitHub registration][github-signup])
+- For ZARP usage questions, please use the [_ZARP_ Q&A forum][zarp-qa]
+  (requires [GitHub registration][github-signup]).
 - For feature suggestions and bug reports, please use either the
   [ZARP-cli][zarp-cli-issue-tracker] or [ZARP issue
-  tracker][zarp-issue-tracker]  
-  (require [GitHub registration][github-signup])
-- For any other requests, please reach out to us via [email][contact]
+  tracker][zarp-issue-tracker] (require [GitHub registration][github-signup]).
+- For any other requests, please reach out to us via [email][contact].
 
-!!! info "Contributors welcome!"
+## Contributing
 
-    Open source contributors are always welcome, for [_ZARP_][zarp],
-    [_ZARP-cli_][zarp-cli] or any other of the [Zavolab
-    projects][zavolab-gh]. Simply reach out by [email][contact] to schedule
-    an onboarding call.
+We always welcome and duly acknowledge open source contributors, for
+[_ZARP-cli_][zarp-cli], [_ZARP_][zarp] or any other of [our
+projects][zavolab-gh]. Simply follow our [onboarding
+instructions][contributing] and please mind our [Code of Conduct][coc]. If you
+have any questions, do not hesitate to shoot us us an [email][contact].
 
 ## Acknowledgements
 

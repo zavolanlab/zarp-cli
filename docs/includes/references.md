@@ -1,8 +1,10 @@
 [apptainer]: <https://apptainer.org/>
 [apptainer-docs]: <https://apptainer.org/documentation/>
 [bioanalyzer]: <https://www.agilent.com/en/product/automated-electrophoresis/bioanalyzer-systems>
+[coc]: <https://github.com/zavolanlab/zarp-cli/blob/dev/CODE_OF_CONDUCT.md>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [contact]: <mailto:zavolab-biozentrum@unibas.ch>
+[contributing]: <https://github.com/zavolanlab/zarp-cli/blob/dev/CONTRIBUTING.md>
 [ddbj]: <https://www.ddbj.nig.ac.jp/index-e.html>
 [ena]: <https://www.ebi.ac.uk/ena/browser/home>
 [genomepy]: <https://github.com/vanheeringen-lab/genomepy>
