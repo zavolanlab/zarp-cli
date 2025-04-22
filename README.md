@@ -75,10 +75,7 @@ of ways in which execution can be tweaked. For the full documentation visit
 ## Versioning
 
 The project adopts the [Semantic Versioning][semver] specification for
-versioning. Currently the service is still in beta stage, so the API may change
-and even break without further notice. However, we are planning to release a
-`1.0.0` release as soon as we feel that the software is reasonably stable and
-"feature complete" for all of the major use cases we wish to cover.
+versioning.
 
 ## Contributing
 
