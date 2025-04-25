@@ -51,7 +51,7 @@ class TestSampleFetcherSRA:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
         assert hasattr(sra, "records")
         assert len(sra.records.index) == 2
@@ -63,7 +63,7 @@ class TestSampleFetcherSRA:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
@@ -101,7 +101,7 @@ class TestSampleFetcherSRA:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
@@ -123,7 +123,7 @@ class TestSampleFetcherSRA:
         df = self.data.copy(deep=True)
         df_set = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
         sra.records = df_set
         assert len(sra.records.index) == 3
@@ -141,7 +141,7 @@ class TestSampleFetcherSRA:
         config_file = Path(run_dir) / "config.yaml"
         sample_table = Path(run_dir) / "samples_remote.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
         sra._configure_run(root_dir=Path(tmpdir))
         assert Path(run_dir).exists()
@@ -156,7 +156,7 @@ class TestSampleFetcherSRA:
         df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_remote.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
         sra._prepare_sample_table(sample_table=sample_table)
         assert (Path(tmpdir) / "samples_remote.tsv").exists()
@@ -167,7 +167,7 @@ class TestSampleFetcherSRA:
         df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_remote.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         sra = SRA(config=config, records=srp.records)
         sra._prepare_sample_table(sample_table=sample_table)
         with caplog.at_level(logging.DEBUG):

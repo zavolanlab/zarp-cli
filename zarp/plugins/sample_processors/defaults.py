@@ -40,7 +40,7 @@ class SampleProcessorDefaults(
             default_data[key] = [val for _ in range(len(sample_index))]
         default_df: pd.DataFrame = pd.DataFrame(default_data)
         srp: SRP = SRP()
-        srp.append(self.records)
+        srp.append_df(self.records)
         srp.update(
             df=default_df,
             anchor=self.config.run.working_directory,
