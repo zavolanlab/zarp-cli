@@ -43,7 +43,6 @@ class SampleRecordProcessor:
         """
         LOGGER.debug("Appending sample records...")
         df_sanitized = self._sanitize_df(df=df, **kwargs)
-        original_columns = self.records.columns.copy()
         self.records: pd.DataFrame = pd.concat(
             [self.records, df_sanitized],
             ignore_index=False,
