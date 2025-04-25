@@ -65,9 +65,9 @@ class SnakemakeExecutor:
         bind_paths_str: List[str]
         bind_paths_arg: str
         if self.run_config.dependency_embedding == "CONDA":
-            cmd_ls.append("--software-deployment-method conda")
+            cmd_ls.extend(["--software-deployment-method", "conda"])
         elif self.run_config.dependency_embedding == "APPTAINER":
-            cmd_ls.append("--software-deployment-method apptainer")
+            cmd_ls.extend(["--software-deployment-method", "apptainer"])
             bind_paths = [
                 self.exec_dir,
                 self.run_config.working_directory,
