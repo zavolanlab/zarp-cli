@@ -17,4 +17,5 @@ dependencies:
   - rich >=12.5.1
   - snakemake >=8
   - pip:
+    - snakemake-executor-plugin-cluster-generic >=1
     - -e ..

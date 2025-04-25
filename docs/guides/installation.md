@@ -43,6 +43,10 @@ Installation requires the following:
     Snakemake execution [profiles][snakemake-profiles] to connect _ZARP_
     runs to your HPC cluster.
 
+    Note that _ZARP-cli_ installs the Snakemake 8+ plugin
+    `snakemake-executor-plugin-cluster-generic` required for HPC cluster
+    execution by default.
+
 ## Installation steps
 
 ### 1. Clone _ZARP_

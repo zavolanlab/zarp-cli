@@ -9,7 +9,7 @@
 [ena]: <https://www.ebi.ac.uk/ena/browser/home>
 [genomepy]: <https://github.com/vanheeringen-lab/genomepy>
 [github-signup]: <https://github.com/signup>
-[htsinfer]: <https://github.com/zavolanlab/htsinfer> 
+[htsinfer]: <https://github.com/zavolanlab/htsinfer>
 [kallisto]: <https://github.com/pachterlab/kallisto>
 [salmon]: <https://github.com/COMBINE-lab/salmon>
 [snakemake]: <https://github.com/snakemake/snakemake>
@@ -22,6 +22,6 @@
 [zarp-docs]: <https://zavolanlab.github.io/zarp/>
 [zarp-issue-tracker]: <https://github.com/zavolanlab/zarp/issues>
 [zarp-qa]: <https://github.com/zavolanlab/zarp/discussions>
-[zarp-supplementary]: <https://zenodo.org/records/10797372.
+[zarp-supplementary]: <https://zenodo.org/records/10797372>
 [zavolab-gh]: <https://github.com/zavolanlab>
 [zenodo]: <https://zenodo.org/>

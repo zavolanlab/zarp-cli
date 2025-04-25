@@ -102,7 +102,10 @@ class TestSnakemakeExecutor:
         run_config.dependency_embedding = dependency_embedding
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=snakefile)
-        my_param = f"--software-deployment-method {dependency_embedding.value.lower()}"
+        my_param = (
+            "--software-deployment-method"
+            f" {dependency_embedding.value.lower()}"
+        )
         assert my_param in cmd
 
     @pytest.mark.parametrize(
