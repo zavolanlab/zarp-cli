@@ -51,7 +51,7 @@ class TestSnakemakeExecutor:
             "1",
             "--directory",
             str(my_run.exec_dir),
-            "--use-conda",
+            "--software-deployment-method conda",
         ]
         cmd = my_run.compile_command(snakefile=snakefile)
         assert all(item in cmd for item in expected_command)
@@ -102,7 +102,7 @@ class TestSnakemakeExecutor:
         run_config.dependency_embedding = dependency_embedding
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=snakefile)
-        my_param = f"--use-{dependency_embedding.value.lower()}"
+        my_param = f"--software-deployment-method {dependency_embedding.value.lower()}"
         assert my_param in cmd
 
     @pytest.mark.parametrize(
