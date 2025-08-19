@@ -3,6 +3,15 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - bioconda::bedtools
+  - bioconda::snakefmt
+  - bioconda::snakemake>=9.8
+  - bioconda::snakemake-executor-plugin-cluster-generic
+  - conda-forge::biopython
+  - conda-forge::graphviz
+  - conda-forge::pyopenssl>=23.2.0
+  - conda-forge::python>=3.11
+  - conda-forge::unzip
   - addict >=2.4.0
   - bidict >=0.22.0
   - black >=20.8b1
@@ -21,12 +30,9 @@ dependencies:
   - pygments >=2.8.0
   - pylint >=2.7.1
   - pytest >=6.2.2
-  - python >=3.11
   - python-semantic-release >=7.15.0
   - rich >=12.5.1
-  - snakemake >=8
   - types-pyyaml >=6.0.11
   - pip:
-    - snakemake-executor-plugin-cluster-generic >=1
     - -e ..
 
