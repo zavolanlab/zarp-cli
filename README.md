@@ -63,6 +63,7 @@ git clone git@github.com:zavolanlab/zarp-cli.git
 cd zarp-cli
 conda env create -f install/environment.yml
 conda activate zarp-cli
+```
 
 That's it - you can now use _ZARP-cli_!
 
