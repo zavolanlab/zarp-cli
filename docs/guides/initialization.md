@@ -41,7 +41,7 @@ The following configuration options are available.
 | `zarp_directory` | Path to the local copy of the [ZARP workflow repository][zarp] | `../zarp` relative to the location of the ZARP-cli repository |
 | `execution_mode` | Trigger a full _ZARP-cli_ run (`RUN`), a dry run (`DRY_RUN`; external tools are not actually run, only logs what _would be_ run; useful for testing) or prepare a _ZARP_ run (`PREPARE_RUN`; _ZARP-cli_ is run normally, including all external tools, up until the point of the execution of the actual _ZARP_ workflow; use to manually check metadata table before _ZARP_ execution)  | `RUN` |
 | `cores` | Number of CPU cores that Snakemake is run with when executing _ZARP_ and the auxiliary workflows (fetching libraries from [SRA][sra], inferring metadata) | `1` |
-| `dependency_embedding` | Whether Snakemake should use `CONDA` or containers (`SINGULARITY`) to manage dependencies of each workflow step/rule | `CONDA` |
+| `dependency_embedding` | Whether Snakemake should use `CONDA` or containers (`APPTAINER`) to manage dependencies of each workflow step/rule | `CONDA` |
 | `genome_assemblies_map` | A headerless 3-column semicolon-separated mapping table of organism/source trivial names (e.g., `homo_sapiens`), optional comma-separated aliases such as NCBI taxon IDs and/or organism/source short names (e.g., `7227,dmelanogaster`) and a corresponding genome assembly name (e.g., `GRCm39`); a table in the required format is shipped with _ZARP_cli_ in the the default location; it can be amended with additional aliases; note that for [`genomepy`][genomepy] to be able to pull genome annotations for organisms/sources that [HTSinfer][htsinfer] inferred, NCBI taxon ID aliases are _required_  | `./data/genome_assemblies.csv` relative to the location of the ZARP-cli repository |
 | `resources_version` | Whether to always download the latest available version of genome annotations for a given organism/source from Ensembl (enter `None`; default) or whether to use a specific version of the corresponding Ensembl database (e.g., `100`); note that the different Ensembl databases (e.g., for fungi, plants) use a different versioning scheme, so pinning a particular database version may lead to unexpected outcomes | `None` |
 | `rule_config` | A configuration file for the _ZARP_ workflow that sets specific parameters for each workflow step ("rule"); see [ZARP][zarp] documentation for details | `None` |
@@ -61,10 +61,10 @@ configuration settings**:
 - **Re-run `zarp --init`**  
   Suggested defaults are now taken from the current
   contents of `~/.zarp/user.yaml`, which will then be overridden with the
-  values supplied during the interactive initialization mode
+  values supplied during the interactive initialization mode.
 - **Edit configuration file in a text editor**  
   Simply edit the `~/.zarp/user.yaml` file in a text editor; however, make sure
-  that only valid values are provided, as inputs are not checked
+  that only valid values are provided, as inputs are not checked.
 
 Additionally, there are ways in which you can **modify configuration settings
 dynamically**:
@@ -74,14 +74,14 @@ dynamically**:
   CLI parameter; this could be a copy of an old/alternative `~/.zarp/user.yaml`
   file or a subset with only some of the parameters; however, the format has
   to strictly follow that of the default configuration file in order for the
-  custom configuration file contents to take effect
+  custom configuration file contents to take effect.
 - **Setting individual CLI arguments**  
   _ZARP-cli_ provides a range of run-specific [CLI parameters](./usage.md)
   that, when specified, will override the default configuration settings for a
-  given run
-- **Setting sample-specific parameters in sample tables**
+  given run.
+- **Setting sample-specific parameters in sample tables**  
   _ZARP-cli_'s ability to process sample table allows setting of most sample-
-  specific parameters via _ZARP_ sample tables
+  specific parameters via _ZARP_ sample tables.
 
 ??? Note "Configuration setting precedence"
 

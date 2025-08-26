@@ -2,7 +2,7 @@ name: docs
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, upgrade_ci]
   workflow_dispatch:
 
 jobs:
@@ -15,25 +15,26 @@ jobs:
 
     steps:
       - name: check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: set up Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+      - name: set up Miniforge with ZARP-cli environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.10"
-          mamba-version: "*"
+          environment-file: install/environment.dev.yml
+          miniforge-version: latest
+          conda-remove-defaults: true
+          channel-priority: strict
           auto-update-conda: true
-          activate-environment: zarp-cli
-          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
+          activate-environment: zarp-cli
 
-      - name: display environment info
+      - name: display Conda and environment info
         run: |
           conda info -a
           conda list
 
       - name: cache build artifacts
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ github.ref }}
           path: .cache

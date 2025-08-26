@@ -52,9 +52,12 @@ class SampleRunnerZARP(
             return self.records
         conf_file, _ = self._configure_run(root_dir=loc)
         bind_paths: List[Path] = list(
-            self.records.paths_1.append(self.records.paths_2)
-            .append(self.records.annotations)
-            .append(self.records.reference_sequences)
+            pd.concat([
+                self.records.paths_1,
+                self.records.paths_2,
+                self.records.annotations,
+                self.records.reference_sequences
+            ], ignore_index=True)
             .dropna()
             .unique()
         )

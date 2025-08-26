@@ -51,7 +51,12 @@ class SampleProcessorHTSinfer(
             return self.records
         conf_file, conf_content = self._configure_run(root_dir=loc)
         bind_paths: List[Path] = list(
-            self.records.paths_1.append(self.records.paths_2).dropna().unique()
+            pd.concat([
+                self.records.paths_1,
+                self.records.paths_2
+            ], ignore_index=True)
+            .dropna()
+            .unique()
         )
         executor: SnakemakeExecutor = SnakemakeExecutor(
             run_config=self.config.run,

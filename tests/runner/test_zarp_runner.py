@@ -55,7 +55,7 @@ class TestSampleRunnerZARP:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         assert hasattr(srz, "records")
         assert len(srp.records.index) == 2
@@ -73,7 +73,7 @@ class TestSampleRunnerZARP:
         sample_table = Path(run_dir) / "samples_zarp.tsv"
         index_dir = Path(tmpdir) / "indexes"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         conf_file, content = srz._configure_run(root_dir=Path(tmpdir))
         assert conf_file.exists()
@@ -99,7 +99,7 @@ class TestSampleRunnerZARP:
         df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_zarp.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         srz._prepare_sample_table(sample_table=sample_table)
         assert sample_table.exists()
@@ -109,7 +109,7 @@ class TestSampleRunnerZARP:
         config = self.config.copy(deep=True)
         df = self.data_incomplete.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         assert len(srz.records.index) == 0
         srz.records = srp.records
@@ -124,7 +124,7 @@ class TestSampleRunnerZARP:
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         df = self.data_incomplete.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         assert len(srz.records.index) == 0
         with caplog.at_level(logging.DEBUG):
@@ -139,7 +139,7 @@ class TestSampleRunnerZARP:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
@@ -165,7 +165,7 @@ class TestSampleRunnerZARP:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srz = SRZ(config=config, records=srp.records)
         df_out = srz.process(loc=outdir, workflow=workflow)
         assert len(srp.records.index) == 2

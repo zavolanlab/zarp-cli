@@ -22,8 +22,8 @@ class TestSampleRecordProcessor:
         assert hasattr(srp, "records")
         assert isinstance(srp.records, pd.DataFrame)
 
-    def test_append(self):
-        """Test `append()` function."""
+    def test_append_df(self):
+        """Test `append_df()` function."""
         srp = SRP()
         df = pd.DataFrame(
             data={
@@ -32,7 +32,7 @@ class TestSampleRecordProcessor:
                 "not_available": ["run1", "run2"],
             }
         )
-        srp.append(df, path_columns=["paths_1"])
+        srp.append_df(df, path_columns=["paths_1"])
         assert len(srp.records.index) == 2
         assert "name" in srp.records.columns
         assert "identifier" in srp.records.columns
@@ -49,10 +49,10 @@ class TestSampleRecordProcessor:
             [Path(item).is_absolute() for item in srp.records["name"].tolist()]
         )
 
-    def test_append_from_obj(self):
-        """Test `append_from_obj()` function."""
+    def test_append_obj(self):
+        """Test `append_obj()` function."""
         srp = SRP()
-        srp.append_from_obj(
+        srp.append_obj(
             samples=[
                 Sample(
                     name="sample_pe",
@@ -89,7 +89,7 @@ class TestSampleRecordProcessor:
                 "not_available": [np.nan, np.nan],
             }
         )
-        srp.append(df)
+        srp.append_df(df)
         df_short = pd.DataFrame(
             data={
                 "name": ["sample1"],
@@ -127,7 +127,7 @@ class TestSampleRecordProcessor:
                 "not_available": [np.nan, np.nan],
             }
         )
-        srp.append(df)
+        srp.append_df(df)
         df_new = pd.DataFrame(
             data={
                 "name": ["sample1", "sample2"],
@@ -158,7 +158,7 @@ class TestSampleRecordProcessor:
                 "not_available": ["na1", "na2"],
             }
         )
-        srp.append(df)
+        srp.append_df(df)
         with caplog.at_level(logging.DEBUG):
             srp.view()
         assert "sample1" in caplog.text
@@ -200,7 +200,7 @@ class TestSampleRecordProcessor:
                 "paths_1": ["path1", "path2"],
             }
         )
-        srp.append(df)
+        srp.append_df(df)
         df_same = df.copy(deep=True)
         df_same = srp._sanitize_df(df=df_same)
         with caplog.at_level(logging.WARNING):

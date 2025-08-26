@@ -51,8 +51,9 @@ zarp \
 Quick installation requires the following:
 
 - Linux with root permissions
-- [`conda >= 22.11.1`][conda]
-- [`mamba >=1.3.0`][mamba]
+- [`conda >= 24.11.3`][conda]
+- Recommended: [`apptainer >= 1.3.6`][apptainer] (only required if `APPTAINER`
+  shall be used as the dependency embedding strategy)
 
 Execute the following commands:
 
@@ -60,16 +61,9 @@ Execute the following commands:
 git clone git@github.com:zavolanlab/zarp
 git clone git@github.com:zavolanlab/zarp-cli.git
 cd zarp-cli
-mamba env create -f install/environment.root.yml
+conda env create -f install/environment.yml
 conda activate zarp-cli
 ```
-
-> If you do not have root privileges on your machine, replace the `mamba env
-> create` call with the following one:
->
-> ```sh
-> mamba env create -f install/environment.yml
-> ```
 
 That's it - you can now use _ZARP-cli_!
 
@@ -82,10 +76,7 @@ of ways in which execution can be tweaked. For the full documentation visit
 ## Versioning
 
 The project adopts the [Semantic Versioning][semver] specification for
-versioning. Currently the service is still in beta stage, so the API may change
-and even break without further notice. However, we are planning to release a
-`1.0.0` release as soon as we feel that the software is reasonably stable and
-"feature complete" for all of the major use cases we wish to cover.
+versioning.
 
 ## Contributing
 
@@ -103,6 +94,7 @@ by [email][contact].
 
 &copy; 2021 [Zavolab, Biozentrum, University of Basel][zavolab]
 
+[apptainer]: <https://apptainer.org/>
 [conda]: <https://docs.conda.io/projects/conda/en/latest/index.html>
 [contact]: <mailto:zavolab-biozentrum@unibas.ch>
 [badge-build-status]: <https://github.com/zavolanlab/zarp-cli/actions/workflows/tests.yml/badge.svg>
@@ -121,7 +113,6 @@ by [email][contact].
 [badge-url-license]: <http://www.apache.org/licenses/LICENSE-2.0>
 [htsinfer]: <https://github.com/zavolanlab/htsinfer>
 [issue-tracker]: <https://github.com/zavolanlab/zarp-cli/issues>
-[mamba]: <https://mamba.readthedocs.io/en/latest/>
 [semver]: <https://semver.org/>
 [zarp]: <https://github.com/zavolanlab/zarp>
 [zavolab]: <https://www.biozentrum.unibas.ch/research/researchgroups/overview/unit/zavolan/research-group-mihaela-zavolan/>

@@ -41,7 +41,7 @@ class TestSampleProcessorDefaults:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srd = SPD(config=config, records=srp.records)
         assert hasattr(srd, "records")
         assert len(srd.records.index) == 2
@@ -52,7 +52,7 @@ class TestSampleProcessorDefaults:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         srd = SPD(config=config, records=srp.records)
         df_out = srd.process()
         assert len(df_out.index) == 2

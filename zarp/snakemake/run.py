@@ -20,13 +20,13 @@ class SnakemakeExecutor:
         run_config: Run-specific parameters.
         exec_dir: Directory in which the run is executed.
         config_file: Path to Snakemake configuration file.
-        bind_paths: Paths to bind to Singularity container.
+        bind_paths: Paths to bind to container.
 
     Attributes:
         run_config: Run-specific parameters.
         exec_dir: Directory in which the run is executed.
         config_file: Path to Snakemake configuration file.
-        bind_paths: Paths to bind to Singularity container.
+        bind_paths: Paths to bind to container.
         run_state: State of the run.
     """
 
@@ -65,9 +65,9 @@ class SnakemakeExecutor:
         bind_paths_str: List[str]
         bind_paths_arg: str
         if self.run_config.dependency_embedding == "CONDA":
-            cmd_ls.append("--use-conda")
-        elif self.run_config.dependency_embedding == "SINGULARITY":
-            cmd_ls.append("--use-singularity")
+            cmd_ls.extend(["--software-deployment-method", "conda"])
+        elif self.run_config.dependency_embedding == "APPTAINER":
+            cmd_ls.extend(["--software-deployment-method", "apptainer"])
             bind_paths = [
                 self.exec_dir,
                 self.run_config.working_directory,
@@ -84,7 +84,7 @@ class SnakemakeExecutor:
                 item for item in bind_paths_str if item != DUMMY_DATA
             ]
             bind_paths_arg = ",".join(bind_paths_str)
-            cmd_ls.extend(["--singularity-args", f"--bind {bind_paths_arg}"])
+            cmd_ls.extend(["--apptainer-args", f"--bind {bind_paths_arg}"])
         return cmd_ls
 
     def run(self, cmd) -> None:

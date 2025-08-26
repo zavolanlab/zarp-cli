@@ -28,7 +28,7 @@ class SampleRecordProcessor:
             columns=np.array(columns_model),
         )
 
-    def append(
+    def append_df(
         self,
         df: pd.DataFrame,
         **kwargs: Any,
@@ -42,14 +42,15 @@ class SampleRecordProcessor:
             **kwargs: Keyword arguments to pass to ``_sanitize_df()``.
         """
         LOGGER.debug("Appending sample records...")
-        df = self._sanitize_df(df=df, **kwargs)
-        self.records: pd.DataFrame = self.records.append(  # type: ignore
-            df,
+        df_sanitized = self._sanitize_df(df=df, **kwargs)
+        self.records = pd.concat(
+            [self.records, df_sanitized],
+            ignore_index=False,
             verify_integrity=True,
         )[self.records.columns]
-        LOGGER.debug(f"Sample records appended: {len(df.index)}")
+        LOGGER.debug(f"Sample records appended: {len(df_sanitized.index)}")
 
-    def append_from_obj(
+    def append_obj(
         self,
         samples: Sequence[Sample],
         **kwargs: Any,
@@ -60,10 +61,10 @@ class SampleRecordProcessor:
 
         Args:
             samples: Sequence of ``Sample`` objects.
-            **kwargs: Keyword arguments to pass to ``append()``.
+            **kwargs: Keyword arguments to pass to ``append_df()``.
         """
         df = self._objects_to_df(samples=samples)
-        self.append(df=df, **kwargs)
+        self.append_df(df=df, **kwargs)
 
     def update(
         self,

@@ -12,22 +12,28 @@ jobs:
 
     steps:
       - name: check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: set up Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+      - name: set up Miniforge with ZARP-cli environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.10"
-          mamba-version: "*"
-          auto-update-conda: true
-          activate-environment: zarp-cli
           environment-file: install/environment.dev.yml
+          miniforge-version: latest
+          conda-remove-defaults: true
+          channel-priority: strict
+          auto-update-conda: true
           auto-activate-base: false
+          activate-environment: zarp-cli
 
-      - name: display environment info
+      - name: display Conda and environment info
         run: |
           conda info -a
           conda list
+
+      - name: Install Apptainer
+        uses: eWaterCycle/setup-apptainer@v2
+        with:
+          apptainer-version: 1.3.6
 
       - name: flake8
         run: flake8
@@ -43,37 +49,38 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.9', '3.10' ]
-    name: unit-testing-Python-${{ matrix.python-version }}
 
     steps:
       - name: check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: set up Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+      - name: set up Miniforge with ZARP-cli environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
-          mamba-version: "*"
+          environment-file: install/environment.dev.yml
+          miniforge-version: latest
+          conda-remove-defaults: true
+          channel-priority: strict
           auto-update-conda: true
-          activate-environment: zarp-cli
-          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
+          activate-environment: zarp-cli
 
-      - name: display environment info
+      - name: display Conda and environment info
         run: |
           conda info -a
           conda list
+
+      - name: Install Apptainer
+        uses: eWaterCycle/setup-apptainer@v2
+        with:
+          apptainer-version: 1.3.6
 
       - name: run unit tests
         run: |
           coverage run --source zarp -m pytest && coverage xml
 
       - name: submit coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
@@ -85,27 +92,23 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.9', '3.10' ]
-    name: integration-testing-Python-${{ matrix.python-version }}
 
     steps:
       - name: check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: set up Conda/Mamba
-        uses: conda-incubator/setup-miniconda@v2
+      - name: set up Miniforge with ZARP-cli environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
-          mamba-version: "*"
+          environment-file: install/environment.dev.yml
+          miniforge-version: latest
+          conda-remove-defaults: true
+          channel-priority: strict
           auto-update-conda: true
-          activate-environment: zarp-cli
-          environment-file: install/environment.dev.root.yml
           auto-activate-base: false
+          activate-environment: zarp-cli
 
-      - name: display environment info
+      - name: display Conda and environment info
         run: |
           conda info -a
           conda list

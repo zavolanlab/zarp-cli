@@ -46,7 +46,7 @@ class TestSampleProcessorGenomePy:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         spg = SPG(config=config, records=srp.records)
         assert hasattr(spg, "records")
         assert len(spg.records.index) == 2
@@ -56,7 +56,7 @@ class TestSampleProcessorGenomePy:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         spg = SPG(config=config, records=srp.records)
         genomes_dir_root = Path(tmpdir)
         return_data = []
@@ -127,7 +127,7 @@ class TestSampleProcessorGenomePy:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         spg = SPG(config=config, records=srp.records)
         spg.set_assemblies()
         assert "assembly" in spg.records.columns
@@ -140,7 +140,7 @@ class TestSampleProcessorGenomePy:
         config.run.resources_version = 50
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         spg = SPG(config=config, records=srp.records)
         spg.set_assemblies()
         genomes_dir_root = Path(tmpdir)
@@ -189,7 +189,7 @@ class TestSampleProcessorGenomePy:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         spg = SPG(config=config, records=srp.records)
         spg.set_assemblies()
         resource_paths = dict(

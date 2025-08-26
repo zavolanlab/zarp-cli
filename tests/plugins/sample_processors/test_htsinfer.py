@@ -50,7 +50,7 @@ class TestSampleProcessorHTSinfer:
         config = self.config.copy(deep=True)
         df = self.data.copy(deep=True)
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         hts = HTS(config=config, records=srp.records)
         assert hasattr(hts, "records")
         assert len(hts.records.index) == 2
@@ -62,7 +62,7 @@ class TestSampleProcessorHTSinfer:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         hts = HTS(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
@@ -99,7 +99,7 @@ class TestSampleProcessorHTSinfer:
         outdir = Path(tmpdir)
         workflow = create_snakefile(dir=outdir, name="Snakefile")
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         hts = HTS(config=config, records=srp.records)
 
         def patched_run(self, cmd) -> None:
@@ -124,7 +124,7 @@ class TestSampleProcessorHTSinfer:
         out_dir = Path(tmpdir) / "results"
         sample_table = Path(run_dir) / "samples_htsinfer.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         hts = HTS(config=config, records=srp.records)
         hts._configure_run(root_dir=Path(tmpdir))
         assert Path(run_dir).exists()
@@ -137,7 +137,7 @@ class TestSampleProcessorHTSinfer:
         df = self.data.copy(deep=True)
         sample_table = Path(tmpdir) / "samples_htsinfer.tsv"
         srp = SRP()
-        srp.append(df)
+        srp.append_df(df)
         hts = HTS(config=config, records=srp.records)
         hts._prepare_sample_table(sample_table=sample_table)
         assert (Path(tmpdir) / "samples_htsinfer.tsv").exists()

@@ -80,7 +80,7 @@ class ZARP:
 
         # instantiate sample record processor
         srp: SRP = SRP()
-        srp.append_from_obj(samples=sample_processor.samples)
+        srp.append_obj(samples=sample_processor.samples)
         srp.view()
 
         # fill defaults

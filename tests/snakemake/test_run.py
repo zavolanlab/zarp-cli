@@ -51,7 +51,8 @@ class TestSnakemakeExecutor:
             "1",
             "--directory",
             str(my_run.exec_dir),
-            "--use-conda",
+            "--software-deployment-method",
+            "conda",
         ]
         cmd = my_run.compile_command(snakefile=snakefile)
         assert all(item in cmd for item in expected_command)
@@ -63,7 +64,7 @@ class TestSnakemakeExecutor:
         config_file = create_config_file(dir=Path(tmpdir))
         run_config = default_run_config.copy(deep=True)
         run_config.dependency_embedding = (
-            DependencyEmbeddingStrategies.SINGULARITY
+            DependencyEmbeddingStrategies.APPTAINER
         )
         my_run = SnakemakeExecutor(
             run_config=run_config,
@@ -92,7 +93,7 @@ class TestSnakemakeExecutor:
         "dependency_embedding",
         [
             DependencyEmbeddingStrategies.CONDA,
-            DependencyEmbeddingStrategies.SINGULARITY,
+            DependencyEmbeddingStrategies.APPTAINER,
         ],
     )
     def test_compile_command_dep_embedding(self, dependency_embedding, tmpdir):
@@ -102,8 +103,8 @@ class TestSnakemakeExecutor:
         run_config.dependency_embedding = dependency_embedding
         my_run = SnakemakeExecutor(run_config=run_config, exec_dir=tmpdir)
         cmd = my_run.compile_command(snakefile=snakefile)
-        my_param = f"--use-{dependency_embedding.value.lower()}"
-        assert my_param in cmd
+        assert "--software-deployment-method" in cmd
+        assert dependency_embedding.value.lower() in cmd
 
     @pytest.mark.parametrize(
         "exec_mode", [ExecModes.RUN, ExecModes.DRY_RUN, ExecModes.PREPARE_RUN]
